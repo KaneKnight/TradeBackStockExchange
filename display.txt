@@ -3,5 +3,5 @@
   "currentMarketPrice" : [0-9]* /*in usd*/,
   "latestTimeStamp": iso 8601 hh:mm:ss.sss,
   /*NonEssential*/
-  
+  "highestBid": [0-9]* /*in usd*/
 }
