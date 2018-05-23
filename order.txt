@@ -1,0 +1,8 @@
+{
+  /*Essential*/
+  "orderType": "bid"/"ask",
+  "userId": [0-9]*,
+  /*NonEssential*/
+  "marketOrder": "market"/"limit",
+  "amount": [0-9]*
+}
