@@ -1,0 +1,61 @@
+body {
+  background-color: lightgray;
+  margin: 0;
+  overflow: hidden;
+}
+
+#app {
+  width: 100%; 
+  margin: 0 auto;
+}
+
+#user_interface, #market {
+  float: left;
+  height: 100%;
+  border: 1px solid white;
+}
+
+#user_interface {
+  width: 20%;
+  background-color: blue;
+  position: fixed;
+}
+
+#market {
+  width: 80%;
+  background-color: red;
+  float: right;
+}
+
+#graph, #equity_figures {
+  float: left;
+  height: 100%;
+  border: 1px solid lightgray;
+}
+
+#graph {
+  width: 70%;
+  background-color: aqua;
+}
+
+#equity_figures {
+  width: 30%;
+  background-color: burlywood;
+  float: right;
+}
+
+#display, #user_buttons {
+  float: left;
+  width: 100%;
+  border: 1px solid darkgray;
+}
+
+#display {
+  height: 85%;
+  background-color: aquamarine;
+}
+
+#user_buttons {
+  height: 15%;
+  background-color: aliceblue;
+}
