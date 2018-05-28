@@ -1,31 +1,31 @@
 package oms
 
 type Order struct {
-  int idNumber
-  bool buyOrSell
-  int shares
-  int limit
-  int entryTime
-  int eventTime
-  Order *nextOrder
-  Order *prevOrder
-  Limit *parentLimit
+  IdNumber int
+  BuyOrSell bool
+  Shares int
+  Limit int
+  EntryTime int
+  EventTime int
+  NextOrder *Order
+  PrevOrder *Order
+  ParentLimit *Limit
 }
 
 type Limit struct {
-  int limitPrice
-  int size
-  int totalVolume
-  Limit *parent
-  Limit *leftChild
-  Limit *rightChild
-  Order *headOrder
-  Order *tailOrder
+  LimitPrice int
+  Size int
+  TotalVolume int
+  Parent *Limit
+  LeftChild *Limit
+  RightChild *Limit
+  HeadOrder *Order
+  TailOrder *Order
 }
 
 type Book struct {
-  Limit *buyTree
-  Limit *sellTree
-  Limit *lowestSell
-  Limit *highestBuy
+  BuyTree *Limit
+  SellTree *Limit
+  LowestSell *Limit
+  HighestBuy *Limit
 }
