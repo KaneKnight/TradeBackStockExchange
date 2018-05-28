@@ -1,0 +1,4 @@
+{
+    /* Price seller is asking for.*/
+    "priceToSellAt": [0-9]*
+}

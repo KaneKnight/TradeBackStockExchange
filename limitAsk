@@ -1,0 +1,4 @@
+{
+    /* Min price seller will accept, any lower price will not be accepted.*/
+    "minimumWillingPriceToSell": [0-9]*
+}
