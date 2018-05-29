@@ -1,3 +1,7 @@
+html {
+  min-width: 600px;
+}
+
 body {
   font-family: "Lato", sans-serif;
   font-size: 18px;
@@ -18,17 +22,17 @@ h1 {
 #user_interface, #market {
   float: left;
   height: 100%;
-  border: 1px solid white;
+  border: 1px solid black;
 }
 
 #user_interface {
-  width: 20%;
+  width: 15%;
   background-color: blue;
   position: fixed;
 }
 
 #market {
-  width: 80%;
+  width: 85%;
   background-color: red;
   float: right;
 }
@@ -36,16 +40,17 @@ h1 {
 #graph, #equity_figures {
   float: left;
   height: 100%;
-  border: 1px solid lightgray;
+  border: 1px solid white;
 }
 
 #graph {
-  width: 70%;
+  width: 65%;
   background-color: aqua;
+  position: fixed;
 }
 
 #equity_figures {
-  width: 30%;
+  width: 35%;
   background-color: burlywood;
   float: right;
 }
@@ -53,7 +58,7 @@ h1 {
 #display, #user_buttons {
   float: left;
   width: 100%;
-  border: 1px solid darkgray;
+  border: 1px solid black;
 }
 
 #display {
@@ -64,4 +69,52 @@ h1 {
 #user_buttons {
   height: 15%;
   background-color: aliceblue;
+}
+
+#graph_display {
+  background-color: white;
+  width: 94%;
+  height: 94%;
+  margin-left: 3%;
+  margin-top: 3%;
+}
+
+#graph_display_canvas{
+  width: 100%;
+  height: 100%;
+}
+
+#buy, #sell {
+  padding: 16px 40px;
+  transition-duration: 0.4s;
+  color:white;
+  border-radius: 4px;
+}
+
+#buy {
+  background-color: lightgreen;
+  border: 2px solid lightgreen;
+  margin-left: 10%;
+}
+
+#buy:hover {
+  color: black;
+  background-color: white;
+}
+
+#sell {
+  background-color: darkgreen;
+  border: 2px solid darkgreen;
+  float: right;
+  margin-right: 10%;
+}
+
+#sell:hover {
+  color: black;
+  background-color: white;
+}
+
+#navigation {
+  height: 50%;
+  background-color: blueviolet;
 }
