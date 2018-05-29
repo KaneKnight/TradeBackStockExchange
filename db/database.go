@@ -10,22 +10,22 @@ import (
 
 
 var schema = `
-create table transaction (
-    transactionId serial,
+create table transactionTable (
     buyerId integer,
     sellerId integer,
     ticker text,
     amountTraded integer,
-    cashTraded float(64)
+    cashTraded float(53),
+    timeOfTrade timestamp
 );
 
-create table user (
+create table userTable (
     userId serial,
     userName text,
     userPasswordHash text
 );
 
-create table company (
+create table companyTable (
     ticker text,
     name text
 );`
@@ -38,18 +38,23 @@ type DataBase struct {
     Port int
 }
 
+type User struct {
+  UserId int              `db:"userId"`
+  UserName string         `db:"userName"`
+  UserPasswordHash string `db:"userPasswordHash"`
+}
+
 type Transaction struct {
-    TransactionId int
-    BuyerId int
-    SellerId int
-    EquityTicker string
-    AmountTraded int
-    CashTraded  float64
-    TimeOfTrade time.Time
+    BuyerId int           `db:"buyerId"`
+    SellerId int          `db:"sellerId"`
+    Ticker string         `db:"ticker"`
+    AmountTraded int      `db:"amountTraded"`
+    CashTraded  float64   `db:"cashTraded"`
+    TimeOfTrade time.Time `db:"timeOfTrade"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
- * sqlx database object.*/
+ * sqlx database struct. Opens a connection to the database.*/
 func (db DataBase) openDataBase() (*sqlx.DB, error) {
     connStr := fmt.Sprintf(`user=%s password=%s dbname=%s sslmode=%s port=%d`,
                            db.User,
@@ -57,18 +62,39 @@ func (db DataBase) openDataBase() (*sqlx.DB, error) {
                            db.Name,
                            db.Sslmode,
                            db.Port)
-    fmt.Println(connStr)
     return sqlx.Open("postgres", connStr)
 }
 
-/* 5 args, takes fields of Transaction struct */
-func (db *sqlx.DB) insertTransaction(buyerId int,
-                                     sellerId int,
-                                     ticker string,
-                                     amountTraded int,
-                                     cash float64,
-                                     timeOfTrade time.Time) {
-    db
+/* 6 args, first is the sqlx database struct pointer and the rest are
+ * the fields of Transaction struct, returns void. Inserts a transaction
+ * into the database.*/
+func insertTransaction(db *sqlx.DB,
+                       buyerId int,
+                       sellerId int,
+                       ticker string,
+                       amountTraded int,
+                       cash float64,
+                       timeOfTrade time.Time) {
+    ax := db.MustBegin()
+    ax.MustExec(`insert into transactionTable (buyerId, sellerId,
+                                          ticker, amountTraded,
+                                          cashTraded, timeOfTrade)
+                                          values ($1, $2, $3, $4, $5, $6)`,
+                                          buyerId, sellerId,  ticker,
+                                          amountTraded, cash, timeOfTrade)
+    ax.Commit()
+}
+
+
+/* 3 args, first is the sqlx database struct pointer, the second is
+ * the username and the last is the password hash.*/
+func createUser(db *sqlx.DB,
+                userName string,
+                userPasswordHash string) {
+    ax := db.MustBegin()
+    ax.MustExec(`insert into userTable (userName, userPasswordHash)
+                 values ($1, $2)`, userName, userPasswordHash)
+    ax.Commit()
 }
 
 func main() {
@@ -84,13 +110,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-  trades := []Transaction{}
-  err = db.Select(&trades, "SELECT * FROM transactions")
+  users := []User{}
+  err = db.Select(&users, "select * from userTable")
     if err != nil {
         fmt.Println(err)
         return
     }
-  for _, trade := range trades {
-    fmt.Printf("time: %s\n", trade.TimeOfTrade.Format("2006-01-02T15:04:05Z07:00.000"))
+  for _, user := range users {
+    fmt.Printf("name: %s\n", user.UserName)
   }
 }
