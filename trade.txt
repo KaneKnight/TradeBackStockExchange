@@ -1,0 +1,29 @@
+{
+    /* Buyer id.*/
+    "buyerId": [0-9]*,
+
+    /* Buyer username.*/
+    "buyerName": [a-z, 0-9]*,
+
+    /* Seller id*/
+    "sellerId": [0-9]*,
+
+    /* Seller username*/
+    "sellerName": [a-z, 0-9]*,
+
+    /* Equity traded.*/
+    "equityTicker": any valid ticker,
+
+    /* Amount traded. */
+    "amountTraded": [0-9]*,
+
+    /* Capital Exchanged */
+    "cashTraded": [0-9]*,
+
+    /* Price per share.*/
+    "pricePerShare": [0-9]*,
+
+    /* Time of trade in usual format. Time is the time where we matched
+     *a buyer and seller, not when the user clicked.*/
+    "timeOfTrade": iso iso 8601 hh:mm:ss.sss
+}

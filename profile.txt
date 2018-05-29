@@ -1,0 +1,13 @@
+{
+    /* Username of the user.*/
+    "name": [a-z,0-9]*,
+
+    /* User id*/
+    "id": [0-9]*,
+
+    /* List of trade json objects. See trade.txt.*/
+    "trades": array of json trades.
+
+    /* List of position json objects. See position.txt.*/
+    "positions": array of json positions.
+}
