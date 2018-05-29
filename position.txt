@@ -1,0 +1,13 @@
+{
+    /* Equity that user owns.*/
+    "equityTicker": any valid ticker,
+
+    /* Amount of shares owned.*/
+    "numberOfSharesOwned": [0-9]*,
+
+    /* Current value of position at current market price.*/
+    "valueOfPosition": [0-9]*,
+
+    /* Percentage gain/loss on position.*/
+    "percentageGain": [0-9]*
+}

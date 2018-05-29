@@ -1,0 +1,34 @@
+{
+  /* Timestamp used for graphing.
+   * Hours, minutes, seconds, fraction of second to 3dp.*/
+  "latestTimeStamp": iso 8601 hh:mm:ss.sss,
+
+  /* Equity info*/
+  "ticker": any valid ticker,
+  "name": name of company
+
+  /* Market price, ie lowest ask.*/
+  "currentMarketPrice" : [0-9]*,
+
+  /* Highest bid price,
+   * to show a line on the graph for to show bid ask spread.*/
+  "highestBid": [0-9]*,
+
+  /* Volatility of equity. Maybe not use.*/
+  "volatility": [0-9]*,
+
+  /* Lowest price of the day.*/
+  "dayMinimum": [0-9]*,
+
+  /* Highest price of the day.*/
+  "dayMaximum": [0-9]*,
+
+  /* Opening price of the day.*/
+  "open": [0-9]*,
+
+  /* Closing price of the day.*/
+  "close": [0-9]*
+
+  /* 30 day moving average.*/
+  "movingAverage": [0-9]*
+}
