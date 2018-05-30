@@ -39,18 +39,18 @@ type DataBase struct {
 }
 
 type User struct {
-  UserId int              `db:"userId"`
-  UserName string         `db:"userName"`
-  UserPasswordHash string `db:"userPasswordHash"`
+  UserId int              `db:"userid"`
+  UserName string         `db:"username"`
+  UserPasswordHash string `db:"userpasswordhash"`
 }
 
 type Transaction struct {
-    BuyerId int           `db:"buyerId"`
-    SellerId int          `db:"sellerId"`
+    BuyerId int           `db:"buyerid"`
+    SellerId int          `db:"sellerid"`
     Ticker string         `db:"ticker"`
-    AmountTraded int      `db:"amountTraded"`
-    CashTraded  float64   `db:"cashTraded"`
-    TimeOfTrade time.Time `db:"timeOfTrade"`
+    AmountTraded int      `db:"amounttraded"`
+    CashTraded  float64   `db:"cashtraded"`
+    TimeOfTrade time.Time `db:"timeoftrade"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -85,6 +85,17 @@ func insertTransaction(db *sqlx.DB,
     ax.Commit()
 }
 
+func getAllTransactionsOfUser(db *sqlx.DB,
+                              userId int) []Transaction {
+    transactions := []Transaction{}
+    err := db.Select(&transactions, `select * from transactionTable
+                             where buyerId=$1 or sellerId=$1`, userId)
+    if (err != nil) {
+      log.Fatalln(err)
+    }
+    return transactions
+}
+
 
 /* 3 args, first is the sqlx database struct pointer, the second is
  * the username and the last is the password hash.*/
@@ -94,6 +105,15 @@ func createUser(db *sqlx.DB,
     ax := db.MustBegin()
     ax.MustExec(`insert into userTable (userName, userPasswordHash)
                  values ($1, $2)`, userName, userPasswordHash)
+    ax.Commit()
+}
+/* 2 args, first is the sqlx database struct pointer, the second is
+ * the userId of the user you wish to remove.*/
+func removeUser(db *sqlx.DB,
+                userId int) {
+    ax := db.MustBegin()
+    ax.MustExec(`delete from userTable
+                 where userId=$1`, userId)
     ax.Commit()
 }
 
@@ -110,13 +130,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-  users := []User{}
-  err = db.Select(&users, "select * from userTable")
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
-  for _, user := range users {
-    fmt.Printf("name: %s\n", user.UserName)
+
+  transactions := getAllTransactionsOfUser(db, 1)
+  for _, transaction := range transactions {
+    fmt.Printf("ticker: %s\n", transaction.Ticker)
   }
 }
