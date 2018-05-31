@@ -1,18 +1,22 @@
 package oms
 
 import (
-  "fmt"
+  //"fmt"
   "net/http"
-  "encoding/json"
-  "errors"
-  "github.com/gin-gonic/contrib/static"
+  //"encoding/json"
+  //"errors"
+  //"strconv"
+  //"github.com/gin-gonic/contrib/static"
   "github.com/gin-gonic/gin"
 )
 
-func askHandler(c *gin.Context) {
-
+func AskHandler(c *gin.Context) {
+  //params := c.Params
+  //userId, _ := strconv.Atoi(params.ByName("userId"))
+  //c.Header("Content-Type", "application/json")
+  c.JSON(http.StatusOK, "Hi Louis")
 }
 
-func bidHandler(c *gin.Context) {
+func BidHandler(c *gin.Context) {
 
 }

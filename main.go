@@ -9,9 +9,9 @@ import (
   "os"
   jwtmiddleware "github.com/auth0/go-jwt-middleware"
   jwt "github.com/dgrijalva/jwt-go"
-  "github.com/gin-gonic/contrib/static"
+  "github.com/gin-contrib/static"
   "github.com/gin-gonic/gin"
-  //"github.com/louiscarteron/WebApps2018/oms"
+  "github.com/louiscarteron/WebApps2018/oms"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -66,15 +66,19 @@ func main() {
   //Set default router
   router := gin.Default()
 
-  //Serve frontend static files
-  router.Use(static.Serve("/", static.LocalFile("./web", true)))
+  router.LoadHTMLGlob("web/*.html")
+  router.Use(static.Serve("/", static.LocalFile("./web", false)))
+
+  router.GET("/", func(c *gin.Context){
+    c.HTML(http.StatusOK, "index.html", nil)
+  })
 
   //Set up API routing
-  //api := router.Group("/api")
+  api := router.Group("/api")
 
   //TODO:Add /bid:params and /ask/:params
-  //api.POST("/bid", authMiddleWare, oms.bidHandler);
-  //api.POST("/ask", authMiddleWare, oms.askHandler);
+  api.POST("/bid", oms.BidHandler);
+  api.POST("/ask", oms.AskHandler);
 
   //run on default port 8080
   router.Run()

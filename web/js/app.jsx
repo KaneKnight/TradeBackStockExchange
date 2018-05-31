@@ -29,7 +29,7 @@ class Main extends React.Component {
       "http://localhost:8080/api/" + url_type,
       dummy_data,
       res => {
-        console.log("Success");
+        console.log(res);
       }
     );
   }
