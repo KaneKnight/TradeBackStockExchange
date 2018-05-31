@@ -118,3 +118,7 @@ h1 {
   height: 50%;
   background-color: blueviolet;
 }
+
+.svg-plot, .canvas-plot {
+  position: absolute;
+}
