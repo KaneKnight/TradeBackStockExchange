@@ -1,9 +1,26 @@
 {
-  /*Essential*/
-  "orderType": "bid"/"ask",
+  /* User who placed order.*/
   "userId": [0-9]*,
+
+  /* Time order placed at. Hours, minutes, seconds,
+   * fraction of seconds to 3 dp.*/
+  "orderTime": iso 8601 hh:mm:ss.sss,
+
+  /* Equity subject to order.*/
   "equityTicker": any valid ticker,
-  /*NonEssential*/
-  "marketOrder": "market"/"limit",
-  "amount": [0-9]*
+
+  /* Assume 1 for beginning.*/
+  "amount": [0-9]*,
+
+  /* Identifies whether order is market or limit order.
+   * Market bid order buys the lowest ask.
+   * Market ask order is accompanied by the priceToSellAt.
+   * Limit bid order specifies maximum willing price to buy at.
+   * Limit ask order specifies minimum willing price to sell at.*/
+  "orderType": "marketBid"/"marketAsk"/"limitBid"/"limitAsk",
+
+   /* Order type specific data.
+    * Contains a json object with data specific to each type of order. */
+  "orderData": Any of the 4 specified json objects.
+
 }
