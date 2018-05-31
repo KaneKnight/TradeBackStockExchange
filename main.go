@@ -12,6 +12,7 @@ import (
   "github.com/gin-contrib/static"
   "github.com/gin-gonic/gin"
   "github.com/louiscarteron/WebApps2018/oms"
+  "github.com/louiscarteron/WebApps2018/db"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -62,6 +63,14 @@ func main() {
 
   //Assign global jwtMiddleWare
   jwtMiddleWare = jwtMiddleWare_temp
+
+  dbConfig := db.DataBase{
+    "g1727122_u",
+    "PTqnydAPoe",
+    "g1727122_u",
+    "require",
+    5432}
+  oms.InitDB(dbConfig)
 
   //Set default router
   router := gin.Default()

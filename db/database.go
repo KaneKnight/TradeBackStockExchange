@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
     "fmt"
@@ -71,7 +71,7 @@ type Position struct {
 
 /* No args, called on the DataBase struct and returns a pointer to
  * sqlx database struct. Opens a connection to the database.*/
-func (db DataBase) openDataBase() (*sqlx.DB, error) {
+func (db DataBase) OpenDataBase() (*sqlx.DB, error) {
     connStr := fmt.Sprintf(`user=%s password=%s dbname=%s sslmode=%s port=%d`,
                            db.User,
                            db.Password,
@@ -84,7 +84,7 @@ func (db DataBase) openDataBase() (*sqlx.DB, error) {
 /* 6 args, first is the sqlx database struct pointer and the rest are
  * the fields of Transaction struct, returns void. Inserts a transaction
  * into the database.*/
-func insertTransaction(db *sqlx.DB,
+func InsertTransaction(db *sqlx.DB,
                        buyerId int,
                        sellerId int,
                        ticker string,
@@ -104,7 +104,7 @@ func insertTransaction(db *sqlx.DB,
 /* 2 args, the sqlx database struct pointer and the userId of the user
  * which we want to retrieve the transactions for. Returns an array of
  * transaction struct.*/
-func getAllTransactionsOfUser(db *sqlx.DB,
+func GetAllTransactionsOfUser(db *sqlx.DB,
                               userId int) []Transaction {
     transactions := []Transaction{}
     err := db.Select(&transactions, `select * from transactionTable
@@ -118,7 +118,7 @@ func getAllTransactionsOfUser(db *sqlx.DB,
 /* 4 args, sqlx database pointer, userId of user requesting sale, ticker of
  * proposed sale and the amount of shares requested to sell. Will return
  * true if user has the required amount, false if not.*/
-func userCanSellAmountOfShares(db *sqlx.DB,
+func UserCanSellAmountOfShares(db *sqlx.DB,
                               userId int,
                               ticker string,
                               requestedAmount int) bool {
@@ -136,7 +136,7 @@ func userCanSellAmountOfShares(db *sqlx.DB,
 
 /* 3 args, sqlx database pointer, userId and the price of the requested sale,
  * returns true if user has enough cash to buy.*/
-func userCanBuyAmountRequested(db *sqlx.DB,
+func UserCanBuyAmountRequested(db *sqlx.DB,
                                userId int,
                                priceOfSale float64) bool {
     var userCash float64
@@ -151,12 +151,12 @@ func userCanBuyAmountRequested(db *sqlx.DB,
 
 /* 2 args, the sqlx database struct pointer and the transaction that
  * we need to update the positons of the buyer and the seller.*/
-func updatePositionOfUsersFromTransaction(db *sqlx.DB,
+func UpdatePositionOfUsersFromTransaction(db *sqlx.DB,
                                           t Transaction) {
      ax := db.MustBegin()
-     updateBuyerPosition(db, ax, t.BuyerId, t.Ticker,
+     UpdateBuyerPosition(db, ax, t.BuyerId, t.Ticker,
                          t.AmountTraded, t.CashTraded)
-     updateSellerPosition(db, ax, t.SellerId, t.Ticker,
+     UpdateSellerPosition(db, ax, t.SellerId, t.Ticker,
                           t.AmountTraded, t.CashTraded)
      err := ax.Commit()
      if (err != nil) {
@@ -167,7 +167,7 @@ func updatePositionOfUsersFromTransaction(db *sqlx.DB,
 /* 6 args, the sqlx pointers, sellerId, ticker followed by the amount of
  * shares traded and the cash exchanged. Will check if user has had the
  * position before and if not will create a new positon, then updates cash.*/
-func updateBuyerPosition(db *sqlx.DB,
+func UpdateBuyerPosition(db *sqlx.DB,
                          ax *sqlx.Tx,
                          buyerId int,
                          ticker string,
@@ -181,26 +181,26 @@ func updateBuyerPosition(db *sqlx.DB,
       log.Fatalln(err)
    }
    if (numberOfPositions == 0) {
-       createNewPosition(ax, buyerId, ticker, amountTraded, cashTraded)
+       CreateNewPosition(ax, buyerId, ticker, amountTraded, cashTraded)
    } else {
-       updatePosition(ax, buyerId, ticker, amountTraded, cashTraded)
+       UpdatePosition(ax, buyerId, ticker, amountTraded, cashTraded)
    }
    //Minus may not recognise.
-   updateUserCash(ax, buyerId, -cashTraded)
+   UpdateUserCash(ax, buyerId, -cashTraded)
 }
 
 /* 6 args, the sqlx pointers, sellerId, ticker followed by the amount of
  * shares traded and the cash exchanged. Will update the postion of the
  * seller in the database and also change the cash the user has in the
  * user table.*/
-func updateSellerPosition(db *sqlx.DB,
+func UpdateSellerPosition(db *sqlx.DB,
                           ax *sqlx.Tx,
                           sellerId int,
                           ticker string,
                           amountTraded int,
                           cashTraded float64) {
-    updatePosition(ax, sellerId, ticker, -amountTraded, -cashTraded)
-    updateUserCash(ax, sellerId, cashTraded)
+    UpdatePosition(ax, sellerId, ticker, -amountTraded, -cashTraded)
+    UpdateUserCash(ax, sellerId, cashTraded)
 }
 
 /* 5 args, sqlx transaction struct pointer, then the userId and the ticker,
@@ -208,7 +208,7 @@ func updateSellerPosition(db *sqlx.DB,
  * negative means sold. Creates a new entry for positions users have never,
  * taken before. IMPORTANT: POSITIONS THAT USERS TAKE ARE NOT DELETED
  * WHEN ALL OF THE SHARES ARE SOLD.*/
-func createNewPosition(ax *sqlx.Tx,
+func CreateNewPosition(ax *sqlx.Tx,
                        userId int,
                        ticker string,
                        amountTraded int,
@@ -226,7 +226,7 @@ func createNewPosition(ax *sqlx.Tx,
 /* 5 args, sqlx transaction struct pointer, then the userId and the ticker,
  * followed by the amount the user bought or sold. Positive means bought,
  * negative means sold. Updates position that already exists.*/
-func updatePosition(ax *sqlx.Tx,
+func UpdatePosition(ax *sqlx.Tx,
                     userId int,
                     ticker string,
                     amountTraded int,
@@ -244,7 +244,7 @@ func updatePosition(ax *sqlx.Tx,
 /* 3 args, the sqlx transaction object pointer, the userId of the user
  * which we want to update their cash and the difference in cash which
  * may be negative.*/
-func updateUserCash(ax *sqlx.Tx,
+func UpdateUserCash(ax *sqlx.Tx,
                     userId int,
                     cashTraded float64) {
     ax.MustExec(`update userTable
@@ -256,7 +256,7 @@ func updateUserCash(ax *sqlx.Tx,
 
 /* 3 args, first is the sqlx database struct pointer, the second is
  * the username and the last is the password hash.*/
-func createUser(db *sqlx.DB,
+func CreateUser(db *sqlx.DB,
                 userName string,
                 userPasswordHash string,
                 startingCash float64) {
@@ -269,14 +269,14 @@ func createUser(db *sqlx.DB,
 /* 2 args, first is the sqlx database struct pointer, the second is
  * the userId of the user you wish to remove. TODO: DELETE POSITIONS FROM
  * DATABASE.*/
-func removeUser(db *sqlx.DB,
+func RemoveUser(db *sqlx.DB,
                 userId int) {
     ax := db.MustBegin()
     ax.MustExec(`delete from userTable
                  where userId=$1`, userId)
     ax.Commit()
 }
-
+/*
 func main() {
   database := DataBase{"g1727122_u",
      "PTqnydAPoe",
@@ -284,19 +284,20 @@ func main() {
      "require",
      5432}
 
-  db, err := database.openDataBase()
+  db, err := database.OpenDataBase()
 
   if err != nil {
 		log.Fatal(err)
 	}
-  /*t := time.Now()
+  t := time.Now()
   transaction := Transaction{
     1,
     2,
     "AAPL",
     3,
     300,
-    t}*/
-  canBuy := userCanBuyAmountRequested(db, 1, 1001)
+    t}
+  canBuy := UserCanBuyAmountRequested(db, 1, 1001)
   fmt.Println(canBuy)
-}
+}*/
+
