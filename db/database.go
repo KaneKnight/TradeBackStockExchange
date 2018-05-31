@@ -19,10 +19,18 @@ create table transactionTable (
     timeOfTrade timestamp
 );
 
+create table positionTable (
+    userId integer,
+    ticker text,
+    amount integer,
+    initialCashInvestment float(53)
+);
+
 create table userTable (
     userId serial,
     userName text,
-    userPasswordHash text
+    userPasswordHash text,
+    userCash float(53)
 );
 
 create table companyTable (
@@ -42,6 +50,7 @@ type User struct {
   UserId int              `db:"userid"`
   UserName string         `db:"username"`
   UserPasswordHash string `db:"userpasswordhash"`
+  UserCash float64        `db:"usercash"`
 }
 
 type Transaction struct {
@@ -51,6 +60,13 @@ type Transaction struct {
     AmountTraded int      `db:"amounttraded"`
     CashTraded  float64   `db:"cashtraded"`
     TimeOfTrade time.Time `db:"timeoftrade"`
+}
+
+type Position struct {
+  UserId int                    `db:userid`
+  Ticker string                 `db:ticker`
+  Amount int                    `db:amount`
+  InitialCashInvestment float64 `db:initialcashinvestment`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -85,6 +101,9 @@ func insertTransaction(db *sqlx.DB,
     ax.Commit()
 }
 
+/* 2 args, the sqlx database struct pointer and the userId of the user
+ * which we want to retrieve the transactions for. Returns an array of
+ * transaction struct.*/
 func getAllTransactionsOfUser(db *sqlx.DB,
                               userId int) []Transaction {
     transactions := []Transaction{}
@@ -96,15 +115,21 @@ func getAllTransactionsOfUser(db *sqlx.DB,
     return transactions
 }
 
+func updatePositionOfUsers(db *sqlx.Db,
+                           t Transaction) {
+
+}
+
 
 /* 3 args, first is the sqlx database struct pointer, the second is
  * the username and the last is the password hash.*/
 func createUser(db *sqlx.DB,
                 userName string,
-                userPasswordHash string) {
+                userPasswordHash string,
+                startingCash float64) {
     ax := db.MustBegin()
-    ax.MustExec(`insert into userTable (userName, userPasswordHash)
-                 values ($1, $2)`, userName, userPasswordHash)
+    ax.MustExec(`insert into userTable (userName, userPasswordHash, userCash)
+                 values ($1, $2, $3)`, userName, userPasswordHash, startingCash)
     ax.Commit()
 }
 /* 2 args, first is the sqlx database struct pointer, the second is
