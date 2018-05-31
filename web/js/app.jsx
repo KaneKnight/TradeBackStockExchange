@@ -14,12 +14,12 @@ class Main extends React.Component {
   }
 
   buy() {
-    var dummy_data_buy = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : AAPL, "AmountTraded" : 42, "CashTraded" : 420};
+    var dummy_data_buy = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : "AAPL", "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
-    var dummy_data_sell = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : AAPL, "AmountTraded" : 42, "CashTraded" : 420};
+    var dummy_data_sell = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : "AAPL", "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
@@ -29,7 +29,8 @@ class Main extends React.Component {
       "http://localhost:8080/api/" + url_type,
       dummy_data,
       res => {
-        console.log(res);
+        window.alert("Transaction completed at time:" + res);
+        //console.log(res);
       }
     );
   }

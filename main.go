@@ -64,11 +64,11 @@ func main() {
   //Assign global jwtMiddleWare
   jwtMiddleWare = jwtMiddleWare_temp
 
-  dbConfig := db.DataBase{
+  dbConfig := db.DBConfig{
+    "db.doc.ic.ac.uk",
     "g1727122_u",
     "PTqnydAPoe",
     "g1727122_u",
-    "require",
     5432}
   oms.InitDB(dbConfig)
 

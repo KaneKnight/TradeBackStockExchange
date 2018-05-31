@@ -1,12 +1,13 @@
 package oms
 
 import (
-  //"fmt"
+  "fmt"
   "net/http"
   //"encoding/json"
   //"errors"
   //"strconv"
   //"github.com/gin-gonic/contrib/static"
+  "time"
   "github.com/gin-gonic/gin"
   "github.com/louiscarteron/WebApps2018/db"
   "github.com/jmoiron/sqlx"
@@ -14,17 +15,25 @@ import (
 
 var database *sqlx.DB
 
-func InitDB(config db.DataBase) {
-  database, _ = config.OpenDataBase()
+func InitDB(config db.DBConfig) {
+  database = config.OpenDataBase()
 }
 
-type test struct{
-  UserId int `json:"userId"`
-}
 func AskHandler(c *gin.Context) {
-  var testJSON test
-  c.BindJSON(&testJSON)
-  c.JSON(http.StatusOK, testJSON)
+  var transaction db.Transaction
+  c.BindJSON(&transaction)
+
+  transaction.TimeOfTrade = time.Now()
+
+  db.InsertTransaction(database, transaction)
+
+  transactions := db.GetAllTransactionsOfUser(database, 101)
+  fmt.Println(transactions)
+  fmt.Println("")
+  fmt.Println("SIZE OF TRANSACTION TABLE:", len(transactions))
+  fmt.Println("")
+
+  c.JSON(http.StatusOK, transaction.TimeOfTrade)
 }
 
 func BidHandler(c *gin.Context) {

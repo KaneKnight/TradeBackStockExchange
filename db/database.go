@@ -38,12 +38,12 @@ create table companyTable (
     name text
 );`
 
-type DataBase struct {
-    User string
+type DBConfig struct {
+    Host     string
+    User     string
     Password string
-    Name string
-    Sslmode string
-    Port int
+    Name     string
+    Port     int
 }
 
 type User struct {
@@ -71,12 +71,12 @@ type Position struct {
 
 /* No args, called on the DataBase struct and returns a pointer to
  * sqlx database struct. Opens a connection to the database.*/
-func (db DataBase) openDataBase() (*sqlx.DB) {
-    connStr := fmt.Sprintf(`user=%s password=%s dbname=%s sslmode=%s port=%d`,
+ func (db DBConfig) OpenDataBase() (*sqlx.DB) {
+    connStr := fmt.Sprintf(`host=%s user=%s password=%s dbname=%s port=%d`,
+                           db.Host,
                            db.User,
                            db.Password,
                            db.Name,
-                           db.Sslmode,
                            db.Port)
     return sqlx.MustConnect("postgres", connStr)
 }
@@ -84,20 +84,14 @@ func (db DataBase) openDataBase() (*sqlx.DB) {
 /* 6 args, first is the sqlx database struct pointer and the rest are
  * the fields of Transaction struct, returns void. Inserts a transaction
  * into the database.*/
-func InsertTransaction(db *sqlx.DB,
-                       buyerId int,
-                       sellerId int,
-                       ticker string,
-                       amountTraded int,
-                       cash float64,
-                       timeOfTrade time.Time) {
+func InsertTransaction(db *sqlx.DB, t Transaction) {
     ax := db.MustBegin()
     ax.MustExec(`insert into transactionTable (buyerId, sellerId,
                                           ticker, amountTraded,
-                                          cashTraded, timeOfTrade)delete
+                                          cashTraded, timeOfTrade)
                                           values ($1, $2, $3, $4, $5, $6)`,
-                                          buyerId, sellerId,  ticker,
-                                          amountTraded, cash, timeOfTrade)
+                                          t.BuyerId, t.SellerId,  t.Ticker,
+                                          t.AmountTraded, t.CashTraded, t.TimeOfTrade)
     ax.Commit()
 }
 
