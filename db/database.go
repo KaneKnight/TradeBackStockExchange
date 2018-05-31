@@ -23,7 +23,7 @@ create table positionTable (
     userId integer,
     ticker text,
     amount integer,
-    initialCashInvestment float(53)
+    cashSpentOnPosition float(53)
 );
 
 create table userTable (
@@ -63,10 +63,10 @@ type Transaction struct {
 }
 
 type Position struct {
-  UserId int                    `db:userid`
-  Ticker string                 `db:ticker`
-  Amount int                    `db:amount`
-  InitialCashInvestment float64 `db:initialcashinvestment`
+  UserId int                    `db:"userid"`
+  Ticker string                 `db:"ticker"`
+  Amount int                    `db:"amount"`
+  CashSpentOnPosition float64   `db:"cashspentonposition"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -94,7 +94,7 @@ func insertTransaction(db *sqlx.DB,
     ax := db.MustBegin()
     ax.MustExec(`insert into transactionTable (buyerId, sellerId,
                                           ticker, amountTraded,
-                                          cashTraded, timeOfTrade)
+                                          cashTraded, timeOfTrade)delete
                                           values ($1, $2, $3, $4, $5, $6)`,
                                           buyerId, sellerId,  ticker,
                                           amountTraded, cash, timeOfTrade)
@@ -115,10 +115,74 @@ func getAllTransactionsOfUser(db *sqlx.DB,
     return transactions
 }
 
-func updatePositionOfUsers(db *sqlx.Db,
-                           t Transaction) {
-
+/* 2 args, the sqlx database struct pointer and the transaction that
+ * we need to update the positons of the buyer and the seller.*/
+func updatePositionOfUsersFromTransaction(db *sqlx.Db,
+                                          t Transaction) {
+     ax := db.MustBegin()
+     updateBuyerPosition(db, ax, t.BuyerId, t.Ticker,
+                         t.AmountTraded, t.CashTraded)
+     updateSellerPosition(db, ax, t.SellerId, t.Ticker,
+                          t.AmountTraded, t.CashTraded)
+     err = ax.Commit()
+     if (err != nil) {
+       log.Fatalln(err)
+     }
 }
+
+func updateBuyerPosition(db sqlx.DB,
+                         ax sqlx.Tx
+                         buyerId int,
+                         ticker string,
+                         amountTraded int,
+                         cashTraded float64) {
+   var numberOfPositions int
+   err := db.Get(&numberOfPositions , `select (count *) from positionTable
+                                       where userId=$1 and ticker=$2`,
+                                       t.BuyerId, t.Ticker)
+   if (numberOfPositions == 0) {
+        createNewPosition(ax, buyerId, ticker, amountTraded, cashTraded)
+        //Minus may not recognise.
+        updateUserCash(ax, buyerId, -cashTraded)
+   } else {
+
+   }
+}
+
+func updateSellerPosition(db sqlx.DB,
+                          ax sqlx.Tx,
+                          sellerId int,
+                          ticker string,
+                          amountTraded int,
+                          cashTraded float64) {
+                            //TODO:
+}
+
+func createNewPosition(ax sqlx.Tx,
+                       buyerId int,
+                       ticker string,
+                       amountTraded int,
+                       cashTraded float64) {
+    ax.MustExec(`insert into positionTable (userId,
+                                            ticker,
+                                            amount,
+                                            cashSpentOnPosition)
+                 values ($1, $2, $3, $4)`, buyerId,
+                                           ticker,
+                                           amountTraded,
+                                           cashTraded)
+}
+
+/* 3 args, the sqlx transaction object pointer, the userId of the user
+ * which we want to update their cash and the difference in cash which
+ * may be negative.*/
+func updateUserCash(ax sqlx.Tx,
+                    userId int,
+                    cashTraded float64) {
+    ax.MustExec(`update userTable
+                 set userCash=userCash+$1`, cashTraded)
+}
+
 
 
 /* 3 args, first is the sqlx database struct pointer, the second is
