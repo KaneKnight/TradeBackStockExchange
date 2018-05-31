@@ -11,6 +11,7 @@ import (
   jwt "github.com/dgrijalva/jwt-go"
   "github.com/gin-gonic/contrib/static"
   "github.com/gin-gonic/gin"
+  "github.com/louiscarteron/WebApps2018/oms"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -49,7 +50,7 @@ func main() {
 
       cert, err := getPemCert(token)
       if err != nil {
-        log.Fatalf("could not get certificate: %+v", error)
+        log.Fatalf("could not get certificate: %+v", err)
       }
 
       result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
@@ -67,6 +68,13 @@ func main() {
 
   //Serve frontend static files
   router.Use(static.Serve("/", static.LocalFile("./web", true)))
+
+  //Set up API routing
+  api := router.Group("/api")
+
+  //TODO:Add /bid:params and /ask/:params
+  api.POST("/bid", authMiddleWare, oms.bidHandler);
+  api.POST("/ask", authMiddleWare, oms.askHandler);
 
   //run on default port 8080
   router.Run()
@@ -105,7 +113,7 @@ func getPemCert(token *jwt.Token) (string, error) {
 
   x5c := jwks.Keys[0].X5c
   for k, v := range x5c {
-    if token.Header["kid"] = jwks.Keys[k].Kid {
+    if token.Header["kid"] == jwks.Keys[k].Kid {
       cert = "-----BEGIN CERTIFICATE-----\n" + v + "\n-----END CERTIFICATE-----"
     }
   }
