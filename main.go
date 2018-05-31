@@ -11,7 +11,7 @@ import (
   jwt "github.com/dgrijalva/jwt-go"
   "github.com/gin-gonic/contrib/static"
   "github.com/gin-gonic/gin"
-  "github.com/louiscarteron/WebApps2018/oms"
+  //"github.com/louiscarteron/WebApps2018/oms"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -70,11 +70,11 @@ func main() {
   router.Use(static.Serve("/", static.LocalFile("./web", true)))
 
   //Set up API routing
-  api := router.Group("/api")
+  //api := router.Group("/api")
 
   //TODO:Add /bid:params and /ask/:params
-  api.POST("/bid", authMiddleWare, oms.bidHandler);
-  api.POST("/ask", authMiddleWare, oms.askHandler);
+  //api.POST("/bid", authMiddleWare, oms.bidHandler);
+  //api.POST("/ask", authMiddleWare, oms.askHandler);
 
   //run on default port 8080
   router.Run()
