@@ -14,12 +14,12 @@ class Main extends React.Component {
   }
 
   buy() {
-    var dummy_data_buy = {"userId" : 1};
+    var dummy_data_buy = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : AAPL, "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
-    var dummy_data_sell = {"userId" : 1};
+    var dummy_data_sell = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : AAPL, "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
