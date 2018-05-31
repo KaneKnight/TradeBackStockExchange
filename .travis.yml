@@ -14,5 +14,5 @@ addons:
       - sshpass
 
 after_success:
-  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && export SSHPASS=$DEPLOY_PASS
-  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sshpass -e ssh -o StrictHostKeyChecking=no ljc216@shell1.doc.ic.ac.uk $DEPLOY_PATH/deploy.sh
+  - $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_BRANCH == "master" && export SSHPASS=$DEPLOY_PASS
+  - $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_BRANCH == "master" && sshpass -e ssh -o StrictHostKeyChecking=no ljc216@shell1.doc.ic.ac.uk $DEPLOY_PATH/deploy.sh
