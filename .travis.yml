@@ -15,4 +15,4 @@ addons:
 
 after_success:
   - export SSHPASS=$DEPLOY_PASS
-  - sshpass -e ssh -P "doc.ic.ac.uk" -v -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST $DEPLOY_PATH/deploy.sh
+  - sshpass -e -P "doc.ic.ac.uk" ssh -o StrictHostKeyChecking=no ljc216@shell1.doc.ic.ac.uk $DEPLOY_PATH/deploy.sh
