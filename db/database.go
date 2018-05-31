@@ -71,14 +71,14 @@ type Position struct {
 
 /* No args, called on the DataBase struct and returns a pointer to
  * sqlx database struct. Opens a connection to the database.*/
-func (db DataBase) openDataBase() (*sqlx.DB, error) {
+func (db DataBase) openDataBase() (*sqlx.DB) {
     connStr := fmt.Sprintf(`user=%s password=%s dbname=%s sslmode=%s port=%d`,
                            db.User,
                            db.Password,
                            db.Name,
                            db.Sslmode,
                            db.Port)
-    return sqlx.Open("postgres", connStr)
+    return sqlx.MustConnect("postgres", connStr)
 }
 
 /* 6 args, first is the sqlx database struct pointer and the rest are
@@ -284,19 +284,17 @@ func main() {
      "require",
      5432}
 
-  db, err := database.openDataBase()
+  db := database.openDataBase()
 
-  if err != nil {
-		log.Fatal(err)
-	}
-  /*t := time.Now()
-  transaction := Transaction{
-    1,
-    2,
-    "AAPL",
-    3,
-    300,
-    t}*/
+  // t := time.Now()
+  // transaction := Transaction{
+  //   1,
+  //   2,
+  //   "AAPL",
+  //   3,
+  //   300,
+  //   t}
+
   canBuy := userCanBuyAmountRequested(db, 1, 1001)
   fmt.Println(canBuy)
 }
