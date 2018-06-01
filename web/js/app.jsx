@@ -41,7 +41,7 @@ class Main extends React.Component {
   render() {
     return (
       <div className="main_stage">
-        <button className="buy_button" onClick={this.buy}> Buy! </button>
+        <button className="buy_button" onClick={this.buy}> Buy!!! </button>
         <button className="sell_button" onClick={this.sell}> Sell! </button>
       </div>
     )
