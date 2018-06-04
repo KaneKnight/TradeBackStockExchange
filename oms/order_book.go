@@ -11,8 +11,6 @@ type Order struct {
     EntryTime   int
     /* Time order was placed on website.*/
     EventTime   int
-    NextOrder   *Order
-    PrevOrder   *Order
     ParentLimit *Limit
 }
 
@@ -23,8 +21,7 @@ type Limit struct {
     Parent      *Limit
     LeftChild   *Limit
     RightChild  *Limit
-    HeadOrder   *Order
-    TailOrder   *Order
+    OrderList []*Order
 }
 
 /* There will be 2 different trees for buy and sell.
@@ -38,25 +35,19 @@ type Book struct {
     LimitMap *map[int]Limit
 }
 
-func (l Limit) listIsEmpty() bool {
-    return (l.HeadOrder == nil && l.TailOrder == nil);
-}
 
-func (l Limit) pushOrder(order *Order) {
-    if (l.listIsEmpty()) {
-        l.HeadOrder = order;
-        l.TailOrder = order;
-    } else {
-        lastOrder := l.TailOrder
-        lastOrder.NextOrder = order
-        order.PrevOrder = lastOrder
-        l.TailOrder = order
-    }
+func InitBook(book *Book) {
+    book.BuyTree = nil
+    book.SellTree = nil
+    book.LowestSell = nil
+    book.HighestBuy = nil
+    *book.OrderMap = make(map[int]Order)
+    *book.LimitMap = make(map[int]Limit)
 }
 
 /* 1 arg, an order to be inserted into the book*/
 func (b Book) insertOrder(order *Order) {
-    //TODO: implement
+
 }
 
 /* 1 arg order to be removed from book.*/
