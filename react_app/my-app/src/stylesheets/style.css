@@ -1,27 +1,82 @@
-.buy_button, .sell_button {
+html {
+  min-width: 600px;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+  font-size: 18px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.c-container {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+
+  transition-delay: .3s;
+}
+
+.t--light {
+  background-color: beige;
+}
+
+.t--dark {
+  background-color: dimgray;
+}
+
+.t--light .buy_button, .sell_button {
   padding: 16px 40px;
   transition-duration: 0.4s;
   color:white;
   border-radius: 4px;
 }
 
-.buy_button {
+.t--light .buy_button {
   background-color: lightcoral;
   border: 2px solid lightcoral;
 }
 
-.buy_button:hover {
+.t--light .buy_button:hover {
   color:black;
   background-color: white;
 }
 
-.sell_button {
+.t--light .sell_button {
   background-color: darkmagenta;
   border: 2px solid darkmagenta;
   margin-left: 10%;
 }
 
-.sell_button:hover {
+.t--light .sell_button:hover {
   color:black;
   background-color: white;
+}
+
+.t--dark .buy_button, .sell_button {
+  padding: 16px 40px;
+  transition-duration: 0.4s;
+  color:black;
+  border-radius: 4px;
+}
+
+.t--dark .buy_button {
+  background-color: antiquewhite;
+  border: 2px solid antiquewhite;
+}
+
+.t--dark .buy_button:hover {
+  color: white;
+  background-color: dimgray;
+}
+
+.t--dark .sell_button {
+  background-color: lightgoldenrodyellow;
+  border: 2px solid lightgoldenrodyellow;
+  margin-left: 10%;
+}
+
+.t--dark .sell_button:hover {
+  color: white;
+  background-color: dimgray;
 }

@@ -5,11 +5,38 @@ import './stylesheets/style.css';
 
 class App extends React.Component {
   render() {
-    return (<Main />);
+    //document.body.style.className = "c-container / t--light";
+    return (
+      <div id='Stage' className="c-container / t--light">
+        <ThemeSelector 
+          onClick={() => switch_theme()}
+        />
+        <UiInterface />
+      </div>
+    );
   }
 }
 
-class Main extends React.Component {
+function switch_theme() {
+  console.log("Here");
+  const body = document.getElementById('Stage');
+
+  if (body.classList.contains('t--light')) {
+    body.classList.remove('t--light');
+    body.classList.add('t--dark');
+  } else {
+    body.classList.remove('t--dark');
+    body.classList.add('t--light');
+  }
+}
+
+function ThemeSelector(props) {
+  return(
+    <button className="ThemeSelector" onClick={props.onClick}> Switch Theme </button> 
+  )
+}
+
+class UiInterface extends React.Component {
 
   constructor(props) {
     super(props);
@@ -48,11 +75,26 @@ class Main extends React.Component {
   render() {
     return (
       <div className="main_stage">
-        <button className="buy_button" onClick={this.buy}> Buy!!! </button>
-        <button className="sell_button" onClick={this.sell}> Sell! </button>
+        <Button 
+          button_type={"buy_button"}
+          onClick={() => this.buy()}
+          button_name={"Bid"}
+        />
+        <Button 
+          button_type={"sell_button"}
+          onClick={() => this.sell()}
+          button_name={"Ask"}
+        />
       </div>
     )
   }
+}
+
+/* Button class for rendering the buttons. */
+function Button(props) {
+  return (
+    <button className={props.button_type} onClick={props.onClick}> {props.button_name} </button>
+  )
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
