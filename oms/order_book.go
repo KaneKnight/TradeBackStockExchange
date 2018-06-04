@@ -50,9 +50,9 @@ func (b Book) Execute() {
 }
 
 func (b Book) GetVolumeAtLimit(limit *Limit) int {
-
+  return limit.TotalVolume
 }
 
 func (b Book) GetBestBid(limit *Limit) *Limit {
-
+  return limit
 }
