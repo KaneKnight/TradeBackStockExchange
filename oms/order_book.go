@@ -1,31 +1,41 @@
 package oms
 
+import "time"
+
 type Order struct {
-    IdNumber       int
+    IdNumber int
     /* Buy is true, sell is false.*/
-    BuyOrSell      bool
+    BuyOrSell bool
     NumberOfShares int
     /* For bids this is the maximum price, for asks, lowest price.*/
     LimitPrice int
     /* Time that order was inserted into book.*/
-    EntryTime   int
+    EntryTime time.Time
     /* Time order was placed on website.*/
-    EventTime   int
+    EventTime time.Time
+    /* Only initialised when order is in map.*/
     ParentLimit *Limit
 }
 
 type Limit struct {
+    /* Unique identifier that is key of map.*/
     LimitPrice  int
-    Size        int
+    /* Sum of number of shares in each order.*/
     TotalVolume int
+    /* Parent price in tree.*/
     Parent      *Limit
+    /* Left child price in tree.*/
     LeftChild   *Limit
+    /* Right child price in tree.*/
     RightChild  *Limit
-    OrderList []*Order
+    /* A slice of order pointers. Lower indicies will be earlier orders.
+     * Ordered by event time.*/
+    OrderList *[]*Order
 }
 
 /* There will be 2 different trees for buy and sell.
-Order map which maps IDs to Orders. Limit order which maps prices to limits.*/
+ * Order map which maps IDs to Orders.
+ * Limit order which maps prices to limits.*/
 type Book struct {
     BuyTree    *Limit
     SellTree   *Limit
@@ -35,27 +45,31 @@ type Book struct {
     LimitMap *map[int]Limit
 }
 
-
+/* Initialises the book struct,
+ * maps are created and all other fields are set to nil*/
 func InitBook(book *Book) {
-    book.BuyTree = nil
-    book.SellTree = nil
-    book.LowestSell = nil
-    book.HighestBuy = nil
     *book.OrderMap = make(map[int]Order)
     *book.LimitMap = make(map[int]Limit)
 }
 
+/* Initialises a limit struct with a price and initialises a slice with base
+ * length of 10.*/
+func InitLimit (l *Limit, price int) {
+    l.LimitPrice = price
+    *l.OrderList = make([]*Order, 10)
+}
+
 /* 1 arg, an order to be inserted into the book*/
-func (b Book) insertOrder(order *Order) {
+func (b Book) InsertOrder(order *Order) {
 
 }
 
 /* 1 arg order to be removed from book.*/
-func (b Book) cancelOrder(order *Order) {
+func (b Book) CancelOrder(order *Order) {
   //TODO: implement
 }
 
-func (b Book) execute() {
+func (b Book) Execute() {
     //TODO: implement
 }
 
