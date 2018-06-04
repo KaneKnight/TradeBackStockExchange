@@ -1,0 +1,27 @@
+.buy_button, .sell_button {
+  padding: 16px 40px;
+  transition-duration: 0.4s;
+  color:white;
+  border-radius: 4px;
+}
+
+.buy_button {
+  background-color: lightcoral;
+  border: 2px solid lightcoral;
+}
+
+.buy_button:hover {
+  color:black;
+  background-color: white;
+}
+
+.sell_button {
+  background-color: darkmagenta;
+  border: 2px solid darkmagenta;
+  margin-left: 10%;
+}
+
+.sell_button:hover {
+  color:black;
+  background-color: white;
+}
