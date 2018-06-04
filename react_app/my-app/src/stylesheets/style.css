@@ -85,6 +85,14 @@ body {
   color: white;
   background-color: dimgray;
 }
+
+
+
+
+
+
+/* --- Light Dark theme switch --- */
+
 .onoffswitch {
   float: right;
   position: relative; width: 90px;
