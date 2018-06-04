@@ -36,21 +36,21 @@ type Book struct {
 }
 
 /* 1 arg, an order to be inserted into the book*/
-func (b Book) insertOrder(order Order) {
+func (b Book) InsertOrder(order Order) {
     //TODO: implement
 }
 
 /* 1 arg order to be removed from book.*/
-func (b Book) cancelOrder(order Order) {
+func (b Book) CancelOrder(order Order) {
   //TODO: implement
 }
 
-func (b Book) execute() {
+func (b Book) Execute() {
     //TODO: implement
 }
 
 func (b Book) GetVolumeAtLimit(limit *Limit) int {
-  
+
 }
 
 func (b Book) GetBestBid(limit *Limit) *Limit {
