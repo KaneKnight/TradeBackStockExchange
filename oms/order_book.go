@@ -27,21 +27,40 @@ type Limit struct {
     TailOrder   *Order
 }
 
-/* There will be 2 different trees for buy and sell.*/
+/* There will be 2 different trees for buy and sell.
+Order map which maps IDs to Orders. Limit order which maps prices to limits.*/
 type Book struct {
     BuyTree    *Limit
     SellTree   *Limit
     LowestSell *Limit
     HighestBuy *Limit
+    OrderMap *map[int]Order
+    LimitMap *map[int]Limit
+}
+
+func (l Limit) listIsEmpty() bool {
+    return (l.HeadOrder == nil && l.TailOrder == nil);
+}
+
+func (l Limit) pushOrder(order *Order) {
+    if (l.listIsEmpty()) {
+        l.HeadOrder = order;
+        l.TailOrder = order;
+    } else {
+        lastOrder := l.TailOrder
+        lastOrder.NextOrder = order
+        order.PrevOrder = lastOrder
+        l.TailOrder = order
+    }
 }
 
 /* 1 arg, an order to be inserted into the book*/
-func (b Book) insertOrder(order Order) {
+func (b Book) insertOrder(order *Order) {
     //TODO: implement
 }
 
 /* 1 arg order to be removed from book.*/
-func (b Book) cancelOrder(order Order) {
+func (b Book) cancelOrder(order *Order) {
   //TODO: implement
 }
 
@@ -50,9 +69,11 @@ func (b Book) execute() {
 }
 
 func (b Book) GetVolumeAtLimit(limit *Limit) int {
-  
+    //TODO: implement
+    return 0
 }
 
 func (b Book) GetBestBid(limit *Limit) *Limit {
-
+    //TODO: implement
+    return nil
 }
