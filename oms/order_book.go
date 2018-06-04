@@ -29,3 +29,11 @@ type Book struct {
   LowestSell *Limit
   HighestBuy *Limit
 }
+
+func (b Book) GetVolumeAtLimit(limit *Limit) int {
+  
+}
+
+func (b Book) GetBestBid(limit *Limit) *Limit {
+
+}
