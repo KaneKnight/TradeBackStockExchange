@@ -7,7 +7,7 @@ var currentId int = 0
 type Order struct {
     IdNumber int
     /* Buy is true, sell is false.*/
-    BuyOrSell bool
+    Buy bool
     NumberOfShares int
     /* For bids this is the maximum price, for asks, lowest price.*/
     LimitPrice int
@@ -22,7 +22,8 @@ type Order struct {
 type Limit struct {
     /* Unique identifier that is key of map.*/
     LimitPrice  int
-    /* Sum of number of shares in each order.*/
+    /* The number of shares traded at that price.
+     * Updated when match of orders found.*/
     TotalVolume int
     /* Parent price in tree.*/
     Parent      *Limit
@@ -30,7 +31,7 @@ type Limit struct {
     LeftChild   *Limit
     /* Right child price in tree.*/
     RightChild  *Limit
-    /* A slice of order pointers. Lower indicies will be earlier orders.
+    /* A slice of order pointers. Lower indices will be earlier orders.
      * Ordered by event time.*/
     OrderList *[]*Order
 }
@@ -63,37 +64,60 @@ func InitLimit (l *Limit, price int) {
 
 /* Initalises order struct with buy or sell, number of shares,
  * limit price and the time the order button was clicked.
- * Fields linked to the tree are ingnored.*/
+ * Fields linked to the tree are ingnored. Also updates the current ID,
+ * to allow mapping to orders.*/
 func InitOrder(o *Order, buyOrSell bool, numberOfShares int,
     limitPrice int, eventTime time.Time) {
     o.IdNumber = currentId
     currentId += 1
-    o.BuyOrSell = buyOrSell
+    o.Buy = buyOrSell
     o.NumberOfShares = numberOfShares
     o.LimitPrice = limitPrice
     o.EventTime = eventTime
 }
 
-/* 1 arg, an order to be inserted into the book*/
-func (b Book) InsertOrder(order *Order) {
+/* 1 arg, an order to be inserted into the book.
+ * This order will be a partial that is the result of the init order function
+ * defined above.*/
+func (b *Book) InsertOrder(order *Order) {
+    if(order.Buy) {
+        b.BuyTree.insertOrderIntoTree(order)
+    } else {
+        b.SellTree.insertOrderIntoTree(order)
+    }
+}
 
+func (tree *Limit) insertOrderIntoTree(order *Order) {
+    //TODO: Complete this maybe change insert order above in order to use maps.
+    //if root nil make root of tree and add limit to map.
+    if (tree == nil) {
+        var limit Limit
+        InitLimit(&limit, order.LimitPrice)
+
+    } else if (order.LimitPrice < tree.LimitPrice) {
+        //Insert into left of tree.
+    } else if (order.LimitPrice == tree.LimitPrice){
+        //Insert into list of current limit.
+    } else {
+        //Insert into right of tree.
+    }
 }
 
 /* 1 arg order to be removed from book.*/
-func (b Book) CancelOrder(order *Order) {
+func (b *Book) CancelOrder(order *Order) {
   //TODO: implement
 }
 
-func (b Book) Execute() {
+func (b *Book) Execute() {
     //TODO: implement
 }
 
-func (b Book) GetVolumeAtLimit(limit *Limit) int {
+func (b *Book) GetVolumeAtLimit(limit *Limit) int {
     //TODO: implement
     return 0
 }
 
-func (b Book) GetBestBid(limit *Limit) *Limit {
+func (b *Book) GetBestBid(limit *Limit) *Limit {
     //TODO: implement
     return nil
 }
