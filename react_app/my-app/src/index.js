@@ -4,6 +4,7 @@ import $ from 'jquery';
 import './stylesheets/style.css';
 
 class App extends React.Component {
+
   render() {
     //document.body.style.className = "c-container / t--light";
     return (
@@ -32,7 +33,13 @@ function switch_theme() {
 
 function ThemeSelector(props) {
   return(
-    <button className="ThemeSelector" onClick={props.onClick}> Switch Theme </button> 
+    <div className="onoffswitch">
+      <input type="checkbox" name="onoffswitch" className="onoffswitch-checkbox" id="myonoffswitch" defaultChecked onClick={props.onClick}/>
+      <label className="onoffswitch-label" htmlFor="myonoffswitch">
+        <span className="onoffswitch-inner"></span>
+        <span className="onoffswitch-switch"></span>
+      </label>
+    </div>
   )
 }
 
