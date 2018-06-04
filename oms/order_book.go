@@ -48,3 +48,11 @@ func (b Book) cancelOrder(order Order) {
 func (b Book) execute() {
     //TODO: implement
 }
+
+func (b Book) GetVolumeAtLimit(limit *Limit) int {
+  
+}
+
+func (b Book) GetBestBid(limit *Limit) *Limit {
+
+}
