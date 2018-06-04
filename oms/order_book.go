@@ -2,6 +2,8 @@ package oms
 
 import "time"
 
+var currentId int = 0
+
 type Order struct {
     IdNumber int
     /* Buy is true, sell is false.*/
@@ -53,10 +55,23 @@ func InitBook(book *Book) {
 }
 
 /* Initialises a limit struct with a price and initialises a slice with base
- * length of 10.*/
+ * length of 10. Fields that are linked to the tree are ignored.*/
 func InitLimit (l *Limit, price int) {
     l.LimitPrice = price
     *l.OrderList = make([]*Order, 10)
+}
+
+/* Initalises order struct with buy or sell, number of shares,
+ * limit price and the time the order button was clicked.
+ * Fields linked to the tree are ingnored.*/
+func InitOrder(o *Order, buyOrSell bool, numberOfShares int,
+    limitPrice int, eventTime time.Time) {
+    o.IdNumber = currentId
+    currentId += 1
+    o.BuyOrSell = buyOrSell
+    o.NumberOfShares = numberOfShares
+    o.LimitPrice = limitPrice
+    o.EventTime = eventTime
 }
 
 /* 1 arg, an order to be inserted into the book*/
