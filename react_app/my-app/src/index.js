@@ -61,17 +61,6 @@ class CompanyList extends React.Component {
         <div className="list_of_companies">
           <select id='company_select' size="6" onChange={(e) => this.props.onChange(e.target.value)}>
             {this.state.opts}
-            {/* <option value="Apple">Apple</option>
-            <option value="Apple1">Apple1</option>
-            <option value="Apple2">Apple2</option>
-            <option value="Apple3">Apple3</option>
-            <option value="Apple4">Apple4</option>
-            <option value="Apple5">Apple5</option>
-            <option value="Apple6">Apple6</option>
-            <option value="Apple7">Apple7</option>
-            <option value="Apple8">Apple8</option>
-            <option value="Apple9">Apple9</option> */}
-
           </select>
         </div>
       </div>
