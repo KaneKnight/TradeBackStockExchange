@@ -63,6 +63,14 @@ body {
   background-color: white;
 }
 
+.graph_display {
+  background-color: lightgray;
+  height: 94%;
+  width: 94%;
+  margin-left: 3%;
+  margin-top: 2%;
+}
+
 .ui_buttons_cont {
   grid-area: ui_buttons;
   background-color: black;

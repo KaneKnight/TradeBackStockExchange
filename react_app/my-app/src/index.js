@@ -7,12 +7,15 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
+    this.selectNewCompany = this.selectNewCompany.bind(this);
     this.state = {
       current_company: "Apple",
     };
   }
 
   selectNewCompany(new_company) {
+    console.log("Called with " + new_company);
+    console.log("Called");
     this.setState({current_company : new_company})
   }
 
@@ -22,9 +25,9 @@ class App extends React.Component {
       //<div id='Stage' className="c-container / t--light">
       <div id='Stage' className="grid-container">
         <NavigationBar />
-        <CompanyList />
-        <GraphAndButtons />
-        <CompanyInfo />
+        <CompanyList onChange = {this.selectNewCompany}/>
+        <GraphAndButtons current_company={this.state.current_company}/>
+        <CompanyInfo current_company={this.state.current_company}/>
         <UserInfo />
       </div>
     );
@@ -36,17 +39,17 @@ class CompanyList extends React.Component {
     return (
       <div className="company_list_cont">
         <div className="list_of_companies">
-          <select size="6">
-            <option value="apple">Apple</option>
-            <option value="apple1">Apple1</option>
-            <option value="apple2">Apple2</option>
-            <option value="apple3">Apple3</option>
-            <option value="apple4">Apple4</option>
-            <option value="apple5">Apple5</option>
-            <option value="apple6">Apple6</option>
-            <option value="apple7">Apple7</option>
-            <option value="apple8">Apple8</option>
-            <option value="apple9">Apple9</option>
+          <select id='company_select' size="6" onChange={(e) => this.props.onChange(e.target.value)}>
+            <option value="Apple">Apple</option>
+            <option value="Apple1">Apple1</option>
+            <option value="Apple2">Apple2</option>
+            <option value="Apple3">Apple3</option>
+            <option value="Apple4">Apple4</option>
+            <option value="Apple5">Apple5</option>
+            <option value="Apple6">Apple6</option>
+            <option value="Apple7">Apple7</option>
+            <option value="Apple8">Apple8</option>
+            <option value="Apple9">Apple9</option>
           </select>
         </div>
       </div>
@@ -58,7 +61,7 @@ class GraphAndButtons extends React.Component {
   render() {
     return (
       <div className="grid-container-graph"> 
-        <Graph />
+        <Graph current_company={this.props.current_company}/>
         <UiInterface />
       </div>
     )
@@ -68,7 +71,9 @@ class GraphAndButtons extends React.Component {
 class Graph extends React.Component {
   render() {
     return (
-      <div className="graph_display_cont"> </div>
+      <div className="graph_display_cont">
+        <div className="graph_display"> Showing graph for {this.props.current_company}</div>
+      </div>
     )
   }
 }
@@ -76,7 +81,7 @@ class Graph extends React.Component {
 class CompanyInfo extends React.Component {
   render() {
     return (
-      <div className="company_info_cont"> Company Info Here </div>
+      <div className="company_info_cont"> Currently showing info for {this.props.current_company} </div>
     )
   }
 }
