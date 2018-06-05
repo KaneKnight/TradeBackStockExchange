@@ -86,7 +86,55 @@ body {
   background-color: dimgray;
 }
 
+.navigation_bar {
+  background-color: purple;
+  width: 100%;
+  height: 6%;
+}
 
+.temp_switch {
+  position: relative;
+  float: right;
+  margin-right: 5em;
+}
+
+.login {
+  position: relative;
+  float: right;
+  margin-right: 1em;
+}
+
+.app_name {
+  margin-left: 1em;
+  color: green;
+  width: 10%;
+  float: left;
+}
+
+.list_cont, .graph_company_cont {
+  float: left;
+  height: 80%;
+}
+
+.list_cont {
+  width: 15%;
+  background-color: blue;
+  position: fixed;
+}
+
+.graph_company_cont {
+  width: 85%;
+  background-color: red;
+  float: right;
+}
+
+.user_info_cont {
+  background-color: darkgoldenrod;
+  position: relative;
+  float: left;
+  width: 100%;
+  height: 15%;
+}
 
 
 

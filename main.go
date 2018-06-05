@@ -11,8 +11,8 @@ import (
   jwt "github.com/dgrijalva/jwt-go"
   "github.com/gin-contrib/static"
   "github.com/gin-gonic/gin"
-  "github.com/louiscarteron/WebApps2018/oms"
-  "github.com/louiscarteron/WebApps2018/db"
+  //"github.com/louiscarteron/WebApps2018/oms"
+  //"github.com/louiscarteron/WebApps2018/db"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -64,13 +64,13 @@ func main() {
   //Assign global jwtMiddleWare
   jwtMiddleWare = jwtMiddleWare_temp
 
-  dbConfig := db.DBConfig{
+  /*dbConfig := db.DBConfig{
     "db.doc.ic.ac.uk",
     "g1727122_u",
     "PTqnydAPoe",
     "g1727122_u",
     5432}
-  oms.InitDB(dbConfig)
+  oms.InitDB(dbConfig)*/
 
   //Set default router
   router := gin.Default()
@@ -83,11 +83,11 @@ func main() {
   })
 
   //Set up API routing
-  api := router.Group("/api")
+  //api := router.Group("/api")
 
   //TODO:Add /bid:params and /ask/:params
-  api.POST("/bid", oms.BidHandler);
-  api.POST("/ask", oms.AskHandler);
+  //api.POST("/bid", oms.BidHandler);
+  //api.POST("/ask", oms.AskHandler);
 
   //run on default port 8080
   router.Run()

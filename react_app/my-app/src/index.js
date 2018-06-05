@@ -5,19 +5,82 @@ import './stylesheets/style.css';
 
 class App extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      current_company: "Apple",
+    };
+  }
+
+  selectNewCompany(new_company) {
+    this.setState({current_company : new_company})
+  }
+
   render() {
     //document.body.style.className = "c-container / t--light";
     return (
       <div id='Stage' className="c-container / t--light">
-        <ThemeSelector 
-          onClick={() => switch_theme()}
-        />
-        <UiInterface />
+        <NavigationBar />
+        <CompanyList />
+        <GraphAndCompanyInfo />
+        <UserInfo />
       </div>
     );
   }
 }
 
+class CompanyList extends React.Component {
+  render() {
+    return (
+      <div className="list_cont">
+        <div className="list_of_companies">
+          <select size="6">
+            <option value="apple">Apple</option>
+            <option value="apple1">Apple1</option>
+            <option value="apple2">Apple2</option>
+            <option value="apple3">Apple3</option>
+            <option value="apple4">Apple4</option>
+            <option value="apple5">Apple5</option>
+            <option value="apple6">Apple6</option>
+            <option value="apple7">Apple7</option>
+            <option value="apple8">Apple8</option>
+            <option value="apple9">Apple9</option>
+          </select>
+        </div>
+      </div>
+    )
+  }
+}
+
+class GraphAndCompanyInfo extends React.Component {
+  render() {
+    return (
+      <div className="graph_company_cont"> </div>
+    )
+  }
+}
+
+class UserInfo extends React.Component {
+  render() {
+    return (
+      <div className="user_info_cont"> User Info Here </div>
+    )
+  }
+}
+
+class NavigationBar extends React.Component {
+  render() {
+    return (
+      <div id='nav_bar' className="navigation_bar">
+        <div className="app_name"> App Name Here </div> 
+        <div className="login"> Login </div>
+        <div className="temp_switch"> Should be switch </div>
+      </div>
+    )
+  }
+}
+
+/* Function to switch between light and dark theme. */
 function switch_theme() {
   console.log("Here");
   const body = document.getElementById('Stage');
@@ -31,6 +94,7 @@ function switch_theme() {
   }
 }
 
+/* Component to switch between light and dark theme. */
 function ThemeSelector(props) {
   return(
     <div className="onoffswitch">

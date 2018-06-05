@@ -25,8 +25,10 @@ class Main extends React.Component {
 
   serverRequest(dummy_data_str, url_type) {
     var dummy_data = JSON.stringify(dummy_data_str);
+    /* TODO: Change local host to the actual address of the server. */
+    console.log("Sent POST request for request:" + url_type);
     $.post(
-      "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
+      "localhost:8080/api/" + url_type,
       dummy_data,
       res => {
         window.alert("Transaction completed at time:" + res);
