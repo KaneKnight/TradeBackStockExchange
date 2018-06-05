@@ -76,7 +76,7 @@ class Graph extends React.Component {
 class CompanyInfo extends React.Component {
   render() {
     return (
-      <div className="company_info_cont"> Hello </div>
+      <div className="company_info_cont"> Company Info Here </div>
     )
   }
 }
