@@ -15,6 +15,7 @@ import (
 )
 
 var database *sqlx.DB
+
 //A dynamically sized queue of orders submitted from API
 //OMS will collect from this queue and process the orders
 var orderQueue queue.Queue
@@ -23,20 +24,10 @@ func InitDB(config db.DBConfig) {
   database = config.OpenDataBase()
 }
 
-//Ask and Bid Handlers assume that API is supplied with correct JSON format
-
-func AskHandler(c *gin.Context) {
+//orderHandler assume that API is supplied with correct JSON format
+func orderHandler(c *gin.Context) {
   var order Order
   //Binds supplied JSON to Order struct from order_book defs
   c.BindJSON(&order)
-}
-
-func BidHandler(c *gin.Context) {
-  var order Order
-  //Binds supplied JSON to Order struct from order_book defs
-  c.BindJSON(&order)
-}
-
-func submitOrder(order Order) {
   orderQueue.Put(order)
 }
