@@ -16,11 +16,29 @@ type InfoAtLimit struct {
     OrderList []*Order
 }
 
+/* Pushes order to list.*/
+func (info *InfoAtLimit) pushToList(order *Order)  {
+    info.OrderList = append(info.OrderList, order)
+}
+
+/* Pops head of list, ie oldest order, returns (true,
+ * order) if list is non empty and (false, nil) if empty*/
+func (info *InfoAtLimit) popFromList() (bool, *Order){
+    length := len(info.OrderList)
+    if (length > 0) {
+        order := info.OrderList[length-1]
+        info.OrderList = info.OrderList[:length - 1]
+        return true, order
+    }
+    return false, nil
+}
+
 var currentId int = 0
 
 type Order struct {
     IdNumber int
     /* Buy is true, sell is false.*/
+    UserId int
     Buy bool
     NumberOfShares int
     /* For bids this is the maximum price, for asks, lowest price.*/

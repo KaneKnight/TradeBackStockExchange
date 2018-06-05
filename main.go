@@ -1,20 +1,12 @@
 package main
 
 import (
-  "fmt"
-  "net/http"
-  "encoding/json"
-  "errors"
-  "log"
-  "os"
-  jwtmiddleware "github.com/auth0/go-jwt-middleware"
-  jwt "github.com/dgrijalva/jwt-go"
-  "github.com/gin-contrib/static"
-  "github.com/gin-gonic/gin"
-  "github.com/louiscarteron/WebApps2018/oms"
-  "github.com/louiscarteron/WebApps2018/db"
+    "time"
+    "github.com/louiscarteron/WebApps2018/oms"
+    "fmt"
 )
 
+/*
 //Jwks stores a slice of JSON Web Keys
 type Jwks struct {
   Keys []JSONWebKeys `json:"keys"`
@@ -31,6 +23,7 @@ type JSONWebKeys struct {
 
 //Use by passing to route definitions, along with the handler
 var jwtMiddleWare *jwtmiddleware.JWTMiddleware
+
 
 func main() {
 
@@ -136,4 +129,21 @@ func getPemCert(token *jwt.Token) (string, error) {
   }
 
   return cert, nil
+}
+*/
+
+func main() {
+    book := oms.InitBook()
+    t := time.Now()
+    order1 := oms.InitOrder(1,true, 10, 450, t)
+    order2 := oms.InitOrder(1,true, 43, 463, t.Add(1))
+    order3 := oms.InitOrder(2,true, 7, 450, t.Add(4))
+    book.InsertOrderIntoBook(order1)
+    book.InsertOrderIntoBook(order2)
+    book.InsertOrderIntoBook(order3)
+
+    _, i := book.BuyTree.Get(oms.LimitPrice(450))
+    info := i.(*oms.InfoAtLimit)
+    fmt.Println(info.OrderList[0])
+    fmt.Println(info.OrderList[1])
 }

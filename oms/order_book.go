@@ -43,17 +43,18 @@ func InitLimitInfo (price LimitPrice) *InfoAtLimit {
     return &InfoAtLimit{
         Price:price,
         TotalVolume: 0,
-        OrderList: make([]*Order, 10) }
+        OrderList: make([]*Order, 0) }
 }
 
 /* Initalises order struct with buy or sell, number of shares,
  * limit price and the time the order button was clicked.
  * Fields linked to the tree are ingnored. Also updates the current ID,
  * to allow mapping to orders.*/
-func InitOrder(buy bool, numberOfShares int,
+func InitOrder(userId int, buy bool, numberOfShares int,
     limitPrice LimitPrice, eventTime time.Time) *Order {
     order := Order{
         IdNumber:currentId,
+        UserId:userId,
         Buy:buy,
         NumberOfShares:numberOfShares,
         LimitPrice:limitPrice,
@@ -71,7 +72,6 @@ func (b *Book) InsertOrderIntoBook(order *Order) {
     } else {
         b.insertOrderIntoSellTree(order)
     }
-
 }
 
 
@@ -98,6 +98,7 @@ func (b *Book) insertOrderIntoSellTree(order *Order) {
 func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
+    info.pushToList(order)
     b.BuyTree.Set(limitPrice, info)
     b.BuyLimitMap.insertLimitInfoIntoMap(info)
 }
@@ -105,6 +106,7 @@ func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
 func (b *Book) insertSellOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
+    info.pushToList(order)
     b.SellTree.Set(limitPrice, info)
     b.SellLimitMap.insertLimitInfoIntoMap(info)
 }
@@ -130,7 +132,6 @@ func (m OrderMap) insertOrderIntoMap(order *Order) {
     m[order.IdNumber] = order
 }
 
-
 /* 1 arg order to be removed from book.*/
 func (b *Book) CancelOrder(order *Order) {
   //TODO: implement
@@ -139,7 +140,7 @@ func (b *Book) CancelOrder(order *Order) {
 func (b *Book) Execute() {
     //TODO: implement
 }
-
+/*
 func (b *Book) GetVolumeAtLimit(limit *Limit) int {
     //TODO: implement
     return 0
@@ -148,4 +149,4 @@ func (b *Book) GetVolumeAtLimit(limit *Limit) int {
 func (b *Book) GetBestBid(limit *Limit) *Limit {
     //TODO: implement
     return nil
-}
+} */
