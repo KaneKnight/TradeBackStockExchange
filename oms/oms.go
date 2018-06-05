@@ -2,7 +2,7 @@ package oms
 
 import (
   "fmt"
-  "net/http"
+  //"net/http"
   //"encoding/json"
   //"errors"
   //"strconv"
@@ -12,22 +12,51 @@ import (
   "github.com/louiscarteron/WebApps2018/db"
   "github.com/jmoiron/sqlx"
   "github.com/Workiva/go-datastructures/queue"
+  //"github.com/streadway/amqp"
 )
 
+var dbConfig = db.DBConfig{
+  "db.doc.ic.ac.uk",
+  "g1727122_u",
+  "PTqnydAPoe",
+  "g1727122_u",
+  5432}
+
+//Represent the connection to the Postgres database provided in the config
 var database *sqlx.DB
 
 //A dynamically sized queue of orders submitted from API
 //OMS will collect from this queue and process the orders
-var orderQueue queue.Queue
+//Better than a simple channel because it can grow indefinitely without
+//the need for buffers
+var orderQueue *queue.Queue
 
-func InitDB(config db.DBConfig) {
-  database = config.OpenDataBase()
+func init() {
+  database = dbConfig.OpenDataBase()
+  orderQueue = queue.New(100)
+
+  //initiate the processor routine
+  go processOrder()
 }
 
 //orderHandler assume that API is supplied with correct JSON format
-func orderHandler(c *gin.Context) {
-  var order Order
+func OrderHandler(c *gin.Context) {
+  var order Order = Order{101, true, 10, 1001, time.Now(), time.Now(), nil}
   //Binds supplied JSON to Order struct from order_book defs
-  c.BindJSON(&order)
+  //c.BindJSON(&order)
   orderQueue.Put(order)
 }
+
+//To be run continuously as a goroutine whilst the platform is functioning
+func processOrder() {
+  for true {
+    var order Order
+    i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
+    order = i[0].(Order)
+    //Process the order, need Kane's stuff...
+    time.Sleep(1 * time.Second)
+    fmt.Println(order)
+  }
+}
+
+

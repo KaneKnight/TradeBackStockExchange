@@ -26,7 +26,8 @@ class Main extends React.Component {
   serverRequest(dummy_data_str, url_type) {
     var dummy_data = JSON.stringify(dummy_data_str);
     $.post(
-      "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
+      //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
+      "http://localhost:8080/api/" + url_type,
       dummy_data,
       res => {
         window.alert("Transaction completed at time:" + res);
