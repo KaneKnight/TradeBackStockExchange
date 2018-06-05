@@ -35,12 +35,33 @@ class App extends React.Component {
 }
 
 class CompanyList extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      opts: [],
+    }
+  }
+
+  componentDidMount() {
+    // Call code here to get company list
+    var source = ["Apple", "Apple 1", "Apple 2", "Apple 3", "Apple 4", "Apple 5", "Apple 6", "Apple 7", " Apple 8", "Apple 9"];
+    var options = []
+    for (var i = 0; i < source.length; i++) {
+      options.push(<option value={source[i]}> {source[i]} </option>);
+    }
+    this.setState({
+      opts: options,
+    });
+  }
+
   render() {
     return (
       <div className="company_list_cont">
         <div className="list_of_companies">
           <select id='company_select' size="6" onChange={(e) => this.props.onChange(e.target.value)}>
-            <option value="Apple">Apple</option>
+            {this.state.opts}
+            {/* <option value="Apple">Apple</option>
             <option value="Apple1">Apple1</option>
             <option value="Apple2">Apple2</option>
             <option value="Apple3">Apple3</option>
@@ -49,7 +70,8 @@ class CompanyList extends React.Component {
             <option value="Apple6">Apple6</option>
             <option value="Apple7">Apple7</option>
             <option value="Apple8">Apple8</option>
-            <option value="Apple9">Apple9</option>
+            <option value="Apple9">Apple9</option> */}
+
           </select>
         </div>
       </div>
