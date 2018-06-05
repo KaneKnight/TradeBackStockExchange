@@ -5,6 +5,12 @@ import (
     "time"
 )
 
+/* A mapping of ids to orders.*/
+type OrderMap map[int]*Order
+
+/* A mapping of prices to information about the orders at that price.*/
+type LimitMap map[LimitPrice]*InfoAtLimit
+
 /* There will be 2 different trees for buy and sell.
  * Order map which maps IDs to Orders.
  * Limit order which maps prices to limits.*/
@@ -13,8 +19,8 @@ type Book struct {
     SellTree   *binarytree.Tree
     LowestSell *InfoAtLimit
     HighestBuy *InfoAtLimit
-    OrderMap   map[int]*Order
-    LimitMap   map[LimitPrice]*InfoAtLimit
+    OrderMap   OrderMap
+    LimitMap   LimitMap
 }
 
 /* Initialises the book struct,
@@ -31,8 +37,9 @@ func InitBook() *Book {
 
 /* Initialises a limit struct with a price and initialises a slice with base
  * length of 10. Fields that are linked to the tree are ignored.*/
-func InitLimitInfo (price int) *InfoAtLimit {
+func InitLimitInfo (price LimitPrice) *InfoAtLimit {
     return &InfoAtLimit{
+        Price:price,
         TotalVolume: 0,
         OrderList: make([]*Order, 10) }
 }
@@ -65,7 +72,7 @@ func (b *Book) InsertOrder(order *Order) {
 }
 
 func (b *Book) insertOrderIntoTree(order Order) {
-    limitPrice := order.LimitPrice
+    //limitPrice := order.LimitPrice
 
 }
 
@@ -76,6 +83,15 @@ func (b *Book) getLimitFromMap(price LimitPrice) (bool, *InfoAtLimit) {
     } else {
         return true, info
     }
+}
+
+func (m LimitMap) insertLimitInfoIntoMap(
+    limit *InfoAtLimit)  {
+    m[limit.Price] = limit
+}
+
+func (m OrderMap) insertOrderIntoMap(order *Order) {
+    m[order.IdNumber] = order
 }
 
 

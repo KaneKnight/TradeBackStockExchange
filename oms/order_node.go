@@ -6,6 +6,8 @@ import (
 )
 
 type InfoAtLimit struct {
+    /* Price of the limit.*/
+    Price LimitPrice
     /* The number of shares traded at that price.
      * Updated when match of orders found.*/
     TotalVolume int
