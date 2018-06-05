@@ -57,7 +57,18 @@ class CompanyList extends React.Component {
 class GraphAndButtons extends React.Component {
   render() {
     return (
-      <div className="graph_cont"> Graph </div>
+      <div className="grid-container-graph"> 
+        <Graph />
+        <UiInterface />
+      </div>
+    )
+  }
+}
+
+class Graph extends React.Component {
+  render() {
+    return (
+      <div className="graph_display_cont"> </div>
     )
   }
 }
@@ -155,7 +166,7 @@ class UiInterface extends React.Component {
 
   render() {
     return (
-      <div className="buy_sell_button">
+      <div className="ui_buttons_cont">
         <Button 
           button_type={"buy_button"}
           onClick={() => this.buy()}

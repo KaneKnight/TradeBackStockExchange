@@ -3,7 +3,6 @@ body {
   font-size: 18px;
   margin: 0;
   overflow: hidden;
-  /* height: 100%; */
 }
 
 .grid-container {
@@ -40,4 +39,22 @@ body {
 .company_info_cont {
   grid-area: company_information;
   background-color: yellow;
+}
+
+.grid-container-graph {
+  display: grid;
+  grid-template-areas:
+  'graph_display'
+  'ui_buttons';
+  grid-template-rows: 85% 15%;
+}
+
+.graph_display_cont {
+  grid-area: graph_display;
+  background-color: white;
+}
+
+.ui_buttons_cont {
+  grid-area: ui_buttons;
+  background-color: black;
 }
