@@ -85,7 +85,6 @@ func main() {
   //Set up API routing
   api := router.Group("/api")
 
-  //TODO:Add /bid:params and /ask/:params
   api.POST("/bid", oms.BidHandler);
   api.POST("/ask", oms.AskHandler);
 

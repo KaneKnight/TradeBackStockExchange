@@ -11,24 +11,32 @@ import (
   "github.com/gin-gonic/gin"
   "github.com/louiscarteron/WebApps2018/db"
   "github.com/jmoiron/sqlx"
+  "github.com/Workiva/go-datastructures/queue"
 )
 
 var database *sqlx.DB
-var orderQueue Queue
+//A dynamically sized queue of orders submitted from API
+//OMS will collect from this queue and process the orders
+var orderQueue queue.Queue
 
 func InitDB(config db.DBConfig) {
   database = config.OpenDataBase()
 }
 
+//Ask and Bid Handlers assume that API is supplied with correct JSON format
+
 func AskHandler(c *gin.Context) {
   var order Order
+  //Binds supplied JSON to Order struct from order_book defs
   c.BindJSON(&order)
 }
 
 func BidHandler(c *gin.Context) {
-
+  var order Order
+  //Binds supplied JSON to Order struct from order_book defs
+  c.BindJSON(&order)
 }
 
-func generateOrder(order Order) {
-
+func submitOrder(order Order) {
+  orderQueue.Put(order)
 }
