@@ -24,7 +24,7 @@ type Order struct {
     Buy bool
     NumberOfShares int
     /* For bids this is the maximum price, for asks, lowest price.*/
-    LimitPrice int
+    LimitPrice LimitPrice
     /* Time that order was inserted into book.*/
     EntryTime time.Time
     /* Time order was placed on website.*/

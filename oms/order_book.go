@@ -20,7 +20,8 @@ type Book struct {
     LowestSell *InfoAtLimit
     HighestBuy *InfoAtLimit
     OrderMap   OrderMap
-    LimitMap   LimitMap
+    BuyLimitMap   LimitMap
+    SellLimitMap LimitMap
 }
 
 /* Initialises the book struct,
@@ -32,7 +33,8 @@ func InitBook() *Book {
         LowestSell: nil,
         HighestBuy: nil,
         OrderMap:   make(map[int]*Order),
-        LimitMap:   make(map[LimitPrice]*InfoAtLimit) }
+        BuyLimitMap:   make(map[LimitPrice]*InfoAtLimit),
+        SellLimitMap: make(map[LimitPrice]*InfoAtLimit)}
 }
 
 /* Initialises a limit struct with a price and initialises a slice with base
@@ -49,7 +51,7 @@ func InitLimitInfo (price LimitPrice) *InfoAtLimit {
  * Fields linked to the tree are ingnored. Also updates the current ID,
  * to allow mapping to orders.*/
 func InitOrder(buy bool, numberOfShares int,
-    limitPrice int, eventTime time.Time) *Order {
+    limitPrice LimitPrice, eventTime time.Time) *Order {
     order := Order{
         IdNumber:currentId,
         Buy:buy,
@@ -63,27 +65,61 @@ func InitOrder(buy bool, numberOfShares int,
 /* 1 arg, an order to be inserted into the book.
  * This order will be a partial that is the result of the init order function
  * defined above.*/
-func (b *Book) InsertOrder(order *Order) {
+func (b *Book) InsertOrderIntoBook(order *Order) {
     if (order.Buy) {
-        //insert into buy tree.
+        b.insertOrderIntoBuyTree(order)
     } else {
-        //insert into sell tree.
+        b.insertOrderIntoSellTree(order)
     }
-}
-
-func (b *Book) insertOrderIntoTree(order Order) {
-    //limitPrice := order.LimitPrice
 
 }
 
-func (b *Book) getLimitFromMap(price LimitPrice) (bool, *InfoAtLimit) {
-    info := b.LimitMap[price]
+
+func (b *Book) insertOrderIntoBuyTree(order *Order) {
+    buyMap := b.BuyLimitMap
+    info := buyMap[order.LimitPrice]
     if (info == nil) {
-        return false, info
+        b.insertBuyOrderAtNewLimit(order)
     } else {
-        return true, info
+        b.insertBuyOrderAtLimit(info, order)
     }
 }
+
+func (b *Book) insertOrderIntoSellTree(order *Order) {
+    info := b.SellLimitMap[order.LimitPrice]
+    if (info == nil) {
+        b.insertSellOrderAtNewLimit(order)
+
+    } else {
+        b.insertSellOrderAtLimit(info, order)
+    }
+}
+
+func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
+    limitPrice := order.LimitPrice
+    info := InitLimitInfo(limitPrice)
+    b.BuyTree.Set(limitPrice, info)
+    b.BuyLimitMap.insertLimitInfoIntoMap(info)
+}
+
+func (b *Book) insertSellOrderAtNewLimit(order *Order) {
+    limitPrice := order.LimitPrice
+    info := InitLimitInfo(limitPrice)
+    b.SellTree.Set(limitPrice, info)
+    b.SellLimitMap.insertLimitInfoIntoMap(info)
+}
+
+
+func (b *Book) insertBuyOrderAtLimit(limit *InfoAtLimit, order *Order) {
+    limit.OrderList = append(limit.OrderList, order)
+    b.OrderMap.insertOrderIntoMap(order)
+}
+
+func (b *Book) insertSellOrderAtLimit(limit *InfoAtLimit, order *Order) {
+    limit.OrderList = append(limit.OrderList, order)
+    b.OrderMap.insertOrderIntoMap(order)
+}
+
 
 func (m LimitMap) insertLimitInfoIntoMap(
     limit *InfoAtLimit)  {
