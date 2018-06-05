@@ -14,28 +14,21 @@ import (
 )
 
 var database *sqlx.DB
+var orderQueue Queue
 
 func InitDB(config db.DBConfig) {
   database = config.OpenDataBase()
 }
 
 func AskHandler(c *gin.Context) {
-  var transaction db.Transaction
-  c.BindJSON(&transaction)
-
-  transaction.TimeOfTrade = time.Now()
-
-  db.InsertTransaction(database, transaction)
-
-  transactions := db.GetAllTransactionsOfUser(database, 101)
-  fmt.Println(transactions)
-  fmt.Println("")
-  fmt.Println("SIZE OF TRANSACTION TABLE:", len(transactions))
-  fmt.Println("")
-
-  c.JSON(http.StatusOK, transaction.TimeOfTrade)
+  var order Order
+  c.BindJSON(&order)
 }
 
 func BidHandler(c *gin.Context) {
+
+}
+
+func generateOrder(order Order) {
 
 }
