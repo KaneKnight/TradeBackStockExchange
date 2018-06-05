@@ -19,10 +19,12 @@ class App extends React.Component {
   render() {
     //document.body.style.className = "c-container / t--light";
     return (
-      <div id='Stage' className="c-container / t--light">
+      //<div id='Stage' className="c-container / t--light">
+      <div id='Stage' className="grid-container">
         <NavigationBar />
         <CompanyList />
-        <GraphAndCompanyInfo />
+        <GraphAndButtons />
+        <CompanyInfo />
         <UserInfo />
       </div>
     );
@@ -32,7 +34,7 @@ class App extends React.Component {
 class CompanyList extends React.Component {
   render() {
     return (
-      <div className="list_cont">
+      <div className="company_list_cont">
         <div className="list_of_companies">
           <select size="6">
             <option value="apple">Apple</option>
@@ -52,10 +54,18 @@ class CompanyList extends React.Component {
   }
 }
 
-class GraphAndCompanyInfo extends React.Component {
+class GraphAndButtons extends React.Component {
   render() {
     return (
-      <div className="graph_company_cont"> </div>
+      <div className="graph_cont"> Graph </div>
+    )
+  }
+}
+
+class CompanyInfo extends React.Component {
+  render() {
+    return (
+      <div className="company_info_cont"> Hello </div>
     )
   }
 }
@@ -71,7 +81,7 @@ class UserInfo extends React.Component {
 class NavigationBar extends React.Component {
   render() {
     return (
-      <div id='nav_bar' className="navigation_bar">
+      <div id='nav_bar' className="nav_bar_cont">
         <div className="app_name"> App Name Here </div> 
         <div className="login"> Login </div>
         <div className="temp_switch"> Should be switch </div>
@@ -145,7 +155,7 @@ class UiInterface extends React.Component {
 
   render() {
     return (
-      <div className="main_stage">
+      <div className="buy_sell_button">
         <Button 
           button_type={"buy_button"}
           onClick={() => this.buy()}

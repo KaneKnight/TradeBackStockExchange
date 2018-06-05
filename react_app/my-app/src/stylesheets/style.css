@@ -1,189 +1,43 @@
-html {
-  min-width: 600px;
-}
-
 body {
   font-family: "Lato", sans-serif;
   font-size: 18px;
   margin: 0;
   overflow: hidden;
+  /* height: 100%; */
 }
 
-.c-container {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-
-  transition-delay: .3s;
+.grid-container {
+  height: 100vh;
+  display: grid;
+  grid-template-areas: 
+  'navigation_bar navigation_bar navigation_bar'
+  'company_list graph_stocks company_information'
+  'user_information user_information user_information';
+  grid-template-rows: 5% 80% 15%;
+  grid-template-columns: 15% 65% 35%;
 }
 
-.t--light {
-  /*color: black;*/
-  background-color: beige;
-}
-
-.t--dark {
-  /*color: white;*/
-  background-color: dimgray;
-  -webkit-font-smoothing: antialiased !important;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
-  -webkit-text-stroke: 1px transparent;
-}
-
-.t--light .buy_button, .t--light .sell_button {
-  padding: 16px 40px;
-  transition-duration: 0.4s;
-  color:white;
-  border-radius: 4px;
-}
-
-.t--light .buy_button {
-  background-color: lightcoral;
-  border: 2px solid lightcoral;
-}
-
-.t--light .buy_button:hover {
-  color:black;
-  background-color: white;
-}
-
-.t--light .sell_button {
-  background-color: darkmagenta;
-  border: 2px solid darkmagenta;
-  margin-left: 10%;
-}
-
-.t--light .sell_button:hover {
-  color:black;
-  background-color: white;
-}
-
-.t--dark .buy_button, .t--dark .sell_button {
-  padding: 16px 40px;
-  transition-duration: 0.4s;
-  color:black;
-  border-radius: 4px;
-}
-
-.t--dark .buy_button {
-  background-color: antiquewhite;
-  border: 2px solid antiquewhite;
-}
-
-.t--dark .buy_button:hover {
-  color: white;
-  background-color: dimgray;
-}
-
-.t--dark .sell_button {
-  background-color: lightgoldenrodyellow;
-  border: 2px solid lightgoldenrodyellow;
-  margin-left: 10%;
-}
-
-.t--dark .sell_button:hover {
-  color: white;
-  background-color: dimgray;
-}
-
-.navigation_bar {
-  background-color: purple;
-  width: 100%;
-  height: 6%;
-}
-
-.temp_switch {
-  position: relative;
-  float: right;
-  margin-right: 5em;
-}
-
-.login {
-  position: relative;
-  float: right;
-  margin-right: 1em;
-}
-
-.app_name {
-  margin-left: 1em;
-  color: green;
-  width: 10%;
-  float: left;
-}
-
-.list_cont, .graph_company_cont {
-  float: left;
-  height: 80%;
-}
-
-.list_cont {
-  width: 15%;
+.nav_bar_cont {
+  grid-area: navigation_bar;
   background-color: blue;
-  position: fixed;
 }
 
-.graph_company_cont {
-  width: 85%;
+.company_list_cont {
+  grid-area: company_list;
   background-color: red;
-  float: right;
+}
+
+.graph_cont {
+  grid-area: graph_stocks;
+  background-color: purple;
 }
 
 .user_info_cont {
-  background-color: darkgoldenrod;
-  position: relative;
-  float: left;
-  width: 100%;
-  height: 15%;
+  grid-area: user_information;
+  background-color: green;
 }
 
-
-
-
-/* --- Light Dark theme switch --- */
-
-.onoffswitch {
-  float: right;
-  position: relative; width: 90px;
-  -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
-}
-.onoffswitch-checkbox {
-  display: none;
-}
-.onoffswitch-label {
-  display: block; overflow: hidden; cursor: pointer;
-  border: 2px solid #999999; border-radius: 20px;
-}
-.onoffswitch-inner {
-  display: block; width: 200%; margin-left: -100%;
-  transition: margin 0.3s ease-in 0s;
-}
-.onoffswitch-inner:before, .onoffswitch-inner:after {
-  display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
-  font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
-  box-sizing: border-box;
-}
-.onoffswitch-inner:before {
-  content: "Light";
-  padding-left: 10px;
-  background-color: #34A7C1; color: #FFFFFF;
-}
-.onoffswitch-inner:after {
-  content: "Dark";
-  padding-right: 10px;
-  background-color: #EEEEEE; color: #999999;
-  text-align: right;
-}
-.onoffswitch-switch {
-  display: block; width: 18px; margin: 6px;
-  background: #FFFFFF;
-  position: absolute; top: 0; bottom: 0;
-  right: 56px;
-  border: 2px solid #999999; border-radius: 20px;
-  transition: all 0.3s ease-in 0s; 
-}
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
-  margin-left: 0;
-}
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-  right: 0px; 
+.company_info_cont {
+  grid-area: company_information;
+  background-color: yellow;
 }
