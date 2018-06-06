@@ -47,8 +47,13 @@ func OrderHandler(c *gin.Context) {
   orderQueue.Put(order)
 }
 
+type equity struct {
+  id int      `json:"id"`
+  name string `json:"text"`
+}
+
 type equityList struct {
-  equities []string `json:"equities"`
+  equities []equity `json:"results"`
 }
 
 //API handler that returns a list of all equity we serve
