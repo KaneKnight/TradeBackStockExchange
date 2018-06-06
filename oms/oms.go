@@ -47,6 +47,35 @@ func OrderHandler(c *gin.Context) {
   orderQueue.Put(order)
 }
 
+type equityList struct {
+  equities []string `json:"equities"`
+}
+
+//API handler that returns a list of all equity we serve
+func GetEquityList(c *gin.Context) {
+
+}
+
+type equityDataRequest struct {
+  equityName string `json:"equityName"`
+  dataNums   int    `json:"dataNums"`
+}
+
+type equityDataResponse struct {
+  equityName string     `json:"equityName"`
+  equityData []equityData `json:"data"`
+}
+
+type equityData struct {
+  time time.Time `json:"time"`
+  price int64    `json:"price"`
+}
+
+//API handler that returns n number of datapoints for a requested equity
+func GetEquityDataPoints(c *gin.Context) {
+
+}
+
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
   for true {
