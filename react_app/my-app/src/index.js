@@ -16,8 +16,8 @@ class App extends React.Component {
   }
 
   selectNewCompany(new_company) {
-    console.log("Called with " + new_company);
-    console.log("Called");
+    //console.log("Called with " + new_company);
+    //console.log("Called");
     this.setState({current_company : new_company})
   }
 
@@ -57,6 +57,8 @@ class CompanyList extends React.Component {
     this.setState({
       options: options,
     });
+
+    this.props.onChange(this.state.selectValue);
 
   }
 
