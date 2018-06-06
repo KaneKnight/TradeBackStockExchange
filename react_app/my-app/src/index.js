@@ -68,7 +68,10 @@ class CompanyList extends React.Component {
     });
     this.props.onChange(newValue);
     var new_list = this.state.recentlyViewedList.slice();
-    new_list.push("Test");
+    new_list.unshift(newValue);
+    if (new_list.length > 5) {
+      new_list.splice(5, 5);
+    }
     this.setState({
       recentlyViewedList: new_list,
     })
@@ -117,20 +120,37 @@ class CompanyList extends React.Component {
 }
 
 class RecentlyViewed extends React.Component {
+
   render() {
 
     var text = "";
     var btn;
 
-    if (this.props.recentlyViewedList.length !== 0) {
-      text = "Recently viewed:"
-      btn = <button id='test' onClick={this.props.jumpToRecent}> Click </button>
+    var list = this.props.recentlyViewedList;
+
+    /* Recently viewed list is not empty, need to build the list */
+    if (list.length !== 0) {
+      text = "Recently viewed:";
+      btn = <button id='test' onClick={this.props.jumpToRecent}> Click </button>;
+      var dummy = document.createElement('div');
+      $(dummy).html();
+      // $(dummy).attr("onclick", )
+      var testDd = document.getElementById('recent_list');
+      testDd.insertBefore(dummy, testDd.firstChild);
     }
 
     return (
-      <div className='recently_viewed_cont'> 
-        {text} {btn}
+      <div id='recent_list' className='recently_viewed_cont'> 
+        {this.props.recentlyViewedList}
       </div>
+    )
+  }
+}
+
+class RecentCompany extends React.Component {
+  render() {
+    return (
+      <div> Test </div>
     )
   }
 }
