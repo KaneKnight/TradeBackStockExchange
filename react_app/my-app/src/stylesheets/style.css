@@ -16,13 +16,14 @@ body {
 
 .grid-container {
   height: 100vh;
+  width: 100vw;
   display: grid;
   grid-template-areas: 
   'navigation_bar navigation_bar navigation_bar'
   'company_list graph_stocks company_information'
   'user_information user_information user_information';
   grid-template-rows: 5% 80% 15%;
-  grid-template-columns: 15% 65% 35%;
+  grid-template-columns: 15% 65% 25%;
 }
 
 .nav_bar_cont {
@@ -107,4 +108,34 @@ body {
 .sell_button:hover {
   color:black;
   background-color: white;
+}
+
+/* CSS For nav bar */
+
+.grid-container-nav-bar {
+  height: 100%;
+  width: 100vw;
+  display: grid;
+  grid-template-areas: 'app_name nav_gap theme_switch login_btn';
+  grid-template-columns: 15% 65% 10% 10%;
+}
+
+.app_name_cont {
+  grid-area: app_name;
+  background-color: beige;
+}
+
+.nav_gap_cont {
+  grid-area: nav_gap;
+  background-color: yellow;
+}
+
+.theme_switch_cont {
+  grid-area: theme_switch;
+  background-color: yellowgreen;
+}
+
+.login_btn_cont {
+  grid-area: login_btn;
+  background-color: greenyellow;
 }

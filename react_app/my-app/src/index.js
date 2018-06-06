@@ -109,9 +109,12 @@ class NavigationBar extends React.Component {
   render() {
     return (
       <div id='nav_bar' className="nav_bar_cont">
-        <div className="app_name"> App Name Here </div> 
-        <div className="login"> Login </div>
-        <div className="temp_switch"> Should be switch </div>
+        <div id='grid_nav_bar' className="grid-container-nav-bar">
+          <div className="app_name_cont"> App Name Here </div> 
+          <div className="nav_gap_cont"> </div>
+          <div className="theme_switch_cont"> Should be switch </div>
+          <div className="login_btn_cont"> Login </div>
+        </div>
       </div>
     )
   }
