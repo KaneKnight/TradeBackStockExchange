@@ -2,7 +2,7 @@ package oms
 
 import (
   "fmt"
-  //"net/http"
+  "net/http"
   //"encoding/json"
   //"errors"
   //"strconv"
@@ -31,9 +31,13 @@ var database *sqlx.DB
 //the need for buffers
 var orderQueue *queue.Queue
 
+//Order book instance
+var book *Book
+
 func init() {
   database = dbConfig.OpenDataBase()
   orderQueue = queue.New(100)
+  book = InitBook()
 
   //initiate the processor routine
   go processOrder()
@@ -47,33 +51,10 @@ func OrderHandler(c *gin.Context) {
   orderQueue.Put(*order)
 }
 
-type equity struct {
-  value string `json:"value"`
-  label string `json:"label"`
-}
-
-type equityList struct {
-  equities []equity `json:"results"`
-}
-
 //API handler that returns a list of all equity we serve
-func GetEquityList(c *gin.Context) {
-
-}
-
-type equityDataRequest struct {
-  equityName string `json:"equityName"`
-  dataNums   int    `json:"dataNums"`
-}
-
-type equityDataResponse struct {
-  equityName string     `json:"equityName"`
-  equityData []equityData `json:"data"`
-}
-
-type equityData struct {
-  time time.Time `json:"time"`
-  price int64    `json:"price"`
+func GetCompanyList(c *gin.Context) {
+  companyList := db.GetAllCompanies(database)
+  c.JSON(http.StatusOK, companyList)
 }
 
 //API handler that returns n number of datapoints for a requested equity
@@ -88,9 +69,15 @@ func processOrder() {
     i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
     order = i[0].(Order)
     //Process the order, need Kane's stuff...
-    time.Sleep(1 * time.Second)
+    success, transactions := book.Execute(order)
+    if success {
+      //put into db
+    }
+
+
+    /*time.Sleep(1 * time.Second)
     fmt.Println(order)
-    fmt.Println(orderQueue.Len())
+    fmt.Println(orderQueue.Len())*/
   }
 }
 

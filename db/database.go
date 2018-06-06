@@ -47,10 +47,10 @@ type DBConfig struct {
 }
 
 type User struct {
-  UserId int              `db:"userid"`
-  UserName string         `db:"username"`
-  UserPasswordHash string `db:"userpasswordhash"`
-  UserCash float64        `db:"usercash"`
+    UserId int              `db:"userid"`
+    UserName string         `db:"username"`
+    UserPasswordHash string `db:"userpasswordhash"`
+    UserCash float64        `db:"usercash"`
 }
 
 type Transaction struct {
@@ -63,15 +63,41 @@ type Transaction struct {
 }
 
 type Position struct {
-  UserId int                    `db:"userid"`
-  Ticker string                 `db:"ticker"`
-  Amount int                    `db:"amount"`
-  CashSpentOnPosition float64   `db:"cashspentonposition"`
+    UserId int                    `db:"userid"`
+    Ticker string                 `db:"ticker"`
+    Amount int                    `db:"amount"`
+    CashSpentOnPosition float64   `db:"cashspentonposition"`
+}
+
+/*--------------TYPE STRUCTS USED FOR QUERIES---------------*/
+
+type Company struct {
+    Value string `json:"value", db:"ticker"`
+    Label string `json:"label", db:"name"`
+}
+
+type CompanyList struct {
+    Companies []Company `json:"results"`
+}
+
+type CompanyDataRequest struct {
+    CompanyName string `json:"companyName"`
+    DataNums    int    `json:"dataNums"`
+}
+
+type CompanyDataResponse struct {
+    CompanyName string        `json:"companyName"`
+    CompanyData []CompanyData `json:"data"`
+}
+
+type CompanyData struct {
+    Time time.Time `json:"time"`
+    Price int64    `json:"price"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
  * sqlx database struct. Opens a connection to the database.*/
- func (db DBConfig) OpenDataBase() (*sqlx.DB) {
+func (db DBConfig) OpenDataBase() (*sqlx.DB) {
     connStr := fmt.Sprintf(`host=%s user=%s password=%s dbname=%s port=%d`,
                            db.Host,
                            db.User,
@@ -258,6 +284,15 @@ func CreateUser(db *sqlx.DB,
     ax.MustExec(`insert into userTable (userName, userPasswordHash, userCash)
                  values ($1, $2, $3)`, userName, userPasswordHash, startingCash)
     ax.Commit()
+}
+
+func GetAllCompanies(db *sqlx.DB) CompanyList {
+    var companyList CompanyList
+    err := db.Select(&companyList.Companies, `select * from companyTabel`, nil)
+    if (err != nil) {
+      log.Fatalln(err)
+    }
+    return companyList
 }
 
 /* 2 args, first is the sqlx database struct pointer, the second is
