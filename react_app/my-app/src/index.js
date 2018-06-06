@@ -82,7 +82,7 @@ class CompanyList extends React.Component {
   }
 
   jumpToRecent() {
-
+    console.log("Called Jump");
   }
 
   render() {
@@ -107,7 +107,7 @@ class CompanyList extends React.Component {
         </div>
         <RecentlyViewed 
           recentlyViewedList={this.state.recentlyViewedList}
-          onClick={this.jumpToRecent}
+          jumpToRecent={this.jumpToRecent}
         />
       </div>
     )
@@ -117,15 +117,17 @@ class CompanyList extends React.Component {
 class RecentlyViewed extends React.Component {
   render() {
 
-    var text = ""
+    var text = "";
+    var btn;
 
     if (this.props.recentlyViewedList.length !== 0) {
       text = "Recently viewed:"
+      btn = <button id='test' onClick={this.props.jumpToRecent}> Click </button>
     }
 
     return (
       <div className='recently_viewed_cont'> 
-        {text}
+        {text} {btn}
       </div>
     )
   }
