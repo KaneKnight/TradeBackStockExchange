@@ -8,9 +8,14 @@ import (
 type InfoAtLimit struct {
     /* Price of the limit.*/
     Price LimitPrice
+
     /* The number of shares traded at that price.
      * Updated when match of orders found.*/
     TotalVolume int
+
+    /* The number of shares within this price limit*/
+    Size int
+
     /* A slice of order pointers. Lower indices will be earlier orders.
      * Ordered by event time.*/
     OrderList []*Order

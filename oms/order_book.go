@@ -3,6 +3,7 @@ package oms
 import (
     "github.com/tomdionysus/binarytree"
     "time"
+    "github.com/louiscarteron/WebApps2018/db"
 )
 
 /* A mapping of ids to orders.*/
@@ -43,6 +44,7 @@ func InitLimitInfo (price LimitPrice) *InfoAtLimit {
     return &InfoAtLimit{
         Price:price,
         TotalVolume: 0,
+        Size: 0,
         OrderList: make([]*Order, 0) }
 }
 
@@ -65,14 +67,20 @@ func InitOrder(userId int, buy bool, numberOfShares int,
 
 /* 1 arg, an order to be inserted into the book.
  * This order will be a partial that is the result of the init order function
- * defined above.*/
+ * defined above. Will update the lowest sell and highest buy.*/
 func (b *Book) InsertOrderIntoBook(order *Order) {
     if (order.Buy) {
         b.insertOrderIntoBuyTree(order)
         b.BuyTree.Balance()
+        if (b.HighestBuy.Price < order.LimitPrice) {
+            b.HighestBuy = b.BuyLimitMap[order.LimitPrice]
+        }
     } else {
         b.insertOrderIntoSellTree(order)
         b.SellTree.Balance()
+        if (b.LowestSell.Price > order.LimitPrice) {
+            b.LowestSell = b.SellLimitMap[order.LimitPrice]
+        }
     }
 }
 
@@ -104,6 +112,7 @@ func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
     info.pushToList(order)
+    info.Size += order.NumberOfShares
     b.BuyTree.Set(limitPrice, info)
     b.BuyLimitMap.insertLimitInfoIntoMap(info)
 }
@@ -114,6 +123,7 @@ func (b *Book) insertSellOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
     info.pushToList(order)
+    info.Size += order.NumberOfShares
     b.SellTree.Set(limitPrice, info)
     b.SellLimitMap.insertLimitInfoIntoMap(info)
 }
@@ -123,6 +133,7 @@ func (b *Book) insertSellOrderAtNewLimit(order *Order) {
 func (b *Book) insertOrderAtLimit(limit *InfoAtLimit, order *Order) {
     limit.OrderList = append(limit.OrderList, order)
     b.OrderMap.insertOrderIntoMap(order)
+    limit.Size += order.NumberOfShares
 }
 
 /* Inserts the limit given into the map.
@@ -142,9 +153,47 @@ func (b *Book) CancelOrder(order *Order) {
   //TODO: implement
 }
 
-func (b *Book) Execute() {
-    //TODO: implement
+func (b *Book) Execute(order *Order) (bool, []db.Transaction) {
+    if (order.Buy) {
+        return b.MatchBuy(order)
+    } else {
+        return b.MatchSell(order)
+    }
 }
+
+func (b *Book) MatchBuy(order *Order) (bool, []db.Transaction) {
+    if (order.LimitPrice >= b.LowestSell.Price) {
+        amountLeftToFill := order.NumberOfShares
+        currentPrice := b.LowestSell
+        for (amountLeftToFill > 0 && currentPrice.Price <= order.LimitPrice) {
+            amountLeftToFill -= currentPrice.Size
+            isNextPrice, newPrice , _  := b.SellTree.Next(
+                currentPrice.
+                Price)
+            if (isNextPrice) {
+                currentPrice = b.SellLimitMap[newPrice.(LimitPrice)]
+            } else {
+                return false, nil
+            }
+        }
+        if (amountLeftToFill > 0) {
+            return false, nil
+        }
+        return b.CalcualteTransactions(order)
+    } else {
+        b.InsertOrderIntoBook(order)
+        return false, nil
+    }
+}
+func (b *Book) MatchSell(order *Order) (bool, []db.Transaction) {
+    if (order.LimitPrice <= b.HighestBuy.Price) {
+        //match
+    } else {
+        b.InsertOrderIntoBook(order)
+        return false, nil
+    }
+}
+
 /*
 func (b *Book) GetVolumeAtLimit(limit *Limit) int {
     //TODO: implement
