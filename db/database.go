@@ -46,6 +46,8 @@ type DBConfig struct {
     Port     int
 }
 
+/*--------------TYPE STRUCTS USED FOR QUERIES---------------*/
+
 type User struct {
     UserId int              `db:"userid"`
     UserName string         `db:"username"`
@@ -68,8 +70,6 @@ type Position struct {
     Amount int                    `db:"amount"`
     CashSpentOnPosition float64   `db:"cashspentonposition"`
 }
-
-/*--------------TYPE STRUCTS USED FOR QUERIES---------------*/
 
 type Company struct {
     Value string `json:"value", db:"ticker"`
@@ -293,6 +293,23 @@ func GetAllCompanies(db *sqlx.DB) CompanyList {
       log.Fatalln(err)
     }
     return companyList
+}
+
+func QueryCompanyDataPoints(db *sqlx.DB, name string, num int) CompanyDataResponse {
+    var resp CompanyDataResponse
+    resp.CompanyName = name
+
+    //TODO: Division in the SQL Query might cause errors
+    err := db.Select(&resp.CompanyData, `select timeOfTrade, cashTraded/amountTraded 
+                                         from transactionTable join
+                                              companyTable 
+                                              using ticker
+                                         limit (num) values ($1)`, num)
+
+    if err != nil {
+      log.Fatalln(err)
+    }
+    return resp
 }
 
 /* 2 args, first is the sqlx database struct pointer, the second is

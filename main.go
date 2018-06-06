@@ -84,8 +84,8 @@ func main() {
 
   api.POST("/bid", oms.OrderHandler)
   api.POST("/ask", oms.OrderHandler)
-  api.GET("/get-equity-list", oms.GetEquityList)
-  api.GET("/get-datapoints", oms.GetEquityDataPoints)
+  api.GET("/get-equity-list", oms.GetCompanyList)
+  api.GET("/get-datapoints", oms.GetCompanyDataPoints)
 
   //run on default port 8080
   router.Run()

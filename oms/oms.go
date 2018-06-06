@@ -1,7 +1,7 @@
 package oms
 
 import (
-  "fmt"
+  //"fmt"
   "net/http"
   //"encoding/json"
   //"errors"
@@ -58,8 +58,12 @@ func GetCompanyList(c *gin.Context) {
 }
 
 //API handler that returns n number of datapoints for a requested equity
-func GetEquityDataPoints(c *gin.Context) {
+func GetCompanyDataPoints(c *gin.Context) {
+  var data db.CompanyDataRequest
+  c.BindJSON(&data)
 
+  response := db.QueryCompanyDataPoints(database, data.CompanyName, data.DataNums)
+  c.JSON(http.StatusOK, response)
 }
 
 //To be run continuously as a goroutine whilst the platform is functioning
