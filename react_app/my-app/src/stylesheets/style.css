@@ -23,7 +23,7 @@ body {
   'company_list graph_stocks company_information'
   'user_information user_information user_information';
   grid-template-rows: 5% 80% 15%;
-  grid-template-columns: 15% 65% 25%;
+  grid-template-columns: 15% 65% 20%;
 }
 
 .nav_bar_cont {
