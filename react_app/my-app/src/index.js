@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import './stylesheets/style.css';
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
 
 class App extends React.Component {
 
@@ -39,8 +41,12 @@ class CompanyList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      opts: [],
+      country: 'AU',
+			searchable: true,
+      selectValue: 'new-south-wales',
+      clearable: false,
     }
+    this.updateValue = this.updateValue.bind(this);
   }
 
   componentDidMount() {
@@ -53,7 +59,7 @@ class CompanyList extends React.Component {
       options.push(<option key={source} value={source}> {source} </option>);
     }
     this.setState({
-      opts: options,
+      company: "Hello there",
     });
 
     // Code to set size for select. 45 magic number, don't change it please thanks.     
@@ -62,13 +68,42 @@ class CompanyList extends React.Component {
     $('#company_sel').attr('size', select_size);
   }
 
+  updateValue(newValue) {
+    this.setState({
+			selectValue: newValue,
+		});
+  }
+
   render() {
+
+    var options = [
+      {value: 'test1', label:'test1'},
+      {value: 'test2', label:'test2'},
+      {value: 'test3', label:'test3'}
+    ]
+
     return (
       <div id='test1' className="company_list_cont">
-        <div className="list_of_companies">
+        {/* <div className="list_of_companies">
           <select id='company_sel' className='company_select' onChange={(e) => this.props.onChange(e.target.value)}>
             {this.state.opts}
           </select>
+        </div> */}
+        <div id='test2'>
+        <Select
+					id="state-select"
+					ref={(ref) => { this.select = ref; }}
+					onBlurResetsInput={false}
+					onSelectResetsInput={false}
+					autoFocus
+					options={options}
+					simpleValue
+					name="selected-state"
+					value={this.state.selectValue}
+					onChange={this.updateValue}
+          searchable={this.state.searchable}
+          clearable={this.state.clearable}
+				/>
         </div>
       </div>
     )
