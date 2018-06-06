@@ -41,9 +41,8 @@ class CompanyList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      country: 'AU',
 			searchable: true,
-      selectValue: 'new-south-wales',
+      selectValue: 'test1',
       clearable: false,
     }
     this.updateValue = this.updateValue.bind(this);
@@ -52,35 +51,43 @@ class CompanyList extends React.Component {
   componentDidMount() {
     // Call code here to get company list
     //var source = ["Apple", "Apple 1", "Apple 2", "Apple 3", "Apple 4", "Apple 5", "Apple 6", "Apple 7", " Apple 8", "Apple 9"];
-    var options = []
-    //should be source.length
-    for (var i = 0; i < 25; i++) {
-      var source = "Apple " + i;
-      options.push(<option key={source} value={source}> {source} </option>);
-    }
-    this.setState({
-      company: "Hello there",
-    });
+    // var options = []
+    // //should be source.length
+    // for (var i = 0; i < 25; i++) {
+    //   var source = "Apple " + i;
+    //   options.push(<option key={source} value={source}> {source} </option>);
+    // }
+    // this.setState({
+    //   company: "Hello there",
+    // });
 
-    // Code to set size for select. 45 magic number, don't change it please thanks.     
-    var cont_div_height = $('#test1').height();
-    var select_size = Math.floor(cont_div_height / 45);
-    $('#company_sel').attr('size', select_size);
+    // // Code to set size for select. 45 magic number, don't change it please thanks.     
+    // var cont_div_height = $('#test1').height();
+    // var select_size = Math.floor(cont_div_height / 45);
+    // $('#company_sel').attr('size', select_size);
+    //this.updateValue("Micro");
+    // this.updateValue("test1");
   }
 
   updateValue(newValue) {
     this.setState({
 			selectValue: newValue,
-		});
+    });
+    this.props.onChange(newValue);
+  }
+
+  generateDummyOptions() {
+    var result = [];
+    for (var i = 0; i < 50; i++) {
+      var name = 'test' + i;
+      result.push({value: name, label: name});
+    }
+    return result;
   }
 
   render() {
 
-    var options = [
-      {value: 'test1', label:'test1'},
-      {value: 'test2', label:'test2'},
-      {value: 'test3', label:'test3'}
-    ]
+    var options = this.generateDummyOptions();
 
     return (
       <div id='test1' className="company_list_cont">
