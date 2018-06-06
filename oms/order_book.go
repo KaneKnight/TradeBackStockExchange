@@ -1,106 +1,140 @@
 package oms
 
-import "time"
+import (
+    "github.com/tomdionysus/binarytree"
+    "time"
+)
 
-var currentId int = 0
+/* A mapping of ids to orders.*/
+type OrderMap map[int]*Order
 
-type Order struct {
-    IdNumber int
-    /* Buy is true, sell is false.*/
-    Buy bool
-    NumberOfShares int
-    /* For bids this is the maximum price, for asks, lowest price.*/
-    LimitPrice int
-    /* Time that order was inserted into book.*/
-    EntryTime time.Time
-    /* Time order was placed on website.*/
-    EventTime time.Time
-    /* Only initialised when order is in map.*/
-    ParentLimit *Limit
-}
-
-type Limit struct {
-    /* Unique identifier that is key of map.*/
-    LimitPrice  int
-    /* The number of shares traded at that price.
-     * Updated when match of orders found.*/
-    TotalVolume int
-    /* Parent price in tree.*/
-    Parent      *Limit
-    /* Left child price in tree.*/
-    LeftChild   *Limit
-    /* Right child price in tree.*/
-    RightChild  *Limit
-    /* A slice of order pointers. Lower indices will be earlier orders.
-     * Ordered by event time.*/
-    OrderList *[]*Order
-}
+/* A mapping of prices to information about the orders at that price.*/
+type LimitMap map[LimitPrice]*InfoAtLimit
 
 /* There will be 2 different trees for buy and sell.
  * Order map which maps IDs to Orders.
  * Limit order which maps prices to limits.*/
 type Book struct {
-    BuyTree    *Limit
-    SellTree   *Limit
-    LowestSell *Limit
-    HighestBuy *Limit
-    OrderMap *map[int]Order
-    LimitMap *map[int]Limit
+    BuyTree    *binarytree.Tree
+    SellTree   *binarytree.Tree
+    LowestSell *InfoAtLimit
+    HighestBuy *InfoAtLimit
+    OrderMap   OrderMap
+    BuyLimitMap   LimitMap
+    SellLimitMap LimitMap
 }
 
 /* Initialises the book struct,
  * maps are created and all other fields are set to nil*/
-func InitBook(book *Book) {
-    *book.OrderMap = make(map[int]Order)
-    *book.LimitMap = make(map[int]Limit)
+func InitBook() *Book {
+    return &Book{
+        BuyTree:    binarytree.NewTree(),
+        SellTree:   binarytree.NewTree(),
+        LowestSell: nil,
+        HighestBuy: nil,
+        OrderMap:   make(map[int]*Order),
+        BuyLimitMap:   make(map[LimitPrice]*InfoAtLimit),
+        SellLimitMap: make(map[LimitPrice]*InfoAtLimit)}
 }
 
 /* Initialises a limit struct with a price and initialises a slice with base
  * length of 10. Fields that are linked to the tree are ignored.*/
-func InitLimit (l *Limit, price int) {
-    l.LimitPrice = price
-    *l.OrderList = make([]*Order, 10)
+func InitLimitInfo (price LimitPrice) *InfoAtLimit {
+    return &InfoAtLimit{
+        Price:price,
+        TotalVolume: 0,
+        OrderList: make([]*Order, 0) }
 }
 
 /* Initalises order struct with buy or sell, number of shares,
  * limit price and the time the order button was clicked.
  * Fields linked to the tree are ingnored. Also updates the current ID,
  * to allow mapping to orders.*/
-func InitOrder(o *Order, buyOrSell bool, numberOfShares int,
-    limitPrice int, eventTime time.Time) {
-    o.IdNumber = currentId
+func InitOrder(userId int, buy bool, numberOfShares int,
+    limitPrice LimitPrice, eventTime time.Time) *Order {
+    order := Order{
+        IdNumber:currentId,
+        UserId:userId,
+        Buy:buy,
+        NumberOfShares:numberOfShares,
+        LimitPrice:limitPrice,
+        EventTime:eventTime}
     currentId += 1
-    o.Buy = buyOrSell
-    o.NumberOfShares = numberOfShares
-    o.LimitPrice = limitPrice
-    o.EventTime = eventTime
+    return &order
 }
 
 /* 1 arg, an order to be inserted into the book.
  * This order will be a partial that is the result of the init order function
  * defined above.*/
-func (b *Book) InsertOrder(order *Order) {
-    if(order.Buy) {
-        b.BuyTree.insertOrderIntoTree(order)
+func (b *Book) InsertOrderIntoBook(order *Order) {
+    if (order.Buy) {
+        b.insertOrderIntoBuyTree(order)
+        b.BuyTree.Balance()
     } else {
-        b.SellTree.insertOrderIntoTree(order)
+        b.insertOrderIntoSellTree(order)
+        b.SellTree.Balance()
     }
 }
 
-func (tree *Limit) insertOrderIntoTree(order *Order) {
-    //TODO: Complete this maybe change insert order above in order to use maps.
-    //if root nil make root of tree and add limit to map.
-    if (tree == nil) {
-        var limit Limit
-        InitLimit(&limit, order.LimitPrice)
-
-    } else if (order.LimitPrice < tree.LimitPrice) {
-        //Insert into left of tree.
-    } else if (order.LimitPrice == tree.LimitPrice){
-        //Insert into list of current limit.
+/* Auxiliary helper to insert. Checks if limit is in the buy map. If not,
+ * a new limit is created and the order is pushed on. */
+func (b *Book) insertOrderIntoBuyTree(order *Order) {
+    info := b.BuyLimitMap[order.LimitPrice]
+    if (info == nil) {
+        b.insertBuyOrderAtNewLimit(order)
     } else {
-        //Insert into right of tree.
+        b.insertOrderAtLimit(info, order)
     }
+}
+
+/* Auxiliary helper to insert. Checks if limit is in the sell map. If not,
+ * a new limit is created and the order is pushed on. */
+func (b *Book) insertOrderIntoSellTree(order *Order) {
+    info := b.SellLimitMap[order.LimitPrice]
+    if (info == nil) {
+        b.insertSellOrderAtNewLimit(order)
+    } else {
+        b.insertOrderAtLimit(info, order)
+    }
+}
+
+/* Creates a new limit pushes the order onto its list and inserts it into the
+ * buy binary tree. Adds the limit to the buy map.*/
+func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
+    limitPrice := order.LimitPrice
+    info := InitLimitInfo(limitPrice)
+    info.pushToList(order)
+    b.BuyTree.Set(limitPrice, info)
+    b.BuyLimitMap.insertLimitInfoIntoMap(info)
+}
+
+/* Creates a new limit pushes the order onto its list and inserts it into the
+ * sell binary tree. Adds the limit to the sell map.*/
+func (b *Book) insertSellOrderAtNewLimit(order *Order) {
+    limitPrice := order.LimitPrice
+    info := InitLimitInfo(limitPrice)
+    info.pushToList(order)
+    b.SellTree.Set(limitPrice, info)
+    b.SellLimitMap.insertLimitInfoIntoMap(info)
+}
+
+/* Takes a limit and pushes the order onto its list,
+ * then inserts the order into its map. */
+func (b *Book) insertOrderAtLimit(limit *InfoAtLimit, order *Order) {
+    limit.OrderList = append(limit.OrderList, order)
+    b.OrderMap.insertOrderIntoMap(order)
+}
+
+/* Inserts the limit given into the map.
+Mapping limit price to the limit info.*/
+func (m LimitMap) insertLimitInfoIntoMap(limit *InfoAtLimit)  {
+    m[limit.Price] = limit
+}
+
+/* Inserts the order given into the books order map.
+ * Mapping order id to order.*/
+func (m OrderMap) insertOrderIntoMap(order *Order) {
+    m[order.IdNumber] = order
 }
 
 /* 1 arg order to be removed from book.*/
@@ -111,7 +145,7 @@ func (b *Book) CancelOrder(order *Order) {
 func (b *Book) Execute() {
     //TODO: implement
 }
-
+/*
 func (b *Book) GetVolumeAtLimit(limit *Limit) int {
     //TODO: implement
     return 0
@@ -120,4 +154,4 @@ func (b *Book) GetVolumeAtLimit(limit *Limit) int {
 func (b *Book) GetBestBid(limit *Limit) *Limit {
     //TODO: implement
     return nil
-}
+} */

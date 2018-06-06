@@ -32,6 +32,7 @@ type JSONWebKeys struct {
 //Use by passing to route definitions, along with the handler
 var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
+
 func main() {
 /*
   jwtMiddleWare_temp := jwtmiddleware.New(jwtmiddleware.Options{
