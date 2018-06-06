@@ -69,32 +69,37 @@ func InitOrder(userId int, buy bool, numberOfShares int,
 func (b *Book) InsertOrderIntoBook(order *Order) {
     if (order.Buy) {
         b.insertOrderIntoBuyTree(order)
+        b.BuyTree.Balance()
     } else {
         b.insertOrderIntoSellTree(order)
+        b.SellTree.Balance()
     }
 }
 
-
+/* Auxiliary helper to insert. Checks if limit is in the buy map. If not,
+ * a new limit is created and the order is pushed on. */
 func (b *Book) insertOrderIntoBuyTree(order *Order) {
-    buyMap := b.BuyLimitMap
-    info := buyMap[order.LimitPrice]
+    info := b.BuyLimitMap[order.LimitPrice]
     if (info == nil) {
         b.insertBuyOrderAtNewLimit(order)
     } else {
-        b.insertBuyOrderAtLimit(info, order)
+        b.insertOrderAtLimit(info, order)
     }
 }
 
+/* Auxiliary helper to insert. Checks if limit is in the sell map. If not,
+ * a new limit is created and the order is pushed on. */
 func (b *Book) insertOrderIntoSellTree(order *Order) {
     info := b.SellLimitMap[order.LimitPrice]
     if (info == nil) {
         b.insertSellOrderAtNewLimit(order)
-
     } else {
-        b.insertSellOrderAtLimit(info, order)
+        b.insertOrderAtLimit(info, order)
     }
 }
 
+/* Creates a new limit pushes the order onto its list and inserts it into the
+ * buy binary tree. Adds the limit to the buy map.*/
 func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
@@ -103,6 +108,8 @@ func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
     b.BuyLimitMap.insertLimitInfoIntoMap(info)
 }
 
+/* Creates a new limit pushes the order onto its list and inserts it into the
+ * sell binary tree. Adds the limit to the sell map.*/
 func (b *Book) insertSellOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
@@ -111,23 +118,21 @@ func (b *Book) insertSellOrderAtNewLimit(order *Order) {
     b.SellLimitMap.insertLimitInfoIntoMap(info)
 }
 
-
-func (b *Book) insertBuyOrderAtLimit(limit *InfoAtLimit, order *Order) {
+/* Takes a limit and pushes the order onto its list,
+ * then inserts the order into its map. */
+func (b *Book) insertOrderAtLimit(limit *InfoAtLimit, order *Order) {
     limit.OrderList = append(limit.OrderList, order)
     b.OrderMap.insertOrderIntoMap(order)
 }
 
-func (b *Book) insertSellOrderAtLimit(limit *InfoAtLimit, order *Order) {
-    limit.OrderList = append(limit.OrderList, order)
-    b.OrderMap.insertOrderIntoMap(order)
-}
-
-
-func (m LimitMap) insertLimitInfoIntoMap(
-    limit *InfoAtLimit)  {
+/* Inserts the limit given into the map.
+Mapping limit price to the limit info.*/
+func (m LimitMap) insertLimitInfoIntoMap(limit *InfoAtLimit)  {
     m[limit.Price] = limit
 }
 
+/* Inserts the order given into the books order map.
+ * Mapping order id to order.*/
 func (m OrderMap) insertOrderIntoMap(order *Order) {
     m[order.IdNumber] = order
 }
