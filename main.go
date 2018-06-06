@@ -1,12 +1,20 @@
 package main
 
 import (
-    "time"
+    "github.com/auth0/go-jwt-middleware"
+    "github.com/dgrijalva/jwt-go"
+    "os"
+    "errors"
+    "log"
+    "github.com/louiscarteron/WebApps2018/db"
     "github.com/louiscarteron/WebApps2018/oms"
+    "github.com/gin-gonic/gin"
+    "github.com/gin-contrib/static"
+    "net/http"
     "fmt"
+    "github.com/gin-gonic/gin/json"
 )
 
-/*
 //Jwks stores a slice of JSON Web Keys
 type Jwks struct {
   Keys []JSONWebKeys `json:"keys"`
@@ -129,21 +137,4 @@ func getPemCert(token *jwt.Token) (string, error) {
   }
 
   return cert, nil
-}
-*/
-
-func main() {
-    book := oms.InitBook()
-    t := time.Now()
-    order1 := oms.InitOrder(1,true, 10, 450, t)
-    order2 := oms.InitOrder(1,true, 43, 463, t.Add(1))
-    order3 := oms.InitOrder(2,true, 7, 450, t.Add(4))
-    book.InsertOrderIntoBook(order1)
-    book.InsertOrderIntoBook(order2)
-    book.InsertOrderIntoBook(order3)
-
-    _, i := book.BuyTree.Get(oms.LimitPrice(450))
-    info := i.(*oms.InfoAtLimit)
-    fmt.Println(info.OrderList[0])
-    fmt.Println(info.OrderList[1])
 }
