@@ -1,18 +1,18 @@
 package main
 
 import (
-  "fmt"
-  "net/http"
-  "encoding/json"
-  "errors"
-  "log"
-  "os"
-  jwtmiddleware "github.com/auth0/go-jwt-middleware"
-  jwt "github.com/dgrijalva/jwt-go"
-  "github.com/gin-contrib/static"
-  "github.com/gin-gonic/gin"
-  "github.com/louiscarteron/WebApps2018/oms"
-  "github.com/louiscarteron/WebApps2018/db"
+    "github.com/auth0/go-jwt-middleware"
+    "github.com/dgrijalva/jwt-go"
+    "os"
+    "errors"
+    "log"
+    "github.com/louiscarteron/WebApps2018/db"
+    "github.com/louiscarteron/WebApps2018/oms"
+    "github.com/gin-gonic/gin"
+    "github.com/gin-contrib/static"
+    "net/http"
+    "fmt"
+    "encoding/json"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -31,6 +31,7 @@ type JSONWebKeys struct {
 
 //Use by passing to route definitions, along with the handler
 var jwtMiddleWare *jwtmiddleware.JWTMiddleware
+
 
 func main() {
 
