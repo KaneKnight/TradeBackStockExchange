@@ -45,21 +45,29 @@ class CompanyList extends React.Component {
 
   componentDidMount() {
     // Call code here to get company list
-    var source = ["Apple", "Apple 1", "Apple 2", "Apple 3", "Apple 4", "Apple 5", "Apple 6", "Apple 7", " Apple 8", "Apple 9"];
+    //var source = ["Apple", "Apple 1", "Apple 2", "Apple 3", "Apple 4", "Apple 5", "Apple 6", "Apple 7", " Apple 8", "Apple 9"];
     var options = []
-    for (var i = 0; i < source.length; i++) {
-      options.push(<option value={source[i]}> {source[i]} </option>);
+    //should be source.length
+    for (var i = 0; i < 25; i++) {
+      var source = "Apple " + i;
+      var idt = "tester" + i;
+      options.push(<option id={idt} value={source}> {source} </option>);
     }
     this.setState({
       opts: options,
     });
+
+    // Code to set size for select. 45 magic number, don't change it please thanks.     
+    var cont_div_height = $('#test1').height();
+    var select_size = Math.floor(cont_div_height / 45);
+    $('#company_sel').attr('size', select_size);
   }
 
   render() {
     return (
-      <div className="company_list_cont">
+      <div id='test1' className="company_list_cont">
         <div className="list_of_companies">
-          <select id='company_select' size="6" onChange={(e) => this.props.onChange(e.target.value)}>
+          <select id='company_sel' className='company_select' onChange={(e) => this.props.onChange(e.target.value)}>
             {this.state.opts}
           </select>
         </div>

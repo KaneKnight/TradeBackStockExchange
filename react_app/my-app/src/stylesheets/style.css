@@ -139,3 +139,32 @@ body {
   grid-area: login_btn;
   background-color: greenyellow;
 }
+
+.company_select {
+  height: 100%;
+  width: 100%;
+  font-size: 24px;
+}
+
+.list_of_companies {
+  border: 1px solid #ccc;
+  overflow: hidden;
+}
+
+.list_of_companies select {
+  border: none;
+  padding: 5px 8px;
+  width: 100%;
+  box-shadow: none;
+  background: whitesmoke;
+}
+
+.list_of_companies select:focus {
+  outline:none;
+}
+
+.list_of_companies select option {
+  border: 1px solid black;
+  /* bottom _ top _ */
+  padding: 0.25em 0px 0.25em 0px;
+}
