@@ -174,3 +174,7 @@ body {
   /* bottom _ top _ */
   padding: 0.25em 0px 0.25em 0px;
 }
+
+.recently_viewed_cont {
+  margin-top: 2em;
+}

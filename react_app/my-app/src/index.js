@@ -44,6 +44,7 @@ class CompanyList extends React.Component {
 			searchable: true,
       selectValue: 'test1',
       clearable: false,
+      recentlyViewedList: [],
     }
     this.updateValue = this.updateValue.bind(this);
   }
@@ -74,6 +75,11 @@ class CompanyList extends React.Component {
 			selectValue: newValue,
     });
     this.props.onChange(newValue);
+    var new_list = this.state.recentlyViewedList.slice();
+    new_list.push("Test");
+    this.setState({
+      recentlyViewedList: new_list,
+    })
   }
 
   generateDummyOptions() {
@@ -112,6 +118,26 @@ class CompanyList extends React.Component {
           clearable={this.state.clearable}
 				/>
         </div>
+        <RecentlyViewed 
+          recentlyViewedList={this.state.recentlyViewedList}
+        />
+      </div>
+    )
+  }
+}
+
+class RecentlyViewed extends React.Component {
+  render() {
+
+    var text = ""
+
+    if (this.props.recentlyViewedList.length !== 0) {
+      text = "Recently viewed:"
+    }
+
+    return (
+      <div className='recently_viewed_cont'> 
+        {text}
       </div>
     )
   }
