@@ -50,8 +50,7 @@ class CompanyList extends React.Component {
     //should be source.length
     for (var i = 0; i < 25; i++) {
       var source = "Apple " + i;
-      var idt = "tester" + i;
-      options.push(<option id={idt} value={source}> {source} </option>);
+      options.push(<option key={source} value={source}> {source} </option>);
     }
     this.setState({
       opts: options,
