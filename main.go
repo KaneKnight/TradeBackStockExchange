@@ -81,8 +81,10 @@ func main() {
   //Set up API routing
   api := router.Group("/api")
 
-  api.POST("/bid", oms.OrderHandler);
-  api.POST("/ask", oms.OrderHandler);
+  api.POST("/bid", oms.OrderHandler)
+  api.POST("/ask", oms.OrderHandler)
+  api.GET("/get-equity-list", oms.GetEquityList)
+  api.GET("/get-datapoints", oms.GetEquityDataPoints)
 
   //run on default port 8080
   router.Run()

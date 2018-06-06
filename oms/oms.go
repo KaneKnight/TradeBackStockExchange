@@ -85,6 +85,7 @@ func processOrder() {
     //Process the order, need Kane's stuff...
     time.Sleep(1 * time.Second)
     fmt.Println(order)
+    fmt.Println(orderQueue.Len())
   }
 }
 
