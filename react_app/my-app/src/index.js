@@ -68,7 +68,15 @@ class CompanyList extends React.Component {
     });
     this.props.onChange(newValue);
     var new_list = this.state.recentlyViewedList.slice();
-    new_list.unshift(newValue);
+
+    for (var i = 0; i < new_list.length; i++) {
+      if(new_list[i].key === newValue) {
+        new_list.splice(i, 1);
+      }
+    }
+
+    var new_elem = <RecentElem key={newValue} recentId={newValue} jumpToRecent={this.jumpToRecent}/>;
+    new_list.unshift(new_elem);
     if (new_list.length > 5) {
       new_list.splice(5, 5);
     }
@@ -86,8 +94,17 @@ class CompanyList extends React.Component {
     return result;
   }
 
-  jumpToRecent() {
-    console.log("Called Jump");
+  jumpToRecent(elem) {
+    var index_of_elem = -1;
+    var new_list = this.state.recentlyViewedList.slice();
+    for (var i = 0; i < new_list.length; i++) {
+      if (new_list[i].key === elem) {
+        index_of_elem = i;
+        break;
+      }
+    }
+    this.state.recentlyViewedList.splice(index_of_elem, 1);
+    this.updateValue(elem);
   }
 
   render() {
@@ -123,22 +140,6 @@ class RecentlyViewed extends React.Component {
 
   render() {
 
-    var text = "";
-    var btn;
-
-    var list = this.props.recentlyViewedList;
-
-    /* Recently viewed list is not empty, need to build the list */
-    if (list.length !== 0) {
-      text = "Recently viewed:";
-      btn = <button id='test' onClick={this.props.jumpToRecent}> Click </button>;
-      var dummy = document.createElement('div');
-      $(dummy).html();
-      // $(dummy).attr("onclick", )
-      var testDd = document.getElementById('recent_list');
-      testDd.insertBefore(dummy, testDd.firstChild);
-    }
-
     return (
       <div id='recent_list' className='recently_viewed_cont'> 
         {this.props.recentlyViewedList}
@@ -147,10 +148,17 @@ class RecentlyViewed extends React.Component {
   }
 }
 
-class RecentCompany extends React.Component {
+class RecentElem extends React.Component {
+
+  doTheJump(elem) {
+    this.props.jumpToRecent(elem);
+  }
+
   render() {
     return (
-      <div> Test </div>
+      <div className='recent_elem'>
+        <a id={this.props.recentId} href="javascript:;" onClick={() => this.doTheJump(this.props.recentId)}> {this.props.recentId} </a>
+      </div>
     )
   }
 }
