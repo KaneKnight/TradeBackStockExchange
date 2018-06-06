@@ -179,7 +179,7 @@ func (b *Book) MatchBuy(order *Order) (bool, []db.Transaction) {
         if (amountLeftToFill > 0) {
             return false, nil
         }
-        return b.CalcualteTransactions(order)
+        return true, b.CalcualteTransactionsBuy(order)
     } else {
         b.InsertOrderIntoBook(order)
         return false, nil
@@ -187,11 +187,33 @@ func (b *Book) MatchBuy(order *Order) (bool, []db.Transaction) {
 }
 func (b *Book) MatchSell(order *Order) (bool, []db.Transaction) {
     if (order.LimitPrice <= b.HighestBuy.Price) {
-        //match
+        amountLeftToFill := order.NumberOfShares
+        currentPrice := b.HighestBuy
+        for (amountLeftToFill > 0 && currentPrice.Price >= order.LimitPrice) {
+            amountLeftToFill -= currentPrice.Size
+            isNextPrice, newPrice , _  := b.BuyTree.Previous(
+                currentPrice.
+                    Price)
+            if (isNextPrice) {
+                currentPrice = b.BuyLimitMap[newPrice.(LimitPrice)]
+            } else {
+                return false, nil
+            }
+        }
+        if (amountLeftToFill > 0) {
+            return false, nil
+        }
+        return true, b.CalcualteTransactionsSell(order)
     } else {
         b.InsertOrderIntoBook(order)
         return false, nil
     }
+}
+func (b *Book) CalcualteTransactionsBuy(order *Order) []db.Transaction {
+    return nil
+}
+func (b *Book) CalcualteTransactionsSell(order *Order) []db.Transaction {
+    return nil
 }
 
 /*
