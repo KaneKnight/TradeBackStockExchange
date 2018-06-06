@@ -12,7 +12,7 @@ import (
     "github.com/gin-contrib/static"
     "net/http"
     "fmt"
-    "github.com/gin-gonic/gin/json"
+    "encoding/json"
 )
 
 //Jwks stores a slice of JSON Web Keys
