@@ -41,7 +41,7 @@ func init() {
 
 //orderHandler assume that API is supplied with correct JSON format
 func OrderHandler(c *gin.Context) {
-  var order Order = Order{101, true, 10, 1001, time.Now(), time.Now(), nil}
+  var order Order = Order{101, 1, true, 10, 1001, time.Now(), time.Now()}
   //Binds supplied JSON to Order struct from order_book defs
   //c.BindJSON(&order)
   orderQueue.Put(order)
