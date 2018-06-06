@@ -96,10 +96,25 @@ class Graph extends React.Component {
   }
 }
 
+function getFigures() {
+  var temp = [2];
+  temp[0] = 100;
+  temp[1] = "+3.4";
+  return temp;
+}
+
 class CompanyInfo extends React.Component {
+
   render() {
+
+    var figures = getFigures();
+
     return (
-      <div className="company_info_cont"> Currently showing info for {this.props.current_company} </div>
+      <div className="company_info_cont"> 
+        Showing for {this.props.current_company}: 
+        <br/> Price: {figures[0]}$
+        <br/> Growth: {figures[1]}%
+      </div>
     )
   }
 }

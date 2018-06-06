@@ -28,27 +28,27 @@ body {
 
 .nav_bar_cont {
   grid-area: navigation_bar;
-  background-color: blue;
+  background-color: beige;
 }
 
 .company_list_cont {
   grid-area: company_list;
-  background-color: red;
+  background-color: beige;
 }
 
 .graph_cont {
   grid-area: graph_stocks;
-  background-color: purple;
+  background-color: beige;
 }
 
 .user_info_cont {
   grid-area: user_information;
-  background-color: green;
+  background-color: beige;
 }
 
 .company_info_cont {
   grid-area: company_information;
-  background-color: yellow;
+  background-color: beige;
 }
 
 .grid-container-graph {
@@ -61,11 +61,12 @@ body {
 
 .graph_display_cont {
   grid-area: graph_display;
-  background-color: white;
+  background-color: beige;
 }
 
 .graph_display {
-  background-color: lightgray;
+  border-radius: 5px;
+  background-color: white;
   height: 94%;
   width: 94%;
   margin-left: 3%;
@@ -74,7 +75,7 @@ body {
 
 .ui_buttons_cont {
   grid-area: ui_buttons;
-  background-color: black;
+  background-color: beige;
 }
 
 /* CSS for buttons */
@@ -157,6 +158,11 @@ body {
   width: 100%;
   box-shadow: none;
   background: whitesmoke;
+  overflow: hidden;
+}
+
+.list_of_companies select:hover {
+  overflow: auto;
 }
 
 .list_of_companies select:focus {
