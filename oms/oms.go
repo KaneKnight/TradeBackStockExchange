@@ -11,7 +11,7 @@ import (
   "github.com/louiscarteron/WebApps2018/db"
   "github.com/jmoiron/sqlx"
   "github.com/Workiva/go-datastructures/queue"
-
+  //"fmt"
 )
 
 var dbConfig = db.DBConfig{
@@ -55,7 +55,7 @@ func OrderHandler(c *gin.Context) {
     buyOrSell = false
   }
 
-  order := InitOrder(orderRequest.UserId, buyOrSell, "APPL", orderRequest.Amount, 0, time.Now())
+  order := InitOrder(orderRequest.UserId, buyOrSell, orderRequest.EquityTicker, orderRequest.Amount, 10, time.Now())
   orderQueue.Put(order)
   c.JSON(http.StatusOK, nil)
 }
@@ -80,7 +80,7 @@ func GetCompanyInfo(c *gin.Context) {
   var data db.CompanyInfoRequest
   c.BindJSON(&data)
 
-  response := db.QueryCompanyInfo(database, data.UserId, data.CompanyName)
+  response := db.QueryCompanyInfo(database, data.UserId, data.Ticker)
   c.JSON(http.StatusOK, response)
 }
 

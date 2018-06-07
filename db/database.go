@@ -105,13 +105,12 @@ type CompanyData struct {
 }
 
 type CompanyInfoRequest struct {
-  UserId      int    `json:"userId"`
-  CompanyName string `json:"companyName"`
+  UserId      int    `json:"UserId"`
+  Ticker      string `json:"Ticker"`
 }
 
 type CompanyInfoResponse struct {
-  CompanyName string `json:"companyName", db:"name"`
-  Amount      int    `json:"amount", db:"amount"`
+  Amount      int    `db:"amount"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -331,20 +330,27 @@ func QueryCompanyDataPoints(db *sqlx.DB, name string, num int) CompanyDataRespon
     return resp
 }
 
-func QueryCompanyInfo(db *sqlx.DB, userId int, companyName string) CompanyInfoResponse {
-  var resp CompanyInfoResponse
-  resp.CompanyName = companyName
+type amounts struct {
+  Amounts []int `db: amount`
+}
 
-  err := db.Select(&resp.Amount, `select amount
-                                  from positionTable join
-                                       companyTable
-                                       using ticker
-                                  where name=$1 and userId=$2`,
-                                  companyName, userId)
+func QueryCompanyInfo(db *sqlx.DB, userId int, ticker string) CompanyInfoResponse {
+  var resp CompanyInfoResponse
+  var amounts amounts
+
+  err := db.Select(&amounts.Amounts, `select amount
+                                  from positionTable
+                                  where ticker=$1 and userId=$2`,
+                                  ticker, userId)
 
 
   if err != nil {
     log.Fatalln(err)
+  }
+  if len(amounts.Amounts) == 0 {
+    resp.Amount = 0
+  } else {
+    resp.Amount = amounts.Amounts[0]
   }
   return resp
 }

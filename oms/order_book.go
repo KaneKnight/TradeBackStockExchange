@@ -4,7 +4,7 @@ import (
     "github.com/tomdionysus/binarytree"
     "time"
     "github.com/louiscarteron/WebApps2018/db"
-    "fmt"
+    //"fmt"
 )
 
 /* A mapping of ids to orders.*/
@@ -30,15 +30,10 @@ type Book struct {
 
 func ExecuteFake(b *Book, order *Order) (bool, *db.Transaction) {
     if (order.Buy) {
-        fmt.Println("Before: ", b)
         b.BuyOrder = order
-        b.LowestSell = InitLimitInfo(10)
-        fmt.Println("After", b)
         return false, nil
     } else {
-        fmt.Println("Before: ", b)
         b.SellOrder = order
-        fmt.Println("After", b)
     }
     return true, &db.Transaction{
         BuyerId:      b.BuyOrder.UserId,
