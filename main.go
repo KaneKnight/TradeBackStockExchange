@@ -1,18 +1,18 @@
 package main
 
 import (
-    "github.com/auth0/go-jwt-middleware"
-    "github.com/dgrijalva/jwt-go"
-    "os"
-    "errors"
-    "log"
-    "github.com/louiscarteron/WebApps2018/db"
-    "github.com/louiscarteron/WebApps2018/oms"
-    "github.com/gin-gonic/gin"
-    "github.com/gin-contrib/static"
-    "net/http"
-    "fmt"
-    "encoding/json"
+  "runtime"
+  "fmt"
+  "net/http"
+  "encoding/json"
+  "errors"
+  //"log"
+  "os"
+  jwtmiddleware "github.com/auth0/go-jwt-middleware"
+  jwt "github.com/dgrijalva/jwt-go"
+  "github.com/gin-contrib/static"
+  "github.com/gin-gonic/gin"
+  "github.com/louiscarteron/WebApps2018/oms"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -34,7 +34,7 @@ var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
 
 func main() {
-
+/*
   jwtMiddleWare_temp := jwtmiddleware.New(jwtmiddleware.Options{
     ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
       aud := os.Getenv("AUTH0_API_AUDIENCE")
@@ -64,14 +64,10 @@ func main() {
 
   //Assign global jwtMiddleWare
   jwtMiddleWare = jwtMiddleWare_temp
+*/
 
-  dbConfig := db.DBConfig{
-    "db.doc.ic.ac.uk",
-    "g1727122_u",
-    "PTqnydAPoe",
-    "g1727122_u",
-    5432}
-  oms.InitDB(dbConfig)
+  //Allow go runtime to utilise 2 CPU cores
+  runtime.GOMAXPROCS(2)
 
   //Set default router
   router := gin.Default()
@@ -84,11 +80,13 @@ func main() {
   })
 
   //Set up API routing
-  api := router.Group("/api")
+  //api := router.Group("/api")
 
-  //TODO:Add /bid:params and /ask/:params
-  api.POST("/bid", oms.BidHandler);
-  api.POST("/ask", oms.AskHandler);
+  api.POST("/bid", oms.OrderHandler)
+  api.POST("/ask", oms.OrderHandler)
+  api.GET("/get-equity-list", oms.GetCompanyList)
+  api.GET("/get-datapoints", oms.GetCompanyDataPoints)
+  api.GET("/get-company-info", oms.GetCompanyInfo)
 
   //run on default port 8080
   router.Run()
