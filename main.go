@@ -1,18 +1,18 @@
 package main
 
 import (
-  "runtime"
   "fmt"
   "net/http"
   "encoding/json"
   "errors"
   //"log"
   "os"
-  jwtmiddleware "github.com/auth0/go-jwt-middleware"
-  jwt "github.com/dgrijalva/jwt-go"
+  "github.com/auth0/go-jwt-middleware"
+  "github.com/dgrijalva/jwt-go"
   "github.com/gin-contrib/static"
   "github.com/gin-gonic/gin"
   "github.com/louiscarteron/WebApps2018/oms"
+  "runtime"
 )
 
 //Jwks stores a slice of JSON Web Keys
