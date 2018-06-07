@@ -6,6 +6,14 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
 class App extends React.Component {
+  render() {
+    return (
+      <Main />
+    )
+  }
+}
+
+class Main extends React.Component {
 
   constructor(props) {
     super(props);

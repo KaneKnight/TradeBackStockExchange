@@ -1,13 +1,97 @@
+
+
+html, body {
+  height: 100%;
+  width: 100%;
+  min-width: 600px;
+  min-height: 600px;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+  font-size: 18px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.grid-container {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-areas: 
+  'navigation_bar navigation_bar navigation_bar'
+  'company_list graph_stocks company_information'
+  'user_information user_information user_information';
+  grid-template-rows: 5% 80% 15%;
+  grid-template-columns: 15% 65% 20%;
+}
+
+.nav_bar_cont {
+  grid-area: navigation_bar;
+  background-color: beige;
+}
+
+.company_list_cont {
+  grid-area: company_list;
+  background-color: beige;
+}
+
+.graph_cont {
+  grid-area: graph_stocks;
+  background-color: beige;
+}
+
+.user_info_cont {
+  grid-area: user_information;
+  background-color: beige;
+}
+
+.company_info_cont {
+  grid-area: company_information;
+  background-color: beige;
+}
+
+.grid-container-graph {
+  display: grid;
+  grid-template-areas:
+  'graph_display'
+  'ui_buttons';
+  grid-template-rows: 85% 15%;
+}
+
+.graph_display_cont {
+  grid-area: graph_display;
+  background-color: beige;
+}
+
+.graph_display {
+  border-radius: 5px;
+  background-color: white;
+  height: 94%;
+  width: 94%;
+  margin-left: 3%;
+  margin-top: 2%;
+}
+
+.ui_buttons_cont {
+  grid-area: ui_buttons;
+  background-color: beige;
+}
+
+/* CSS for buttons */
 .buy_button, .sell_button {
   padding: 16px 40px;
   transition-duration: 0.4s;
   color:white;
   border-radius: 4px;
+  margin-top: 1%;
 }
 
 .buy_button {
   background-color: lightcoral;
   border: 2px solid lightcoral;
+  float: left;
+  margin-left: 10%;
 }
 
 .buy_button:hover {
@@ -18,10 +102,79 @@
 .sell_button {
   background-color: darkmagenta;
   border: 2px solid darkmagenta;
-  margin-left: 10%;
+  float: right;
+  margin-right: 10%;
 }
 
 .sell_button:hover {
   color:black;
   background-color: white;
+}
+
+/* CSS For nav bar */
+
+.grid-container-nav-bar {
+  height: 100%;
+  width: 100vw;
+  display: grid;
+  grid-template-areas: 'app_name nav_gap theme_switch login_btn';
+  grid-template-columns: 15% 65% 10% 10%;
+}
+
+.app_name_cont {
+  grid-area: app_name;
+  background-color: beige;
+}
+
+.nav_gap_cont {
+  grid-area: nav_gap;
+  background-color: beige;
+}
+
+.theme_switch_cont {
+  grid-area: theme_switch;
+  background-color: yellowgreen;
+}
+
+.login_btn_cont {
+  grid-area: login_btn;
+  background-color: greenyellow;
+}
+
+.company_select {
+  height: 100%;
+  width: 100%;
+  font-size: 24px;
+}
+
+.list_of_companies {
+  border: 1px solid #ccc;
+  overflow: hidden;
+}
+
+.list_of_companies select {
+  border: none;
+  padding: 5px 8px;
+  width: 100%;
+  box-shadow: none;
+  background: whitesmoke;
+  overflow: hidden;
+}
+
+.list_of_companies select:hover {
+  overflow: auto;
+}
+
+.list_of_companies select:focus {
+  outline:none;
+}
+
+.list_of_companies select option {
+  border: 1px solid black;
+  /* bottom _ top _ */
+  padding: 0.25em 0px 0.25em 0px;
+}
+
+.recently_viewed_cont {
+  margin-top: 2em;
 }
