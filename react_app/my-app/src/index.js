@@ -28,7 +28,7 @@ class App extends React.Component {
       <div id='Stage' className="grid-container">
         <NavigationBar />
         <CompanyList onChange = {this.selectNewCompany}/>
-        <GraphAndButtons current_company={this.state.current_company}/>
+        <GraphAndButtons onChange={this.selectNewCompany} current_company={this.state.current_company}/>
         <CompanyInfo current_company={this.state.current_company}/>
         <UserInfo />
       </div>
@@ -69,17 +69,24 @@ class CompanyList extends React.Component {
     this.props.onChange(newValue);
     var new_list = this.state.recentlyViewedList.slice();
 
+    /* Check if the key already exists, meaning that we have to move 
+       it to the top of the list. */
+
     for (var i = 0; i < new_list.length; i++) {
       if(new_list[i].key === newValue) {
         new_list.splice(i, 1);
       }
     }
 
+    /* Generate and insert the new element for the list. */
     var new_elem = <RecentElem key={newValue} recentId={newValue} jumpToRecent={this.jumpToRecent}/>;
+    const max_number_of_elems_in_list = 5;
     new_list.unshift(new_elem);
-    if (new_list.length > 5) {
-      new_list.splice(5, 5);
+    if (new_list.length > max_number_of_elems_in_list) {
+      new_list.splice(max_number_of_elems_in_list, 1);
     }
+
+    /* Update state list to the new generate one. */
     this.setState({
       recentlyViewedList: new_list,
     })
@@ -97,12 +104,17 @@ class CompanyList extends React.Component {
   jumpToRecent(elem) {
     var index_of_elem = -1;
     var new_list = this.state.recentlyViewedList.slice();
+
+    /* Find index of the element we want to jump to*/
     for (var i = 0; i < new_list.length; i++) {
       if (new_list[i].key === elem) {
         index_of_elem = i;
         break;
       }
     }
+
+    /* Remove it from original array. Ok to use original as updateValue will make a copy and then
+       update it. */
     this.state.recentlyViewedList.splice(index_of_elem, 1);
     this.updateValue(elem);
   }
@@ -142,6 +154,7 @@ class RecentlyViewed extends React.Component {
 
     return (
       <div id='recent_list' className='recently_viewed_cont'> 
+        Recently viewed: 
         {this.props.recentlyViewedList}
       </div>
     )
@@ -168,7 +181,7 @@ class GraphAndButtons extends React.Component {
     return (
       <div className="grid-container-graph"> 
         <Graph current_company={this.props.current_company}/>
-        <UiInterface />
+        <UiInterface onChange={this.props.onChange} current_company={this.props.current_company}/>
       </div>
     )
   }
@@ -184,10 +197,17 @@ class Graph extends React.Component {
   }
 }
 
-function getFigures() {
-  var temp = [2];
-  temp[0] = 100;
-  temp[1] = "+3.4";
+function getFigures(comp) {
+  var dummy_data_comp = {"BuyerId" : 101, "company" : comp};
+  var dummy_data = JSON.stringify(dummy_data_comp);
+  var temp;
+  $.get(
+    "localhost:8080/api/get-company-info/",
+    dummy_data,
+    res => {
+      temp = res;
+    }
+  );
   return temp;
 }
 
@@ -195,13 +215,15 @@ class CompanyInfo extends React.Component {
 
   render() {
 
-    var figures = getFigures();
+    //var figures = getFigures(this.props.current_company);
+    var figures = [1, 2];
+    console.log("updated");
 
     return (
       <div className="company_info_cont"> 
         Showing for {this.props.current_company}: 
         <br/> Price: {figures[0]}$
-        <br/> Growth: {figures[1]}%
+        <br/> Currently own {figures[1]} shares. 
       </div>
     )
   }
@@ -267,12 +289,12 @@ class UiInterface extends React.Component {
   }
 
   buy() {
-    var dummy_data_buy = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : "AAPL", "AmountTraded" : 42, "CashTraded" : 420};
+    var dummy_data_buy = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : this.props.current_company, "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
-    var dummy_data_sell = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : "AAPL", "AmountTraded" : 42, "CashTraded" : 420};
+    var dummy_data_sell = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : this.props.current_company, "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
@@ -284,11 +306,11 @@ class UiInterface extends React.Component {
       "localhost:8080/api/" + url_type,
       dummy_data,
       res => {
-        window.alert("Transaction completed at time:" + res);
-        //console.log(res);
-	console.log("Transaction done");
+        window.alert("Transaction completed!");
       }
     );
+    /* Change to current company to update the view */
+    this.props.onChange(this.props.current_company);
   }
 
 
