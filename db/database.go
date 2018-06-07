@@ -95,6 +95,16 @@ type CompanyData struct {
     Price int64    `json:"price"`
 }
 
+type CompanyInfoRequest struct {
+  UserId      int    `json:"userId"`
+  CompanyName string `json:"companyName"`
+}
+
+type CompanyInfoResponse struct {
+  CompanyName string `json:"companyName", db:"name"`
+  Amount      int64  `json:"amount", db:"amount"`
+}
+
 /* No args, called on the DataBase struct and returns a pointer to
  * sqlx database struct. Opens a connection to the database.*/
 func (db DBConfig) OpenDataBase() (*sqlx.DB) {
@@ -310,6 +320,24 @@ func QueryCompanyDataPoints(db *sqlx.DB, name string, num int) CompanyDataRespon
       log.Fatalln(err)
     }
     return resp
+}
+
+func QueryCompanyInfo(db *sqlx.DB, userId int, companyName string) CompanyInfoResponse {
+  var resp CompanyInfoResponse
+  resp.CompanyName = companyName
+
+  err := db.Select(&resp.Amount, `select sum(amount)
+                                  from positionTable join
+                                       companyTable
+                                       using ticker
+                                  where name=companyName and userId=userId
+                                  values ($1, $2)`, companyName, userId)
+
+
+  if err != nil {
+    log.Fatalln(err)
+  }
+  return resp
 }
 
 /* 2 args, first is the sqlx database struct pointer, the second is

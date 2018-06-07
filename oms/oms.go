@@ -66,6 +66,15 @@ func GetCompanyDataPoints(c *gin.Context) {
   c.JSON(http.StatusOK, response)
 }
 
+//API handler that returns the amount of stock a user has for a given company
+func GetCompanyInfo(c *gin.Context) {
+  var data db.CompanyInfoRequest
+  c.BindJSON(&data)
+
+  response := db.QueryCompanyInfo(database, data.UserId, data.CompanyName)
+  c.JSON(http.StatusOK, response)
+}
+
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
   for true {
