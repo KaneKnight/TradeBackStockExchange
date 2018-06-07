@@ -311,7 +311,6 @@ func GetAllCompanies(db *sqlx.DB) CompanyList {
     if (err != nil) {
       log.Fatalln(err)
     }
-    fmt.Println(companyList)
     return companyList
 }
 

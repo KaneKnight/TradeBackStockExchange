@@ -57,7 +57,8 @@ func OrderHandler(c *gin.Context) {
   }
 
   order := InitOrder(orderRequest.UserId, buyOrSell, "APPL", orderRequest.Amount, 0, time.Now())
-  orderQueue.Put(*order)
+  //orderQueue.Put(*order)
+  fmt.Println(order)
   c.JSON(http.StatusOK, nil)
 }
 

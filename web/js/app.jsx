@@ -303,14 +303,25 @@ class UiInterface extends React.Component {
     this.sell = this.sell.bind(this);
     this.serverRequest = this.serverRequest.bind(this);
   }
+  
+  getTicker(str) {
+    var regExp = /\(([^)]+)\)/;
+    var result = regExp.exec(str);
+    return result[1];
+  }
 
   buy() {
-    var dummy_data_buy = {"userId" : 101, "equityTicker" : this.props.current_company, "amount" : 1, "orderType" : "marketBid"};
+    var thing_to_cut = this.props.current_company;
+    var ticker = this.getTicker(thing_to_cut);
+    console.log(ticker);
+    var dummy_data_buy = {"userId" : 101, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
-    var dummy_data_sell = {"userId" : 101, "equityTicker" : this.props.current_company, "amount" : 1, "orderType" : "marketAsk"};
+    var thing_to_cut = this.props.current_company;
+    var ticker = this.getTicker(thing_to_cut);
+    var dummy_data_sell = {"userId" : 101, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
