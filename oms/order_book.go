@@ -35,14 +35,20 @@ func (b Book) InsertSellOrderFake(order *Order)  {
     b.SellOrder = order
 }
 
-func (b Book) ExecuteFake() *db.Transaction {
-    return &db.Transaction{
-        BuyerId:b.BuyOrder.UserId,
-        SellerId:b.SellOrder.UserId,
-        Ticker:b.BuyOrder.CompanyTicker,
-        AmountTraded:b.BuyOrder.NumberOfShares,
-        CashTraded:int(b.SellOrder.LimitPrice) * b.BuyOrder.NumberOfShares,
-        TimeOfTrade:time.Now() }
+func (b Book) ExecuteFake(order *Order) (bool, *db.Transaction) {
+    if (order.Buy) {
+        b.InsertBuyOrderFake(order)
+        return false, nil
+    } else {
+        b.InsertSellOrderFake(order)
+    }
+    return true, &db.Transaction{
+        BuyerId:      b.BuyOrder.UserId,
+        SellerId:     b.SellOrder.UserId,
+        Ticker:       b.BuyOrder.CompanyTicker,
+        AmountTraded: b.BuyOrder.NumberOfShares,
+        CashTraded:   int(b.SellOrder.LimitPrice) * b.BuyOrder.NumberOfShares,
+        TimeOfTrade:  time.Now()}
 }
 
 /* Initialises the book struct,

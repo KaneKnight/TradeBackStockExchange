@@ -45,10 +45,12 @@ func init() {
 
 //orderHandler assume that API is supplied with correct JSON format
 func OrderHandler(c *gin.Context) {
-  var order *Order = InitOrder(101, true, 1, 1001, time.Now())
+  var buyOrder *Order = InitOrder(101, true, "AAPL", 1001, 10, time.Now())
+  var sellOrder *Order = InitOrder(101, false, "AAPL", 1001, 10, time.Now())
   //Binds supplied JSON to Order struct from order_book defs
   //c.BindJSON(&order)
-  orderQueue.Put(*order)
+  orderQueue.Put(buyOrder)
+  orderQueue.Put(sellOrder)
 }
 
 //API handler that returns a list of all equity we serve
@@ -81,10 +83,12 @@ func processOrder() {
     var order Order
     i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
     order = i[0].(Order)
+    success, transaction := book.ExecuteFake(&order)
     //Process the order, need Kane's stuff...
-    success, transactions := book.Execute(order)
+    //success, transactions := book.Execute(order)
     if success {
-      //put into db
+      db.InsertTransaction(database, *transaction)
+      db.UpdatePositionOfUsersFromTransaction(database, *transaction)
     }
 
 

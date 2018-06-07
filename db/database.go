@@ -202,7 +202,7 @@ func UpdateBuyerPosition(db *sqlx.DB,
                          buyerId int,
                          ticker string,
                          amountTraded int,
-                         cashTraded float64) {
+                         cashTraded int) {
    var numberOfPositions int
    err := db.Get(&numberOfPositions , `select count(*) from positionTable
                                        where userId=$1 and ticker=$2`,
@@ -228,7 +228,7 @@ func UpdateSellerPosition(db *sqlx.DB,
                           sellerId int,
                           ticker string,
                           amountTraded int,
-                          cashTraded float64) {
+                          cashTraded int) {
     UpdatePosition(ax, sellerId, ticker, -amountTraded, -cashTraded)
     UpdateUserCash(ax, sellerId, cashTraded)
 }
@@ -242,7 +242,7 @@ func CreateNewPosition(ax *sqlx.Tx,
                        userId int,
                        ticker string,
                        amountTraded int,
-                       cashTraded float64) {
+                       cashTraded int) {
     ax.MustExec(`insert into positionTable (userId,
                                             ticker,
                                             amount,
@@ -260,7 +260,7 @@ func UpdatePosition(ax *sqlx.Tx,
                     userId int,
                     ticker string,
                     amountTraded int,
-                    cashTraded float64) {
+                    cashTraded int) {
     ax.MustExec(`update positionTable
                  set amount=amount+$1,
                      cashSpentOnPosition=cashSpentOnPosition+$2
@@ -276,7 +276,7 @@ func UpdatePosition(ax *sqlx.Tx,
  * may be negative.*/
 func UpdateUserCash(ax *sqlx.Tx,
                     userId int,
-                    cashTraded float64) {
+                    cashTraded int) {
     ax.MustExec(`update userTable
                  set userCash=userCash+$1
                  where userId=$2`, cashTraded, userId)
@@ -289,7 +289,7 @@ func UpdateUserCash(ax *sqlx.Tx,
 func CreateUser(db *sqlx.DB,
                 userName string,
                 userPasswordHash string,
-                startingCash float64) {
+                startingCash int) {
     ax := db.MustBegin()
     ax.MustExec(`insert into userTable (userName, userPasswordHash, userCash)
                  values ($1, $2, $3)`, userName, userPasswordHash, startingCash)
