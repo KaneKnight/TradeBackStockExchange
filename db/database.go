@@ -92,7 +92,7 @@ type CompanyDataResponse struct {
 
 type CompanyData struct {
     Time time.Time `json:"time"`
-    Price int64    `json:"price"`
+    Price int      `json:"price"`
 }
 
 type CompanyInfoRequest struct {
@@ -102,7 +102,7 @@ type CompanyInfoRequest struct {
 
 type CompanyInfoResponse struct {
   CompanyName string `json:"companyName", db:"name"`
-  Amount      int64  `json:"amount", db:"amount"`
+  Amount      int    `json:"amount", db:"amount"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -298,7 +298,7 @@ func CreateUser(db *sqlx.DB,
 
 func GetAllCompanies(db *sqlx.DB) CompanyList {
     var companyList CompanyList
-    err := db.Select(&companyList.Companies, `select * from companyTabel`, nil)
+    err := db.Select(&companyList.Companies, `select * from companyTable`, nil)
     if (err != nil) {
       log.Fatalln(err)
     }
@@ -314,7 +314,7 @@ func QueryCompanyDataPoints(db *sqlx.DB, name string, num int) CompanyDataRespon
                                          from transactionTable join
                                               companyTable 
                                               using ticker
-                                         limit (num) values ($1)`, num)
+                                         limit $1`, num)
 
     if err != nil {
       log.Fatalln(err)
@@ -326,12 +326,12 @@ func QueryCompanyInfo(db *sqlx.DB, userId int, companyName string) CompanyInfoRe
   var resp CompanyInfoResponse
   resp.CompanyName = companyName
 
-  err := db.Select(&resp.Amount, `select sum(amount)
+  err := db.Select(&resp.Amount, `select amount
                                   from positionTable join
                                        companyTable
                                        using ticker
-                                  where name=companyName and userId=userId
-                                  values ($1, $2)`, companyName, userId)
+                                  where name=$1 and userId=$2`,
+                                  companyName, userId)
 
 
   if err != nil {

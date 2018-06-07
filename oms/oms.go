@@ -1,7 +1,7 @@
 package oms
 
 import (
-  //"fmt"
+  "fmt"
   "net/http"
   //"encoding/json"
   //"errors"
@@ -82,15 +82,15 @@ func processOrder() {
     i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
     order = i[0].(Order)
     //Process the order, need Kane's stuff...
-    success, transactions := book.Execute(order)
-    if success {
-      //put into db
-    }
+    //success, transactions := book.Execute(order)
+    //if success {
+    //  put into db
+    //}
 
 
-    /*time.Sleep(1 * time.Second)
+    time.Sleep(1 * time.Second)
     fmt.Println(order)
-    fmt.Println(orderQueue.Len())*/
+    fmt.Println(orderQueue.Len())
   }
 }
 
