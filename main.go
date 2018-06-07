@@ -1,14 +1,15 @@
 package main
 
 import (
+
   "fmt"
   "net/http"
   "encoding/json"
   "errors"
   //"log"
   "os"
-  "github.com/auth0/go-jwt-middleware"
-  "github.com/dgrijalva/jwt-go"
+  jwtmiddleware "github.com/auth0/go-jwt-middleware"
+  jwt "github.com/dgrijalva/jwt-go"
   "github.com/gin-contrib/static"
   "github.com/gin-gonic/gin"
   "github.com/louiscarteron/WebApps2018/oms"
@@ -87,6 +88,7 @@ func main() {
   api.GET("/get-company-list", oms.GetCompanyList)
   api.GET("/get-datapoints", oms.GetCompanyDataPoints)
   api.POST("/get-company-info", oms.GetCompanyInfo)
+
 
   //run on default port 8080
   router.Run()

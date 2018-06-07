@@ -12,6 +12,7 @@ import (
   "github.com/jmoiron/sqlx"
   "github.com/Workiva/go-datastructures/queue"
   //"fmt"
+  //"github.com/streadway/amqp"
 )
 
 var dbConfig = db.DBConfig{
@@ -99,5 +100,3 @@ func processOrder() {
       }
   }
 }
-
-
