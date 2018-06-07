@@ -1,8 +1,7 @@
 package oms
 
 import (
-  "fmt"
-  //"net/http"
+  "net/http"
   //"encoding/json"
   //"errors"
   //"strconv"
@@ -12,6 +11,7 @@ import (
   "github.com/louiscarteron/WebApps2018/db"
   "github.com/jmoiron/sqlx"
   "github.com/Workiva/go-datastructures/queue"
+  //"fmt"
   //"github.com/streadway/amqp"
 )
 
@@ -31,9 +31,13 @@ var database *sqlx.DB
 //the need for buffers
 var orderQueue *queue.Queue
 
+//Order book instance
+var book *Book
+
 func init() {
   database = dbConfig.OpenDataBase()
   orderQueue = queue.New(100)
+  book = InitBook()
 
   //initiate the processor routine
   go processOrder()
@@ -41,57 +45,58 @@ func init() {
 
 //orderHandler assume that API is supplied with correct JSON format
 func OrderHandler(c *gin.Context) {
-  var order Order = Order{101, 1, true, 10, 1001, time.Now(), time.Now()}
-  //Binds supplied JSON to Order struct from order_book defs
-  //c.BindJSON(&order)
+  var orderRequest db.OrderRequest
+  c.BindJSON(&orderRequest)
+
+  //TODO:Improve
+  var buyOrSell bool
+  if orderRequest.OrderType == "marketBid" {
+    buyOrSell = true
+  } else {
+    buyOrSell = false
+  }
+
+  order := InitOrder(orderRequest.UserId, buyOrSell, orderRequest.EquityTicker, orderRequest.Amount, 10, time.Now())
   orderQueue.Put(order)
-}
-
-type equity struct {
-  id int      `json:"id"`
-  name string `json:"text"`
-}
-
-type equityList struct {
-  equities []equity `json:"results"`
+  c.JSON(http.StatusOK, nil)
 }
 
 //API handler that returns a list of all equity we serve
-func GetEquityList(c *gin.Context) {
-
-}
-
-type equityDataRequest struct {
-  equityName string `json:"equityName"`
-  dataNums   int    `json:"dataNums"`
-}
-
-type equityDataResponse struct {
-  equityName string     `json:"equityName"`
-  equityData []equityData `json:"data"`
-}
-
-type equityData struct {
-  time time.Time `json:"time"`
-  price int64    `json:"price"`
+func GetCompanyList(c *gin.Context) {
+  companyList := db.GetAllCompanies(database)
+  c.JSON(http.StatusOK, companyList)
 }
 
 //API handler that returns n number of datapoints for a requested equity
-func GetEquityDataPoints(c *gin.Context) {
+func GetCompanyDataPoints(c *gin.Context) {
+  var data db.CompanyDataRequest
+  c.BindJSON(&data)
 
+  response := db.QueryCompanyDataPoints(database, data.CompanyName, data.DataNums)
+  c.JSON(http.StatusOK, response)
+}
+
+//API handler that returns the amount of stock a user has for a given company
+func GetCompanyInfo(c *gin.Context) {
+  var data db.CompanyInfoRequest
+  c.BindJSON(&data)
+
+  response := db.QueryCompanyInfo(database, data.UserId, data.Ticker)
+  c.JSON(http.StatusOK, response)
 }
 
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
   for true {
-    var order Order
-    i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
-    order = i[0].(Order)
-    //Process the order, need Kane's stuff...
-    time.Sleep(1 * time.Second)
-    fmt.Println(order)
-    fmt.Println(orderQueue.Len())
+      var order *Order
+      i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
+      order = i[0].(*Order)
+      success, transaction := ExecuteFake(book, order)
+      //Process the order, need Kane's stuff...
+      //success, transactions := book.Execute(order)
+      if success {
+          db.InsertTransaction(database, *transaction)
+          db.UpdatePositionOfUsersFromTransaction(database, *transaction)
+      }
   }
 }
-
-

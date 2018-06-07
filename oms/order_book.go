@@ -4,6 +4,7 @@ import (
     "github.com/tomdionysus/binarytree"
     "time"
     "github.com/louiscarteron/WebApps2018/db"
+    //"fmt"
 )
 
 /* A mapping of ids to orders.*/
@@ -23,6 +24,24 @@ type Book struct {
     OrderMap   OrderMap
     BuyLimitMap   LimitMap
     SellLimitMap LimitMap
+    BuyOrder *Order
+    SellOrder *Order
+}
+
+func ExecuteFake(b *Book, order *Order) (bool, *db.Transaction) {
+    if (order.Buy) {
+        b.BuyOrder = order
+        return false, nil
+    } else {
+        b.SellOrder = order
+    }
+    return true, &db.Transaction{
+        BuyerId:      b.BuyOrder.UserId,
+        SellerId:     b.SellOrder.UserId,
+        Ticker:       b.BuyOrder.CompanyTicker,
+        AmountTraded: b.BuyOrder.NumberOfShares,
+        CashTraded:   int(b.SellOrder.LimitPrice) * b.BuyOrder.NumberOfShares,
+        TimeOfTrade:  time.Now()}
 }
 
 /* Initialises the book struct,
@@ -35,7 +54,9 @@ func InitBook() *Book {
         HighestBuy: nil,
         OrderMap:   make(map[int]*Order),
         BuyLimitMap:   make(map[LimitPrice]*InfoAtLimit),
-        SellLimitMap: make(map[LimitPrice]*InfoAtLimit)}
+        SellLimitMap: make(map[LimitPrice]*InfoAtLimit),
+        BuyOrder: nil,
+        SellOrder: nil}
 }
 
 /* Initialises a limit struct with a price and initialises a slice with base
@@ -52,12 +73,13 @@ func InitLimitInfo (price LimitPrice) *InfoAtLimit {
  * limit price and the time the order button was clicked.
  * Fields linked to the tree are ingnored. Also updates the current ID,
  * to allow mapping to orders.*/
-func InitOrder(userId int, buy bool, numberOfShares int,
+func InitOrder(userId int, buy bool, companyTicker string, numberOfShares int,
     limitPrice LimitPrice, eventTime time.Time) *Order {
     order := Order{
         IdNumber:currentId,
         UserId:userId,
         Buy:buy,
+        CompanyTicker: companyTicker,
         NumberOfShares:numberOfShares,
         LimitPrice:limitPrice,
         EventTime:eventTime}
@@ -153,7 +175,9 @@ func (b *Book) CancelOrder(order *Order) {
   //TODO: implement
 }
 
-func (b *Book) Execute(order *Order) (bool, []db.Transaction) {
+
+
+func (b *Book) Execute(order *Order) (bool, []*db.Transaction) {
     if (order.Buy) {
         return b.MatchBuy(order)
     } else {
@@ -161,7 +185,7 @@ func (b *Book) Execute(order *Order) (bool, []db.Transaction) {
     }
 }
 
-func (b *Book) MatchBuy(order *Order) (bool, []db.Transaction) {
+func (b *Book) MatchBuy(order *Order) (bool, []*db.Transaction) {
     if (order.LimitPrice >= b.LowestSell.Price) {
         amountLeftToFill := order.NumberOfShares
         currentPrice := b.LowestSell
@@ -185,7 +209,7 @@ func (b *Book) MatchBuy(order *Order) (bool, []db.Transaction) {
         return false, nil
     }
 }
-func (b *Book) MatchSell(order *Order) (bool, []db.Transaction) {
+func (b *Book) MatchSell(order *Order) (bool, []*db.Transaction) {
     if (order.LimitPrice <= b.HighestBuy.Price) {
         amountLeftToFill := order.NumberOfShares
         currentPrice := b.HighestBuy
@@ -209,10 +233,10 @@ func (b *Book) MatchSell(order *Order) (bool, []db.Transaction) {
         return false, nil
     }
 }
-func (b *Book) CalcualteTransactionsBuy(order *Order) []db.Transaction {
+func (b *Book) CalcualteTransactionsBuy(order *Order) []*db.Transaction {
     return nil
 }
-func (b *Book) CalcualteTransactionsSell(order *Order) []db.Transaction {
+func (b *Book) CalcualteTransactionsSell(order *Order) []*db.Transaction {
     return nil
 }
 

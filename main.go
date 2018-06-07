@@ -1,7 +1,7 @@
 package main
 
 import (
-  "runtime"
+
   "fmt"
   "net/http"
   "encoding/json"
@@ -13,6 +13,7 @@ import (
   "github.com/gin-contrib/static"
   "github.com/gin-gonic/gin"
   "github.com/louiscarteron/WebApps2018/oms"
+  "runtime"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -84,8 +85,10 @@ func main() {
 
   api.POST("/bid", oms.OrderHandler)
   api.POST("/ask", oms.OrderHandler)
-  api.GET("/get-equity-list", oms.GetEquityList)
-  api.GET("/get-datapoints", oms.GetEquityDataPoints)
+  api.GET("/get-company-list", oms.GetCompanyList)
+  api.GET("/get-datapoints", oms.GetCompanyDataPoints)
+  api.POST("/get-company-info", oms.GetCompanyInfo)
+
 
   //run on default port 8080
   router.Run()
