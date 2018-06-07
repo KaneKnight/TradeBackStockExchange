@@ -91,11 +91,13 @@ func processOrder() {
     var order Order
     i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
     order = i[0].(Order)
+    success, transaction := book.ExecuteFake(&order)
     //Process the order, need Kane's stuff...
     //success, transactions := book.Execute(order)
-    //if success {
-    //  put into db
-    //}
+    if success {
+      db.InsertTransaction(database, *transaction)
+      db.UpdatePositionOfUsersFromTransaction(database, *transaction)
+    }
 
 
     time.Sleep(1 * time.Second)
