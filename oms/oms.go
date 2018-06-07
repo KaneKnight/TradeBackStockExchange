@@ -32,12 +32,12 @@ var database *sqlx.DB
 var orderQueue *queue.Queue
 
 //Order book instance
-var book *Book
+//var book *Book
 
 func init() {
   database = dbConfig.OpenDataBase()
   orderQueue = queue.New(100)
-  book = InitBook()
+  //book = InitBook()
 
   //initiate the processor routine
   go processOrder()
@@ -45,10 +45,20 @@ func init() {
 
 //orderHandler assume that API is supplied with correct JSON format
 func OrderHandler(c *gin.Context) {
-  var order *Order = InitOrder(101, true, 1, 1001, time.Now())
-  //Binds supplied JSON to Order struct from order_book defs
-  //c.BindJSON(&order)
+  var orderRequest db.OrderRequest
+  c.BindJSON(&orderRequest)
+
+  //TODO:Improve
+  var buyOrSell bool
+  if orderRequest.OrderType == "marketBid" {
+    buyOrSell = true
+  } else {
+    buyOrSell = false
+  }
+
+  order := InitOrder(orderRequest.UserId, buyOrSell, orderRequest.Amount, 0, time.Now())
   orderQueue.Put(*order)
+  c.JSON(http.StatusOK, nil)
 }
 
 //API handler that returns a list of all equity we serve

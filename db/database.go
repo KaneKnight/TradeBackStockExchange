@@ -71,6 +71,15 @@ type Position struct {
     CashSpentOnPosition float64   `db:"cashspentonposition"`
 }
 
+type OrderRequest struct {
+  UserId int `json:"userId"`
+  //TODO: need to decide on who handles time
+  EquityTicker string `json:"equityTicker"`
+  Amount int `json:"amount"`
+  OrderType string `json:"orderType"`
+  //TODO: need to add orderType specific data later
+}
+
 type Company struct {
     Value string `json:"value", db:"ticker"`
     Label string `json:"label", db:"name"`

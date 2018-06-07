@@ -84,7 +84,7 @@ func main() {
 
   api.POST("/bid", oms.OrderHandler)
   api.POST("/ask", oms.OrderHandler)
-  api.GET("/get-equity-list", oms.GetCompanyList)
+  //api.GET("/get-company-list", oms.GetCompanyList)
   api.GET("/get-datapoints", oms.GetCompanyDataPoints)
   api.GET("/get-company-info", oms.GetCompanyInfo)
 

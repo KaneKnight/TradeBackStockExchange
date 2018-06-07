@@ -55,6 +55,7 @@ class CompanyList extends React.Component {
   componentDidMount() {
 
     var options = this.generateDummyOptions();
+    console.log(options);
     this.setState({
       options: options,
     });
@@ -94,12 +95,16 @@ class CompanyList extends React.Component {
   }
 
   generateDummyOptions() {
-    var result = [];
-    for (var i = 0; i < 50; i++) {
-      var name = 'test' + i;
-      result.push({value: name, label: name});
-    }
-    return result;
+    var result;
+    var dummy_data_str = {"packet" : "hi"};
+    var dummy_data = JSON.stringify(dummy_data_str);
+    $.get(
+      "http://localhost:8080/api/get-company-list",
+      res => {
+        result = res;
+      }
+    );
+    return result; 
   }
 
   jumpToRecent(elem) {
@@ -290,12 +295,12 @@ class UiInterface extends React.Component {
   }
 
   buy() {
-    var dummy_data_buy = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : this.props.current_company, "AmountTraded" : 42, "CashTraded" : 420};
+    var dummy_data_buy = {"userId" : 101, "equityTicker" : this.props.current_company, "amount" : 1, "orderType" : "marketBid"};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
-    var dummy_data_sell = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : this.props.current_company, "AmountTraded" : 42, "CashTraded" : 420};
+    var dummy_data_sell = {"userId" : 101, "equityTicker" : this.props.current_company, "amount" : 1, "orderType" : "marketAsk"};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
