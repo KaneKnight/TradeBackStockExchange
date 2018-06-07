@@ -45,6 +45,7 @@ type Order struct {
     /* Buy is true, sell is false.*/
     UserId int
     Buy bool
+    CompanyTicker string
     NumberOfShares int
     /* For bids this is the maximum price, for asks, lowest price.*/
     LimitPrice LimitPrice

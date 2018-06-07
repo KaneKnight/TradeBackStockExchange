@@ -15,7 +15,7 @@ create table transactionTable (
     sellerId integer,
     ticker text,
     amountTraded integer,
-    cashTraded float(53),
+    cashTraded int,
     timeOfTrade timestamp
 );
 
@@ -23,14 +23,14 @@ create table positionTable (
     userId integer,
     ticker text,
     amount integer,
-    cashSpentOnPosition float(53)
+    cashSpentOnPosition int
 );
 
 create table userTable (
     userId serial,
     userName text,
     userPasswordHash text,
-    userCash float(53)
+    userCash int
 );
 
 create table companyTable (
@@ -60,7 +60,7 @@ type Transaction struct {
     SellerId int          `db:"sellerid"`
     Ticker string         `db:"ticker"`
     AmountTraded int      `db:"amounttraded"`
-    CashTraded  float64   `db:"cashtraded"`
+    CashTraded  int   `db:"cashtraded"`
     TimeOfTrade time.Time `db:"timeoftrade"`
 }
 
