@@ -81,8 +81,8 @@ type OrderRequest struct {
 }
 
 type Company struct {
-    Value string `json:"value", db:"ticker"`
-    Label string `json:"label", db:"name"`
+    Value string `db:"ticker"`
+    Label string `db:"name"`
 }
 
 type CompanyList struct {
@@ -307,10 +307,11 @@ func CreateUser(db *sqlx.DB,
 
 func GetAllCompanies(db *sqlx.DB) CompanyList {
     var companyList CompanyList
-    err := db.Select(&companyList.Companies, `select * from companyTable`, nil)
+    err := db.Select(&companyList.Companies, `select * from companyTable`)
     if (err != nil) {
       log.Fatalln(err)
     }
+    fmt.Println(companyList)
     return companyList
 }
 

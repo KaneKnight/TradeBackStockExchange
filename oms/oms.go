@@ -32,12 +32,12 @@ var database *sqlx.DB
 var orderQueue *queue.Queue
 
 //Order book instance
-//var book *Book
+var book *Book
 
 func init() {
   database = dbConfig.OpenDataBase()
   orderQueue = queue.New(100)
-  //book = InitBook()
+  book = InitBook()
 
   //initiate the processor routine
   go processOrder()
@@ -56,7 +56,7 @@ func OrderHandler(c *gin.Context) {
     buyOrSell = false
   }
 
-  order := InitOrder(orderRequest.UserId, buyOrSell, orderRequest.Amount, 0, time.Now())
+  order := InitOrder(orderRequest.UserId, buyOrSell, "APPL", orderRequest.Amount, 0, time.Now())
   orderQueue.Put(*order)
   c.JSON(http.StatusOK, nil)
 }

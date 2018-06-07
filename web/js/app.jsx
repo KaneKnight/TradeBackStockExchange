@@ -43,7 +43,7 @@ class CompanyList extends React.Component {
     super(props);
     this.state = {
 			searchable: true,
-      selectValue: 'test1',
+      selectValue: 'Apple Inc. (AAPL)',
       clearable: false,
       recentlyViewedList: [],
       options: [],
@@ -54,12 +54,20 @@ class CompanyList extends React.Component {
 
   componentDidMount() {
 
-    var options = this.generateDummyOptions();
-    console.log(options);
+    var options_json = this.generateDummyOptions();
+    
+    var options = [];
+    
+    for (var i = 0; i < options_json.length; i++) {
+      var name = "" + options_json[i].Label + " (" + options_json[i].Value + ")";
+      console.log(name);
+      options.push({value: name, label: name });
+    }
+
     this.setState({
       options: options,
     });
-
+    
     this.props.onChange(this.state.selectValue);
 
   }
@@ -95,13 +103,15 @@ class CompanyList extends React.Component {
   }
 
   generateDummyOptions() {
-    var result;
+    var result = [];
     var dummy_data_str = {"packet" : "hi"};
     var dummy_data = JSON.stringify(dummy_data_str);
+    jQuery.ajaxSetup({async:false});
     $.get(
       "http://localhost:8080/api/get-company-list",
       res => {
-        result = res;
+       // console.log(res.results);
+        result = res.results;
       }
     );
     return result; 
