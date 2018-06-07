@@ -314,14 +314,14 @@ class UiInterface extends React.Component {
     var thing_to_cut = this.props.current_company;
     var ticker = this.getTicker(thing_to_cut);
     console.log(ticker);
-    var dummy_data_buy = {"userId" : 101, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
+    var dummy_data_buy = {"userId" : 1, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
     var thing_to_cut = this.props.current_company;
     var ticker = this.getTicker(thing_to_cut);
-    var dummy_data_sell = {"userId" : 101, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
+    var dummy_data_sell = {"userId" : 1, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
     this.serverRequest(dummy_data_sell, "ask");
   }
 

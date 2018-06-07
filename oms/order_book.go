@@ -4,6 +4,7 @@ import (
     "github.com/tomdionysus/binarytree"
     "time"
     "github.com/louiscarteron/WebApps2018/db"
+    "fmt"
 )
 
 /* A mapping of ids to orders.*/
@@ -27,20 +28,17 @@ type Book struct {
     SellOrder *Order
 }
 
-func (b Book) InsertBuyOrderFake(order *Order) {
-    b.BuyOrder = order
-}
-
-func (b Book) InsertSellOrderFake(order *Order)  {
-    b.SellOrder = order
-}
-
-func (b Book) ExecuteFake(order *Order) (bool, *db.Transaction) {
+func ExecuteFake(b *Book, order *Order) (bool, *db.Transaction) {
     if (order.Buy) {
-        b.InsertBuyOrderFake(order)
+        fmt.Println("Before: ", b)
+        b.BuyOrder = order
+        b.LowestSell = InitLimitInfo(10)
+        fmt.Println("After", b)
         return false, nil
     } else {
-        b.InsertSellOrderFake(order)
+        fmt.Println("Before: ", b)
+        b.SellOrder = order
+        fmt.Println("After", b)
     }
     return true, &db.Transaction{
         BuyerId:      b.BuyOrder.UserId,
@@ -61,7 +59,9 @@ func InitBook() *Book {
         HighestBuy: nil,
         OrderMap:   make(map[int]*Order),
         BuyLimitMap:   make(map[LimitPrice]*InfoAtLimit),
-        SellLimitMap: make(map[LimitPrice]*InfoAtLimit)}
+        SellLimitMap: make(map[LimitPrice]*InfoAtLimit),
+        BuyOrder: nil,
+        SellOrder: nil}
 }
 
 /* Initialises a limit struct with a price and initialises a slice with base

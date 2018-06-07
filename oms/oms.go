@@ -1,7 +1,6 @@
 package oms
 
 import (
-  "fmt"
   "net/http"
   //"encoding/json"
   //"errors"
@@ -12,7 +11,7 @@ import (
   "github.com/louiscarteron/WebApps2018/db"
   "github.com/jmoiron/sqlx"
   "github.com/Workiva/go-datastructures/queue"
-  //"github.com/streadway/amqp"
+
 )
 
 var dbConfig = db.DBConfig{
@@ -57,8 +56,7 @@ func OrderHandler(c *gin.Context) {
   }
 
   order := InitOrder(orderRequest.UserId, buyOrSell, "APPL", orderRequest.Amount, 0, time.Now())
-  //orderQueue.Put(*order)
-  fmt.Println(order)
+  orderQueue.Put(order)
   c.JSON(http.StatusOK, nil)
 }
 
@@ -89,21 +87,16 @@ func GetCompanyInfo(c *gin.Context) {
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
   for true {
-    var order Order
-    i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
-    order = i[0].(Order)
-    success, transaction := book.ExecuteFake(&order)
-    //Process the order, need Kane's stuff...
-    //success, transactions := book.Execute(order)
-    if success {
-      db.InsertTransaction(database, *transaction)
-      db.UpdatePositionOfUsersFromTransaction(database, *transaction)
-    }
-
-
-    time.Sleep(1 * time.Second)
-    fmt.Println(order)
-    fmt.Println(orderQueue.Len())
+      var order *Order
+      i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
+      order = i[0].(*Order)
+      success, transaction := ExecuteFake(book, order)
+      //Process the order, need Kane's stuff...
+      //success, transactions := book.Execute(order)
+      if success {
+          db.InsertTransaction(database, *transaction)
+          db.UpdatePositionOfUsersFromTransaction(database, *transaction)
+      }
   }
 }
 
