@@ -52,7 +52,7 @@ type User struct {
     UserId int              `db:"userid"`
     UserName string         `db:"username"`
     UserPasswordHash string `db:"userpasswordhash"`
-    UserCash float64        `db:"usercash"`
+    UserCash int        `db:"usercash"`
 }
 
 type Transaction struct {
@@ -68,7 +68,7 @@ type Position struct {
     UserId int                    `db:"userid"`
     Ticker string                 `db:"ticker"`
     Amount int                    `db:"amount"`
-    CashSpentOnPosition float64   `db:"cashspentonposition"`
+    CashSpentOnPosition int   `db:"cashspentonposition"`
 }
 
 type Company struct {
@@ -92,7 +92,7 @@ type CompanyDataResponse struct {
 
 type CompanyData struct {
     Time time.Time `json:"time"`
-    Price int64    `json:"price"`
+    Price int    `json:"price"`
 }
 
 type CompanyInfoRequest struct {
@@ -102,7 +102,7 @@ type CompanyInfoRequest struct {
 
 type CompanyInfoResponse struct {
   CompanyName string `json:"companyName", db:"name"`
-  Amount      int64  `json:"amount", db:"amount"`
+  Amount      int  `json:"amount", db:"amount"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -168,8 +168,8 @@ func UserCanSellAmountOfShares(db *sqlx.DB,
  * returns true if user has enough cash to buy.*/
 func UserCanBuyAmountRequested(db *sqlx.DB,
                                userId int,
-                               priceOfSale float64) bool {
-    var userCash float64
+                               priceOfSale int) bool {
+    var userCash int
     err := db.Get(&userCash, `select userCash from userTable
                               where userId=$1`, userId)
     if (err != nil) {
