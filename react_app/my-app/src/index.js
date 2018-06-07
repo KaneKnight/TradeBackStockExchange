@@ -1,3 +1,10 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import $ from 'jquery';
+import './stylesheets/style.css';
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
+
 class App extends React.Component {
   render() {
     return (
@@ -304,8 +311,7 @@ class UiInterface extends React.Component {
     /* TODO: Change local host to the actual address of the server. */
     console.log("Sent POST request for request:" + url_type);
     $.post(
-      //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
-      "http://localhost:8080/api/" + url_type,
+      "localhost:8080/api/" + url_type,
       dummy_data,
       res => {
         window.alert("Transaction completed!");
@@ -342,4 +348,4 @@ function Button(props) {
   )
 }
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(<App />, document.getElementById('root'));

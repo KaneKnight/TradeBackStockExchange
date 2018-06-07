@@ -80,7 +80,7 @@ func main() {
   })
 
   //Set up API routing
-  api := router.Group("/api")
+  //api := router.Group("/api")
 
   api.POST("/bid", oms.OrderHandler)
   api.POST("/ask", oms.OrderHandler)
