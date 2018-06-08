@@ -225,6 +225,17 @@ function getFigures(comp) {
 
 class CompanyInfo extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.displayMessage = this.displayMessage.bind(this);
+  }
+
+  displayMessage() {
+    window.alert(
+      "This represents the real-time price of the stock in the market. This is a very volatile figure, and can often change in minutes. This is due to a high volume of orders that get processed every second, which can rapidly change the price."
+    );
+  }
+
   render() {
 
     //var figures = getFigures(this.props.current_company);
@@ -234,7 +245,7 @@ class CompanyInfo extends React.Component {
     return (
       <div className="company_info_cont"> 
         Showing for {this.props.current_company}: 
-        <br/> Price: {figures[0]}$
+        <br/> Price: {figures[0]}$ <button className="yolowhocares" onClick={this.displayMessage}>?</button>
         <br/> Currently own {figures[1]} shares. 
       </div>
     )
