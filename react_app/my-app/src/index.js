@@ -196,10 +196,23 @@ class GraphAndButtons extends React.Component {
 }
 
 class Graph extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.displayMessage = this.displayMessage.bind(this);
+  }
+
+  displayMessage() {
+    window.alert(
+      "Graph that shows the price history of a share for the current company."
+    );
+  }
+
   render() {
     return (
       <div className="graph_display_cont">
         <div className="graph_display"> Showing graph for {this.props.current_company}
+        <button className="againPleaseStop" onClick={this.displayMessage}>?</button>
           <div className="photo">
           <img src="http://www.bbc.co.uk/staticarchive/d952b4abb2a9af3e8f001f7af8afaecfa7a4e4ae.gif" alt="dummy_graph_example" className="center"></img> 
           </div>
