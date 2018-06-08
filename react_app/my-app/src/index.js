@@ -199,7 +199,11 @@ class Graph extends React.Component {
   render() {
     return (
       <div className="graph_display_cont">
-        <div className="graph_display"> Showing graph for {this.props.current_company}</div>
+        <div className="graph_display"> Showing graph for {this.props.current_company}
+          <div className="photo">
+          <img src="http://www.bbc.co.uk/staticarchive/d952b4abb2a9af3e8f001f7af8afaecfa7a4e4ae.gif" alt="dummy_graph_example" className="center"></img> 
+          </div>
+        </div>
       </div>
     )
   }
@@ -342,10 +346,42 @@ class UiInterface extends React.Component {
 }
 
 /* Button class for rendering the buttons. */
-function Button(props) {
-  return (
-    <button className={props.button_type} onClick={props.onClick}> {props.button_name} </button>
-  )
+class Button extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.displayMessage = this.displayMessage.bind(this);
+  }
+
+  displayMessage() {
+
+    var msg = ""
+
+    if (this.props.button_type === "buy_button") {
+      msg = "There are two types of buy, a market buy and a limit buy:" + 
+      "\n > Market Buy" + 
+      "\n A market buy is an order to buy equity shares at the current available market price. The order will be completed at the current market price, assuming enough trading volume is available. Market buys should only be used for trades that need to happen quickly, with less priority given to price." +
+      "\n > Limit Buy" + 
+      "\n A limit buy is an order to buy equity shares at either the price specified by the investor or below. This should be most used type of buy. A limit buy ensures that the investor is only pays the certain maximum price for the shares, and is therefore only executed when this price is available."
+    } else {
+      msg = "There are two types of sell, a market sell and a limit sell" +
+      "\n > Market Sell" + 
+      "\n A market sell is an order to sell equity shares at the current available market price. This order will be filled at the current market price, provided there is enough trading volume to process a trade. Market sells should be used when the investor wants to sell quickly. This could be because either the price is rapidly dropping and the investor is trying to cut losses, or to reinvest that money in a better stock." + 
+      "\n > Limit Sell" + 
+      "\n An order to sell equity shares at a specified price, or better. Sell-limit orders can be used to specify a minimum price for which you are willing to sell equity shares, and will be executed only once that price (or a better one) is available. They can be useful if you have a target selling price in mind but are unable to frequently monitor your portfolio." +
+      "This should be used by investors who aren’t in a hurry to sell, to try and get a better price. However if the market is incredibly volatile, often your order can be “leapfrogged,” such that it expires and the day could end with a lower price. So these should be used with caution."
+    }
+    window.alert(msg);
+  }
+
+  render() {
+    return (
+      <div className={this.props.button_type}>
+      <button className={this.props.button_type + "_1"} onClick={this.props.onClick}> {this.props.button_name} </button>
+      <button className="question_box" onClick={this.displayMessage}> ? </button>
+      </div>
+    )
+  }
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
