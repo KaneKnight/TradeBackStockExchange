@@ -205,6 +205,7 @@ func (b *Book) MatchBuy(order *Order, marketOrder bool) (bool,
     return false, nil
     }
 }
+
 func (b *Book) MatchSell(order *Order, marketOrder bool) (bool,
     *[]*db.Transaction) {
     if (b.canFillSellOrder(order, marketOrder)) {
@@ -270,6 +271,7 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
                 order.CompanyTicker,order.NumberOfShares, cashTraded,
                 time.Now())
             transactions = append(transactions, transaction)
+            currentPrice.TotalVolume += sellOrder.NumberOfShares
             if (amountLeftToFill < 0) {
                 sellOrder.NumberOfShares = -1 * amountLeftToFill
                 currentPrice.OrderList = append(currentPrice.OrderList,
@@ -300,6 +302,7 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
                 order.CompanyTicker,order.NumberOfShares, cashTraded,
                 time.Now())
             transactions = append(transactions, transaction)
+            currentPrice.TotalVolume += buyOrder.NumberOfShares
             if (amountLeftToFill < 0) {
                 buyOrder.NumberOfShares = -1 * amountLeftToFill
                 currentPrice.OrderList = append(currentPrice.OrderList,
@@ -316,6 +319,7 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
     }
     return &transactions
 }
+
 
 /*
 func (b *Book) GetVolumeAtLimit(limit *Limit) int {
