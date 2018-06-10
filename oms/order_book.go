@@ -28,6 +28,18 @@ type Book struct {
     SellOrder    *Order
 }
 
+func InitTransaction(buyerId int, sellerId int,
+    ticker string, amount int, cashTraded int,
+    timeOfTrade time.Time ) *db.Transaction {
+    return &db.Transaction{
+        BuyerId:buyerId,
+        SellerId:sellerId,
+        Ticker:ticker,
+        AmountTraded:amount,
+        CashTraded:cashTraded,
+        TimeOfTrade:timeOfTrade}
+}
+
 func ExecuteFake(b *Book, order *Order) (bool, *db.Transaction) {
     if (order.Buy) {
         b.BuyOrder = order
@@ -252,24 +264,29 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
     for (amountLeftToFill > 0) {
         exists, sellOrder := currentPrice.popFromList()
         if exists {
-            if (amountLeftToFill)
+            amountLeftToFill -= sellOrder.NumberOfShares
+            cashTraded := order.NumberOfShares * int(currentPrice.Price)
             transaction := InitTransaction(order.UserId, sellOrder.UserId,
-                order.CompanyTicker,order.NumberOfShares)
+                order.CompanyTicker,order.NumberOfShares, cashTraded,
+                time.Now())
+            transactions = append(transactions, transaction)
+            if (amountLeftToFill < 0) {
+                sellOrder.NumberOfShares = -1 * amountLeftToFill
+                currentPrice.OrderList = append(currentPrice.OrderList,
+                    sellOrder)
+            }
+        } else {
+            isNextPrice, newPrice, _ := b.SellTree.Next(currentPrice.Price)
+            if (isNextPrice) {
+                currentPrice = b.SellLimitMap[newPrice.(LimitPrice)]
+            } else {
+                return &transactions
+            }
         }
     }
+    return &transactions
 }
 
-func InitTransaction(buyerId int, sellerId int,
-    ticker string, amount int, cashTraded int,
-    timeOfTrade time.Time ) *db.Transaction {
-        return &db.Transaction{
-            BuyerId:buyerId,
-            SellerId:sellerId,
-            Ticker:ticker,
-            AmountTraded:amount,
-            CashTraded:cashTraded,
-            TimeOfTrade:timeOfTrade}
-}
 func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
     return nil
 }
