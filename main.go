@@ -29,18 +29,20 @@ var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
 func main() {
     order1 := oms.InitOrder(1, true, "AAPL", 100, 100, time.Now())
-    order2 := oms.InitOrder(2, false, "AAPL", 10, 90, time.Now())
-    order3 := oms.InitOrder(3, false, "AAPL", 90, 90, time.Now())
+    order2 := oms.InitOrder(2, false, "AAPL", 25, 100, time.Now())
+    order3 := oms.InitOrder(3, false, "AAPL", 25, 100, time.Now())
+    order4 := oms.InitOrder(4, false, "AAPL", 25, 100, time.Now())
+    order5 := oms.InitOrder(5, false, "AAPL", 25, 100, time.Now())
     b := oms.InitBook()
+    b.Execute(order2, false)
+    b.Execute(order3, false)
+    b.Execute(order4, false)
+    b.Execute(order5, false)
     matched1, trans1 := b.Execute(order1, false)
-    matched2, trans2 := b.Execute(order2, false)
-    matched3, trans3 := b.Execute(order3, false)
     fmt.Println("Buy Matched:", matched1)
-    fmt.Println("Transactions: ", trans1)
-    fmt.Println("Sell Matched", matched2)
-    fmt.Println("Transactions: ", (*trans2)[0])
-    fmt.Println("Sell Matched", matched3)
-    fmt.Println("Transactions: ", (*trans3)[0])
+    for i := 0; i < 4; i++ {
+        fmt.Println("Transaction: ", (*trans1)[i])
+    }
 }
 /*
   jwtMiddleWare_temp := jwtmiddleware.New(jwtmiddleware.Options{

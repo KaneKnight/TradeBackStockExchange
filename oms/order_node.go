@@ -32,7 +32,7 @@ func (info *InfoAtLimit) popFromList() (bool, *Order){
     length := len(info.OrderList)
     if (length > 0) {
         order := info.OrderList[length-1]
-        info.OrderList = info.OrderList[:length - 1]
+        info.OrderList = info.OrderList[1:]
         return true, order
     }
     return false, nil
