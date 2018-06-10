@@ -288,7 +288,33 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
 }
 
 func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
-    return nil
+    amountLeftToFill := order.NumberOfShares
+    currentPrice := b.HighestBuy
+    transactions := make([]*db.Transaction, 1)
+    for (amountLeftToFill > 0) {
+        exists, buyOrder := currentPrice.popFromList()
+        if exists {
+            amountLeftToFill -= buyOrder.NumberOfShares
+            cashTraded := order.NumberOfShares * int(currentPrice.Price)
+            transaction := InitTransaction(buyOrder.UserId, order.UserId,
+                order.CompanyTicker,order.NumberOfShares, cashTraded,
+                time.Now())
+            transactions = append(transactions, transaction)
+            if (amountLeftToFill < 0) {
+                buyOrder.NumberOfShares = -1 * amountLeftToFill
+                currentPrice.OrderList = append(currentPrice.OrderList,
+                    buyOrder)
+            }
+        } else {
+            isNextPrice, newPrice, _ := b.BuyTree.Next(currentPrice.Price)
+            if (isNextPrice) {
+                currentPrice = b.BuyLimitMap[newPrice.(LimitPrice)]
+            } else {
+                return &transactions
+            }
+        }
+    }
+    return &transactions
 }
 
 /*
