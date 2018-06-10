@@ -2,18 +2,11 @@ package main
 
 import (
 
-  "fmt"
-  "net/http"
-  "encoding/json"
-  "errors"
-  //"log"
-  "os"
-  jwtmiddleware "github.com/auth0/go-jwt-middleware"
-  jwt "github.com/dgrijalva/jwt-go"
-  "github.com/gin-contrib/static"
-  "github.com/gin-gonic/gin"
-  "github.com/louiscarteron/WebApps2018/oms"
-  "runtime"
+
+  "github.com/auth0/go-jwt-middleware"
+    "github.com/louiscarteron/WebApps2018/oms"
+    "time"
+    "fmt"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -35,6 +28,20 @@ var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
 
 func main() {
+    order1 := oms.InitOrder(1, true, "AAPL", 100, 100, time.Now())
+    order2 := oms.InitOrder(2, false, "AAPL", 10, 90, time.Now())
+    order3 := oms.InitOrder(3, false, "AAPL", 90, 90, time.Now())
+    b := oms.InitBook()
+    matched1, trans1 := b.Execute(order1, false)
+    matched2, trans2 := b.Execute(order2, false)
+    matched3, trans3 := b.Execute(order3, false)
+    fmt.Println("Buy Matched:", matched1)
+    fmt.Println("Transactions: ", trans1)
+    fmt.Println("Sell Matched", matched2)
+    fmt.Println("Transactions: ", (*trans2)[0])
+    fmt.Println("Sell Matched", matched3)
+    fmt.Println("Transactions: ", (*trans3)[0])
+}
 /*
   jwtMiddleWare_temp := jwtmiddleware.New(jwtmiddleware.Options{
     ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
@@ -66,7 +73,7 @@ func main() {
   //Assign global jwtMiddleWare
   jwtMiddleWare = jwtMiddleWare_temp
 */
-
+/*
   //Allow go runtime to utilise 2 CPU cores
   runtime.GOMAXPROCS(2)
 
@@ -138,3 +145,4 @@ func getPemCert(token *jwt.Token) (string, error) {
 
   return cert, nil
 }
+*/

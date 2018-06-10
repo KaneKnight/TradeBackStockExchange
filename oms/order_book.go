@@ -106,13 +106,13 @@ func (b *Book) InsertOrderIntoBook(order *Order) {
     if (order.Buy) {
         b.insertOrderIntoBuyTree(order)
         b.BuyTree.Balance()
-        if (b.HighestBuy.Price < order.LimitPrice) {
+        if (b.HighestBuy == nil || b.HighestBuy.Price < order.LimitPrice) {
             b.HighestBuy = b.BuyLimitMap[order.LimitPrice]
         }
     } else {
         b.insertOrderIntoSellTree(order)
         b.SellTree.Balance()
-        if (b.LowestSell.Price > order.LimitPrice) {
+        if ( b.LowestSell == nil || b.LowestSell.Price > order.LimitPrice) {
             b.LowestSell = b.SellLimitMap[order.LimitPrice]
         }
     }
@@ -261,7 +261,7 @@ func (b *Book) canFillSellOrder(order *Order, marketOrder bool) bool {
 func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
     amountLeftToFill := order.NumberOfShares
     currentPrice := b.LowestSell
-    transactions := make([]*db.Transaction, 1)
+    transactions := make([]*db.Transaction, 0)
     for (amountLeftToFill > 0) {
         exists, sellOrder := currentPrice.popFromList()
         if exists {
@@ -292,7 +292,7 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
 func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
     amountLeftToFill := order.NumberOfShares
     currentPrice := b.HighestBuy
-    transactions := make([]*db.Transaction, 1)
+    transactions := make([]*db.Transaction, 0)
     for (amountLeftToFill > 0) {
         exists, buyOrder := currentPrice.popFromList()
         if exists {
