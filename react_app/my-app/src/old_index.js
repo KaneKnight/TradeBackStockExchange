@@ -1,20 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import jQuery from 'jquery';
 import './stylesheets/style.css';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
 class App extends React.Component {
-
-  componentWillMount() {
-    window.MyVars = {
-      //id: parseInt(prompt("What user ID?", "Enter user ID")),
-      id: 1,
-    }
-  }
-
   render() {
     return (
       <Main />
@@ -59,7 +50,7 @@ class CompanyList extends React.Component {
     super(props);
     this.state = {
 			searchable: true,
-      selectValue: 'Apple Inc. (AAPL)',
+      selectValue: 'test1',
       clearable: false,
       recentlyViewedList: [],
       options: [],
@@ -70,20 +61,11 @@ class CompanyList extends React.Component {
 
   componentDidMount() {
 
-    var options_json = this.generateDummyOptions();
-    
-    var options = [];
-    
-    for (var i = 0; i < options_json.length; i++) {
-      var name = "" + options_json[i].Label + " (" + options_json[i].Value + ")";
-      console.log(name);
-      options.push({value: name, label: name });
-    }
-
+    var options = this.generateDummyOptions();
     this.setState({
       options: options,
     });
-    
+
     this.props.onChange(this.state.selectValue);
 
   }
@@ -118,25 +100,13 @@ class CompanyList extends React.Component {
     })
   }
 
-  /*generateDummyOptions() {
-    var result = [];
-    var dummy_data_str = {"packet" : "hi"};
-    var dummy_data = JSON.stringify(dummy_data_str);
-    jQuery.ajaxSetup({async:false});
-    $.get(
-      "http://localhost:8080/api/get-company-list",
-      //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-list",
-      res => {
-       // console.log(res.results);
-        result = res.results;
-      }
-    );
-    return result; 
-  }*/
-
   generateDummyOptions() {
-    var result = [{Label: "Apple", Value: "AAPL"}, {Label: "Microsoft", Value: "MSFT"}];
-    return result; 
+    var result = [];
+    for (var i = 0; i < 50; i++) {
+      var name = 'test' + i;
+      result.push({value: name, label: name});
+    }
+    return result;
   }
 
   jumpToRecent(elem) {
@@ -236,26 +206,16 @@ class Graph extends React.Component {
 }
 
 function getFigures(comp) {
-  
-  var regExp = /\(([^)]+)\)/;
-  var result = regExp.exec(comp);
-  console.log(result)
-  if (result === null) {
-    return "";
-  }
-  var dummy_data_comp = {"UserId" : window.MyVars.id, "Ticker" : result[1]};
+  var dummy_data_comp = {"BuyerId" : 101, "company" : comp};
   var dummy_data = JSON.stringify(dummy_data_comp);
   var temp;
-  jQuery.ajaxSetup({async:false});
-  /*$.post(
-    "http://localhost:8080/api/get-company-info",
-    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
+  $.get(
+    "localhost:8080/api/get-company-info/",
     dummy_data,
     res => {
-      temp = res.Amount;  
+      temp = res;
     }
-  );*/
-  console.log(temp)
+  );
   return temp;
 }
 
@@ -263,15 +223,15 @@ class CompanyInfo extends React.Component {
 
   render() {
 
-    var figures = getFigures(this.props.current_company);
-    //var figures = [1, 2];
+    //var figures = getFigures(this.props.current_company);
+    var figures = [1, 2];
     console.log("updated");
 
     return (
       <div className="company_info_cont"> 
         Showing for {this.props.current_company}: 
-        <br/> Price: {}$
-        <br/> Currently own {figures} shares. 
+        <br/> Price: {figures[0]}$
+        <br/> Currently own {figures[1]} shares. 
       </div>
     )
   }
@@ -335,25 +295,14 @@ class UiInterface extends React.Component {
     this.sell = this.sell.bind(this);
     this.serverRequest = this.serverRequest.bind(this);
   }
-  
-  getTicker(str) {
-    var regExp = /\(([^)]+)\)/;
-    var result = regExp.exec(str);
-    return result[1];
-  }
 
   buy() {
-    var thing_to_cut = this.props.current_company;
-    var ticker = this.getTicker(thing_to_cut);
-    console.log(ticker);
-    var dummy_data_buy = {"userId" : window.MyVars.id, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
+    var dummy_data_buy = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : this.props.current_company, "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
-    var thing_to_cut = this.props.current_company;
-    var ticker = this.getTicker(thing_to_cut);
-    var dummy_data_sell = {"userId" : window.MyVars.id, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
+    var dummy_data_sell = {"BuyerId" : 101, "SellerId" : 404, "Ticker" : this.props.current_company, "AmountTraded" : 42, "CashTraded" : 420};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
@@ -361,15 +310,13 @@ class UiInterface extends React.Component {
     var dummy_data = JSON.stringify(dummy_data_str);
     /* TODO: Change local host to the actual address of the server. */
     console.log("Sent POST request for request:" + url_type);
-    jQuery.ajaxSetup({async:false});
-    /*$.post(
-      //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
-      "http://localhost:8080/api/" + url_type,
+    $.post(
+      "localhost:8080/api/" + url_type,
       dummy_data,
       res => {
-        window.alert("Order submitted!");
+        window.alert("Transaction completed!");
       }
-    );*/
+    );
     /* Change to current company to update the view */
     this.props.onChange(this.props.current_company);
   }
