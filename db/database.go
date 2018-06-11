@@ -15,7 +15,7 @@ create table transactionTable (
     sellerId integer,
     ticker text,
     amountTraded integer,
-    cashTraded int,
+    cashTraded integer,
     timeOfTrade timestamp
 );
 
@@ -23,14 +23,14 @@ create table positionTable (
     userId integer,
     ticker text,
     amount integer,
-    cashSpentOnPosition int
+    cashSpentOnPosition interger
 );
 
 create table userTable (
-    userId serial,
+    userId integer,
     userName text,
-    userPasswordHash text,
-    userCash int
+    userCash integer
+    cashReserved integer,
 );
 
 create table companyTable (
@@ -51,7 +51,6 @@ type DBConfig struct {
 type User struct {
     UserId int              `db:"userid"`
     UserName string         `db:"username"`
-    UserPasswordHash string `db:"userpasswordhash"`
     UserCash int        `db:"usercash"`
 }
 
@@ -68,7 +67,8 @@ type Position struct {
     UserId int                    `db:"userid"`
     Ticker string                 `db:"ticker"`
     Amount int                    `db:"amount"`
-    CashSpentOnPosition int   `db:"cashspentonposition"`
+    CashReserved int              `db:"cashreserved"`
+    CashSpentOnPosition int       `db:"cashspentonposition"`
 }
 
 type OrderRequest struct {
@@ -223,6 +223,10 @@ func UpdateBuyerPosition(db *sqlx.DB,
    } else {
        UpdatePosition(ax, buyerId, ticker, amountTraded, cashTraded)
    }
+
+   ax.MustExec(`update userTable
+                       set cashReserved=cashReserved-$1
+                       where userId=$2`, cashTraded, buyerId)
    //Minus may not recognise.
    UpdateUserCash(ax, buyerId, -cashTraded)
 }
@@ -295,14 +299,37 @@ func UpdateUserCash(ax *sqlx.Tx,
 /* 3 args, first is the sqlx database struct pointer, the second is
  * the username and the last is the password hash.*/
 func CreateUser(db *sqlx.DB,
+                userId int,
                 userName string,
-                userPasswordHash string,
                 startingCash int) {
     ax := db.MustBegin()
-    ax.MustExec(`insert into userTable (userName, userPasswordHash, userCash)
-                 values ($1, $2, $3)`, userName, userPasswordHash, startingCash)
+    ax.MustExec(`insert into userTable (userId, userName, userCash, 
+cashReserved)
+                 values ($1, $2, $3, $3)`, userId, userName, startingCash)
     ax.Commit()
 }
+
+func ReserveCash(db *sqlx.DB,
+                 userId int,
+                 numberOfShares int,
+                 limitPrice int) {
+    ax := db.MustBegin()
+    ax.MustExec(`update userTable
+                       set cashReserved=cashReserved+$1
+                       where userId=$2`, numberOfShares * limitPrice, userId)
+    ax.Commit()
+}
+
+func getAvailableCash(db *sqlx.DB,
+                      userId int) int {
+    var available int
+    ax := db.MustBegin()
+    ax.Select(&available, `select userCash - cashReserved from userTable
+                                 where userId=$1`, userId)
+    ax.Commit()
+    return available
+}
+
 
 func GetAllCompanies(db *sqlx.DB) CompanyList {
     var companyList CompanyList

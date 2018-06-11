@@ -4,8 +4,6 @@ import (
 
 
   "github.com/auth0/go-jwt-middleware"
-    "github.com/louiscarteron/WebApps2018/oms"
-    "fmt"
     "github.com/dgrijalva/jwt-go"
     "os"
     "errors"
@@ -14,6 +12,8 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/gin-contrib/static"
     "net/http"
+    "github.com/louiscarteron/WebApps2018/oms"
+    "fmt"
     "encoding/json"
 )
 
@@ -36,6 +36,7 @@ var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
 
 func main() {
+
   jwtMiddleWare_temp := jwtmiddleware.New(jwtmiddleware.Options{
     ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
       aud := os.Getenv("AUTH0_API_AUDIENCE")
@@ -136,4 +137,5 @@ func getPemCert(token *jwt.Token) (string, error) {
   }
 
   return cert, nil
+
 }

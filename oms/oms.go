@@ -38,6 +38,16 @@ func init() {
     orderQueue = queue.New(100)
     bookMap = make(map[string]*Book)
 
+    db.ReserveCash(database, 1, 10, 20)
+    t := db.Transaction{
+        1,
+        2,
+        "MSFT",
+        10,
+        200,
+        time.Now()}
+    db.UpdatePositionOfUsersFromTransaction(database, &t)
+
     //initiate the processor routine
     go processOrder()
 }
