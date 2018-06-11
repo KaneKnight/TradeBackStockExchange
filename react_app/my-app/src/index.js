@@ -395,10 +395,57 @@ class UiInterface extends React.Component {
 }
 
 /* Button class for rendering the buttons. */
+class Button extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      renderChild: false,
+    };
+    this.handleChildUnmount = this.handleChildUnmount.bind(this);
+    this.handleChildMount= this.handleChildMount.bind(this);
+  }
+
+  handleChildUnmount() {
+    this.setState({renderChild: false});
+  }
+
+  handleChildMount() {
+    this.setState({renderChild: true});
+  }
+
+  render() {
+    return (
+      <div className="button_and_action_wrapper">
+        <button className={this.props.button_type} onClick={this.handleChildMount}> {this.props.button_name} </button> 
+        {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} /> : null}
+      </div> 
+    )
+  }
+}
+
+class ActionConfirmation extends React.Component {
+
+  dismiss() {
+    this.props.unmountMe();
+  }
+
+  render() {
+    return (
+      <div> 
+        Hello Guys 
+        <button className="testBtn" onClick={() => this.dismiss()}> close </button> 
+      </div> 
+    )
+  }
+}
+
+/* Old Button function
 function Button(props) {
   return (
     <button className={props.button_type} onClick={props.onClick}> {props.button_name} </button>
   )
 }
+*/
 
 ReactDOM.render(<App />, document.getElementById('root'));
