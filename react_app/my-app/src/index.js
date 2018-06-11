@@ -431,6 +431,8 @@ class ActionConfirmation extends React.Component {
   state = {
     number_of_stock: 0,
     action_type: "market",
+    sample_stock_value: 69,
+    user_budget: 6942096,
   }
 
   dismiss() {
@@ -438,7 +440,7 @@ class ActionConfirmation extends React.Component {
   }
 
   inputChangeStock(e) {
-    var value = parseInt(e.target.value);
+    var value = parseInt(e.target.value, 10);
     /* Always have a default of 0 even if input is empty. */
     if (Number.isNaN(value)) {
       value = 0;
@@ -456,25 +458,31 @@ class ActionConfirmation extends React.Component {
   }
 
   render() {
+
+    var current_amount = this.state.sample_stock_value * this.state.number_of_stock;
+    var amount_left = this.state.user_budget - current_amount;
+
     return (
       <div className="darken_bg">
-      <div className="confirmation_window"> 
-      <button className="close_button" onClick={() => this.dismiss()}> X </button> 
-        <p className="company_viewing"> Viewing for {this.props.current_company} :</p>
-        <p> Number of stock: <input type="number" onChange={e => this.inputChangeStock(e)}/> </p>
-        <p> Type of action: 
-          {/* <div> */}
-            <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice1" name="action" value="market" defaultChecked/>
-            <label htmlFor="actionChoice1"> Market </label>
+        <div className="confirmation_window"> 
+          <button className="close_button" onClick={() => this.dismiss()}> X </button> 
+          <p className="company_viewing"> Viewing for {this.props.current_company} :</p>
+          <p> Number of stock: <input type="number" onChange={e => this.inputChangeStock(e)}/> </p>
+          <p> Type of action: 
+            {/* <div> */}
+              <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice1" name="action" value="market" defaultChecked/>
+              <label htmlFor="actionChoice1"> Market </label>
 
-             <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice2" name="action" value="limit"/>
-            <label htmlFor="actionChoice1"> Limit </label>
-          {/* </div> */}
-        </p>
-        <p> total price: </p>
-        <p> total funds left: </p> 
-        <button className="place_order" > Place order </button> 
-      </div> 
+              <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice2" name="action" value="limit"/>
+              <label htmlFor="actionChoice1"> Limit </label>
+            {/* </div> */}
+          </p>
+          <p> Total price: {current_amount}</p>
+          <p style={{color: amount_left > 0 ? "black" : "red"}}> Total funds left: {amount_left}</p> 
+          <div className="place_order">
+            <button className="place_order_button" disabled={amount_left < 0}> Place order </button> 
+          </div>
+        </div> 
       </div>
     )
   }

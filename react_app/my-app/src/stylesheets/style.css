@@ -79,7 +79,7 @@ body {
 }
 
 /* CSS for buttons */
-.buy_button, .sell_button {
+.buy_button, .sell_button, .place_order_button{
   padding: 16px 40px;
   transition-duration: 0.4s;
   color:white;
@@ -215,6 +215,48 @@ body {
   background-color: rgba(0, 0, 0, .7);
 }
 
+/* Not sure about this, need to test on a different viewport. should in theory work. */
+.place_order {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  transform: translate(-50%, 0%);
+}
+
+.place_order_button {
+  background-color: green;
+  border: 2px solid green;
+  float: left;
+  margin-top: 0%;
+}
+
+.place_order_button:hover {
+  color:black;
+  background-color: white;
+}
+
+.place_order_button:disabled {
+  background-color: gray;
+  border: 2px solid gray;
+}
+
+.place_order_button:disabled:hover {
+  color: white;
+}
+
+.amount_left {
+  color: red;
+}
+
+
+
+
+
+
+
+
+
+/* Input styling, not important */
 input[type="number"] {
   border: 1px solid rgba(0, 0, 0, .4);
 }
