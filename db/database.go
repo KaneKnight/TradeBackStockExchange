@@ -128,7 +128,7 @@ func (db DBConfig) OpenDataBase() (*sqlx.DB) {
 /* 6 args, first is the sqlx database struct pointer and the rest are
  * the fields of Transaction struct, returns void. Inserts a transaction
  * into the database.*/
-func InsertTransaction(db *sqlx.DB, t Transaction) {
+func InsertTransaction(db *sqlx.DB, t *Transaction) {
     ax := db.MustBegin()
     ax.MustExec(`insert into transactionTable (buyerId, sellerId,
                                           ticker, amountTraded,
@@ -190,7 +190,7 @@ func UserCanBuyAmountRequested(db *sqlx.DB,
 /* 2 args, the sqlx database struct pointer and the transaction that
  * we need to update the positons of the buyer and the seller.*/
 func UpdatePositionOfUsersFromTransaction(db *sqlx.DB,
-                                          t Transaction) {
+                                          t *Transaction) {
      ax := db.MustBegin()
      UpdateBuyerPosition(db, ax, t.BuyerId, t.Ticker,
                          t.AmountTraded, t.CashTraded)
