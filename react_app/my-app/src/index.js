@@ -456,6 +456,10 @@ class ActionConfirmation extends React.Component {
     if (Number.isNaN(value)) {
       value = 0;
     }
+
+    /* To prevent from people putting in a decimal number. will be floored. */
+    value = Math.floor(value);
+
     this.setState({
       number_of_stock: value
     });
@@ -519,7 +523,7 @@ class ActionConfirmation extends React.Component {
           <p> Total price: {current_amount}</p>
           <p style={{color: amount_left > 0 ? "black" : "red"}}> Total funds left: {amount_left}</p> 
           <div className="place_order">
-            <button className="place_order_button" disabled={amount_left < 0} onClick={() => this.submitRequest()}> Place order </button> 
+            <button className="place_order_button" disabled={amount_left < 0 || this.state.number_of_stock <= 0} onClick={() => this.submitRequest()}> Place order </button> 
           </div>
         </div> 
       </div>
