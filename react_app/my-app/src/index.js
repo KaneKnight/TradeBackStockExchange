@@ -420,7 +420,7 @@ class Button extends React.Component {
     return (
       <div className="button_and_action_wrapper">
         <button className={this.props.button_type} onClick={this.handleChildMount}> {this.props.button_name} </button> 
-        {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company}/> : null}
+        {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company} button_name={this.props.button_name}/> : null}
       </div> 
     )
   }
@@ -428,15 +428,26 @@ class Button extends React.Component {
 
 class ActionConfirmation extends React.Component {
 
-  state = {
-    number_of_stock: 0,
-    action_type: "market",
-    sample_stock_value: 69,
-    user_budget: 6942096,
+  constructor(props) {
+    super(props);
+
+    this.state ={
+      number_of_stock: 0,
+      action_type: "market",
+      sample_stock_value: 69,
+      user_budget: 6942096,
+      renderSubmitted: false,
+    }
+    this.handleCloseConfirmation = this.handleCloseConfirmation.bind(this);
   }
 
   dismiss() {
     this.props.unmountMe();
+  }
+
+  handleCloseConfirmation() {
+    this.setState({renderSubmitted : false});
+    this.dismiss();
   }
 
   inputChangeStock(e) {
@@ -457,6 +468,33 @@ class ActionConfirmation extends React.Component {
     })
   }
 
+  getTicker(str) {
+    var regExp = /\(([^)]+)\)/;
+    var result = regExp.exec(str);
+    return result[1];
+  }
+
+  submitRequest() {
+    var ticker = this.getTicker(this.props.current_company);
+    var data_to_send ={"userId" : 1, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
+    var data = JSON.stringify(data_to_send);
+    console.log(data);
+    this.setState({renderSubmitted: true});
+    /* 
+    jQuery.ajaxSetup({async:false});
+    var url_type = this.props.button_name.toLowerCase();
+    $.post(
+      //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
+      "http://localhost:8080/api/" + url_type,
+      dummy_data,
+      res => {
+        window.alert("Order submitted!");
+      }
+    );
+    */
+    // this.dismiss();
+  }
+
   render() {
 
     var current_amount = this.state.sample_stock_value * this.state.number_of_stock;
@@ -464,9 +502,10 @@ class ActionConfirmation extends React.Component {
 
     return (
       <div className="darken_bg">
+        {this.state.renderSubmitted ? <SubmitConfirmation unmountMe={this.handleCloseConfirmation}/> : null}
         <div className="confirmation_window"> 
           <button className="close_button" onClick={() => this.dismiss()}> X </button> 
-          <p className="company_viewing"> Viewing for {this.props.current_company} :</p>
+          <p className="company_viewing"> Viewing for {this.props.current_company} - {this.props.button_name}:</p>
           <p> Number of stock: <input type="number" onChange={e => this.inputChangeStock(e)}/> </p>
           <p> Type of action: 
             {/* <div> */}
@@ -480,10 +519,28 @@ class ActionConfirmation extends React.Component {
           <p> Total price: {current_amount}</p>
           <p style={{color: amount_left > 0 ? "black" : "red"}}> Total funds left: {amount_left}</p> 
           <div className="place_order">
-            <button className="place_order_button" disabled={amount_left < 0}> Place order </button> 
+            <button className="place_order_button" disabled={amount_left < 0} onClick={() => this.submitRequest()}> Place order </button> 
           </div>
         </div> 
       </div>
+    )
+  }
+}
+
+class SubmitConfirmation extends React.Component {
+
+  dismiss() {
+    this.props.unmountMe();
+  }
+
+  render() {
+    return (
+      <div className="darken_bg2">
+        <div className="submit_window">
+          <p> Submitted! </p> 
+          <button className="ok_confirmation_button" onClick={() => this.dismiss()}> Click to close </button> 
+        </div> 
+      </div> 
     )
   }
 }
