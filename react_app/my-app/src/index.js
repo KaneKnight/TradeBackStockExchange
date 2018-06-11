@@ -383,11 +383,13 @@ class UiInterface extends React.Component {
           button_type={"buy_button"}
           onClick={() => this.buy()}
           button_name={"Bid"}
+          current_company={this.props.current_company}
         />
         <Button 
           button_type={"sell_button"}
           onClick={() => this.sell()}
           button_name={"Ask"}
+          current_company={this.props.current_company}
         />
       </div>
     )
@@ -418,7 +420,7 @@ class Button extends React.Component {
     return (
       <div className="button_and_action_wrapper">
         <button className={this.props.button_type} onClick={this.handleChildMount}> {this.props.button_name} </button> 
-        {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} /> : null}
+        {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company}/> : null}
       </div> 
     )
   }
@@ -426,16 +428,54 @@ class Button extends React.Component {
 
 class ActionConfirmation extends React.Component {
 
+  state = {
+    number_of_stock: 0,
+    action_type: "market",
+  }
+
   dismiss() {
     this.props.unmountMe();
   }
 
+  inputChangeStock(e) {
+    var value = parseInt(e.target.value);
+    /* Always have a default of 0 even if input is empty. */
+    if (Number.isNaN(value)) {
+      value = 0;
+    }
+    this.setState({
+      number_of_stock: value
+    });
+  }
+
+  inputChangeAction(e) {
+    const value = e.target.value;
+    this.setState({
+      action_type: value
+    })
+  }
+
   render() {
     return (
-      <div> 
-        Hello Guys 
-        <button className="testBtn" onClick={() => this.dismiss()}> close </button> 
+      <div className="darken_bg">
+      <div className="confirmation_window"> 
+      <button className="close_button" onClick={() => this.dismiss()}> X </button> 
+        <p className="company_viewing"> Viewing for {this.props.current_company} :</p>
+        <p> Number of stock: <input type="number" onChange={e => this.inputChangeStock(e)}/> </p>
+        <p> Type of action: 
+          {/* <div> */}
+            <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice1" name="action" value="market" defaultChecked/>
+            <label htmlFor="actionChoice1"> Market </label>
+
+             <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice2" name="action" value="limit"/>
+            <label htmlFor="actionChoice1"> Limit </label>
+          {/* </div> */}
+        </p>
+        <p> total price: </p>
+        <p> total funds left: </p> 
+        <button className="place_order" > Place order </button> 
       </div> 
+      </div>
     )
   }
 }

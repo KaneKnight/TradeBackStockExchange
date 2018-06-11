@@ -178,3 +178,51 @@ body {
 .recently_viewed_cont {
   margin-top: 2em;
 }
+
+
+/* Style for confirmation window */
+.confirmation_window {
+  width: 30vw;
+  height: 50vh;
+  position: absolute;
+  z-index: 15;
+  top: 40%;
+  left: 50%;
+  text-indent: 1em;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid black;
+}
+
+/* Center the viewing title */
+.company_viewing {
+  text-align: center;
+}
+
+.close_button {
+  float: right;
+}
+
+/* To fade background and to make viewing object easier to see. Is reusable. */
+.darken_bg {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, .7);
+}
+
+input[type="number"] {
+  border: 1px solid rgba(0, 0, 0, .4);
+}
+
+/* Hide spinner in number input field. */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
