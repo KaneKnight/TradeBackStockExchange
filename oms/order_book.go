@@ -268,7 +268,7 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
             amountLeftToFill -= sellOrder.NumberOfShares
             cashTraded := order.NumberOfShares * int(currentPrice.Price)
             transaction := InitTransaction(order.UserId, sellOrder.UserId,
-                order.CompanyTicker,order.NumberOfShares, cashTraded,
+                order.CompanyTicker,sellOrder.NumberOfShares, cashTraded,
                 time.Now())
             transactions = append(transactions, transaction)
             currentPrice.TotalVolume += sellOrder.NumberOfShares
@@ -299,7 +299,7 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
             amountLeftToFill -= buyOrder.NumberOfShares
             cashTraded := order.NumberOfShares * int(currentPrice.Price)
             transaction := InitTransaction(buyOrder.UserId, order.UserId,
-                order.CompanyTicker,order.NumberOfShares, cashTraded,
+                order.CompanyTicker, buyOrder.NumberOfShares, cashTraded,
                 time.Now())
             transactions = append(transactions, transaction)
             currentPrice.TotalVolume += buyOrder.NumberOfShares

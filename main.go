@@ -5,8 +5,16 @@ import (
 
   "github.com/auth0/go-jwt-middleware"
     "github.com/louiscarteron/WebApps2018/oms"
-    "time"
     "fmt"
+    "github.com/dgrijalva/jwt-go"
+    "os"
+    "errors"
+    "log"
+    "runtime"
+    "github.com/gin-gonic/gin"
+    "github.com/gin-contrib/static"
+    "net/http"
+    "encoding/json"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -28,23 +36,6 @@ var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
 
 func main() {
-    order1 := oms.InitOrder(1, true, "AAPL", 100, 100, time.Now())
-    order2 := oms.InitOrder(2, false, "AAPL", 25, 100, time.Now())
-    order3 := oms.InitOrder(3, false, "AAPL", 25, 100, time.Now())
-    order4 := oms.InitOrder(4, false, "AAPL", 25, 100, time.Now())
-    order5 := oms.InitOrder(5, false, "AAPL", 25, 100, time.Now())
-    b := oms.InitBook()
-    b.Execute(order2, false)
-    b.Execute(order3, false)
-    b.Execute(order4, false)
-    b.Execute(order5, false)
-    matched1, trans1 := b.Execute(order1, false)
-    fmt.Println("Buy Matched:", matched1)
-    for i := 0; i < 4; i++ {
-        fmt.Println("Transaction: ", (*trans1)[i])
-    }
-}
-/*
   jwtMiddleWare_temp := jwtmiddleware.New(jwtmiddleware.Options{
     ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
       aud := os.Getenv("AUTH0_API_AUDIENCE")
@@ -74,8 +65,7 @@ func main() {
 
   //Assign global jwtMiddleWare
   jwtMiddleWare = jwtMiddleWare_temp
-*/
-/*
+
   //Allow go runtime to utilise 2 CPU cores
   runtime.GOMAXPROCS(2)
 
@@ -147,4 +137,3 @@ func getPemCert(token *jwt.Token) (string, error) {
 
   return cert, nil
 }
-*/
