@@ -4,6 +4,7 @@ import (
     "github.com/tomdionysus/binarytree"
     "time"
     "github.com/louiscarteron/WebApps2018/db"
+    "math"
 )
 
 /* A mapping of ids to orders.*/
@@ -304,10 +305,16 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
 }
 
 func GetHighestBidOfStock(ticker string) int {
+    if bookMap[ticker] == nil {
+        return 0
+    }
     return int(bookMap[ticker].HighestBuy.Price)
 }
 
 func GetLowestAskOfStock(ticker string) int {
+    if bookMap[ticker] == nil {
+        return 0
+    }
     return int(bookMap[ticker].LowestSell.Price)
 }
 
@@ -323,9 +330,17 @@ func getValueAndGain(ticker string, userId int) (int, int) {
 func getPositionResponse(ticker string, userId int) db.PositionResponse {
     position := db.GetPosition(database, ticker, userId)
     currentPriceOfStock := float64(GetHighestBidOfStock(ticker)) / 100
-    value := float64(position.Amount) * currentPriceOfStock
-    gain := ((value / currentPriceOfStock) - 1) * 100
-
+    var value float64
+    var gain float64
+    if (&position != nil && currentPriceOfStock != 0) {
+        value = float64(position.Amount) * currentPriceOfStock
+        cashSpent := float64(position.CashSpentOnPosition)
+        gain = ((value / cashSpent) - 1) * 100
+        gain = Round(gain, 0.01)
+    } else {
+        value = 0
+        gain = 0
+    }
     return db.PositionResponse{
         ticker,
         position.Amount,
@@ -333,3 +348,6 @@ func getPositionResponse(ticker string, userId int) db.PositionResponse {
         gain}
 }
 
+func Round(x float64, unit float64) float64 {
+    return math.Round(x/unit) * unit
+}

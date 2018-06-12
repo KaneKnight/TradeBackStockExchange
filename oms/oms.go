@@ -11,8 +11,8 @@ import (
     "github.com/louiscarteron/WebApps2018/db"
     "github.com/jmoiron/sqlx"
     "github.com/Workiva/go-datastructures/queue"
-    //"fmt"
-    //"github.com/streadway/amqp"
+
+    "fmt"
 )
 
 var dbConfig = db.DBConfig{
@@ -38,15 +38,6 @@ func init() {
     orderQueue = queue.New(100)
     bookMap = make(map[string]*Book)
 
-    db.ReserveCash(database, 1, 10, 20)
-    t := db.Transaction{
-        1,
-        2,
-        "MSFT",
-        10,
-        200,
-        time.Now()}
-    db.UpdatePositionOfUsersFromTransaction(database, &t)
     //initiate the processor routine
     go processOrder()
 }
@@ -57,15 +48,26 @@ func OrderHandler(c *gin.Context) {
     c.BindJSON(&orderRequest)
 
     //TODO:Improve
-    var buyOrSell bool
-    if orderRequest.OrderType == "marketBid" {
-        buyOrSell = true
-    } else {
-        buyOrSell = false
+    var buy bool
+    var market bool
+    switch orderRequest.OrderType {
+    case "marketBid":
+        market = true
+        buy = true
+    case "marketAsk":
+        market = true
+        buy = false
+    case "limitBid":
+        market = false
+        buy = true
+    case "limitAsk":
+        market = false
+        buy = false
     }
 
-    order := InitOrder(orderRequest.UserId, buyOrSell, false,
-        orderRequest.EquityTicker, orderRequest.Amount, 10, time.Now())
+    price := LimitPrice(orderRequest.Price * 100)
+    order := InitOrder(orderRequest.UserId, buy, market,
+        orderRequest.EquityTicker, orderRequest.Amount, price, time.Now())
     orderQueue.Put(order)
     c.JSON(http.StatusOK, nil)
 }
@@ -107,6 +109,8 @@ func GetCompanyInfo(c *gin.Context) {
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
     for true {
+        order1 := InitOrder(5, true, false, "AAPL",1, 5000, time.Now())
+        orderQueue.Put(order1)
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
@@ -116,8 +120,6 @@ func processOrder() {
             bookMap[order.CompanyTicker] = book
         }
         success, transactions := book.Execute(order)
-        //Process the order, need Kane's stuff...
-        //success, transactions := book.Execute(order)
         if success {
             length := len(*transactions)
             for j := 0; j < length; j++ {
@@ -128,6 +130,9 @@ func processOrder() {
 
         }
 
+        fmt.Println(GetHighestBidOfStock("AAPL"))
+        position := getPositionResponse("AAPL", 1)
+        fmt.Println("Gain: ", position.PercentageGain)
     }
 }
 

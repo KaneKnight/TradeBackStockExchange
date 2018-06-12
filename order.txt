@@ -20,7 +20,6 @@
   "orderType": "marketBid"/"marketAsk"/"limitBid"/"limitAsk",
 
    /* Order type specific data.
-    * Contains a json object with data specific to each type of order. */
-  "orderData": Any of the 4 specified json objects.
+  "limitPrice": [0-9]*
 
 }
