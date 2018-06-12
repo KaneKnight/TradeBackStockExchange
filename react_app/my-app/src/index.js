@@ -226,6 +226,49 @@ class GraphAndButtons extends React.Component {
   }
 }
 
+//Function to get the initial data points, should call backend for this. 
+function getInitialDataForGraph() {
+  var initial_data = [];
+  //initial_data.push({x: '1-Jan-15 10:00:00', y: 20});
+  //initial_data.push({x: '1-Jan-15 10:00:30', y: 70});
+  //initial_data.push({x: '1-Jan-15 10:01:00' , y: 40});
+
+  const initialDate = '1-Jan-15 ';
+ 
+  for(var i = 0; i < 10; i++) {
+
+    var d = new Date(new Date().getTime() - ((10 - i) * 10 * 1000));
+    var rnd = Math.floor((Math.random() * 80) + 20);
+    
+    var h = (d.getHours() < 10 ? '0' : '') + d.getHours();
+    var m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+    var s = (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
+
+    const dateToAdd = initialDate + h + ':' + m + ':' + s;
+
+    initial_data.push({x: dateToAdd, y: rnd});
+  }
+
+  var wrapper = [];
+  wrapper.push(initial_data);
+  return wrapper;
+}
+
+// Function to get the next data point, should call backend for this. 
+function getNextDataPointForGraph() {
+  const initialDate = '1-Jan-15 ';
+  // var rnd = Math.floor((Math.random() * 80) + 20);
+  var d = new Date();
+  var h = (d.getHours() < 10 ? '0' : '') + d.getHours();
+  var m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+  var s = (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
+
+  const dateToAdd = initialDate + h + ':' + m + ':' + s;
+  
+  // var nextPoint = {x: dateToAdd, y: rnd};
+  return dateToAdd;
+}
+
 class Graph extends React.Component {
 
   constructor(props) {
@@ -233,22 +276,49 @@ class Graph extends React.Component {
     this.state = {
       graph_width: 0,
       graph_height: 0,
+      data: [10], 
     };
+    this.updateDataGraph = this.updateDataGraph.bind(this);
     this.myRef = React.createRef();
   }
 
   componentDidMount() {
-    // const boundingBox = ReactDOM.findDOMNode(this.refs.graph_disp).getBoundingClientRect();
     const boundingBox = this.myRef.current.getBoundingClientRect();
-    console.log("Width: " + boundingBox.width);
+    const dataToPlot = getInitialDataForGraph();
 
     this.setState({
       graph_width: boundingBox.width,
       graph_height: boundingBox.height,
+      data: dataToPlot,
+    }, function() {
+      this.updateDataGraph();
     }); 
 
     window.addEventListener("resize", this.updateDimensions.bind(this));
+
   }
+
+
+  // Function to update the graph every 10 seconds with new data points. call backend for this. 
+  updateDataGraph() {
+  
+    if (this.state.data.length === 0) {
+      setTimeout(this.updateDataGraph, 1 * 1000);
+    }
+    const nextDataPointTime = getNextDataPointForGraph();
+    var new_data_set = this.state.data[0].slice();
+    new_data_set.shift();
+    var rnd = Math.floor((Math.random() * 80) + 20);
+    console.log(nextDataPointTime);
+    new_data_set.push({x: nextDataPointTime, y: rnd});
+    var wrapper = [];
+    wrapper.push(new_data_set);
+    this.setState({
+      data: wrapper,
+    });
+    setTimeout(this.updateDataGraph, 10 * 1000);
+  }
+
 
   updateDimensions() {
     const boundingBox = this.myRef.current.getBoundingClientRect();
@@ -264,29 +334,17 @@ class Graph extends React.Component {
         <div className="graph_display"> Showing graph for {this.props.current_company}:
         <div className="graph_cont" ref={this.myRef}>
         <LineChart
+          datePattern={'%d-%b-%y %H:%M:%S'}
           xType={'time'}
           axes
           grid
           verticalGrid
-          interpolate={'cardinal'}
-          lineColors={['pink', 'cyan']}
+          //interpolate={'cardinal'}
+          lineColors={['cyan']}
           width={this.state.graph_width}
           height={this.state.graph_height}
-          data={[
-            [
-              { x: '1-Jan-15', y: 20 },
-              { x: '1-Feb-15', y: 10 },
-              { x: '1-Mar-15', y: 33 },
-              { x: '1-Apr-15', y: 45 },
-              { x: '1-May-15', y: 15 }
-            ], [
-              { x: '1-Jan-15', y: 10 },
-              { x: '1-Feb-15', y: 15 },
-              { x: '1-Mar-15', y: 13 },
-              { x: '1-Apr-15', y: 15 },
-              { x: '1-May-15', y: 10 }
-            ]
-          ]}
+          axisLabels={{x: 'Time', y: 'Price (USD)'}}
+          data={this.state.data}
         />
         </div> 
         </div>

@@ -203,6 +203,7 @@ body {
 }
 
 .close_button {
+  border-radius: 4px;
   float: right;
 }
 
