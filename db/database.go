@@ -80,6 +80,19 @@ type OrderRequest struct {
   //TODO: need to add orderType specific data later
 }
 
+type PositionResponse struct {
+    EquityTicker string  `json:"equityTicker"`
+    NumberOfSharesOwned int  `json:"numberOfSharesOwned"`
+    ValueOfPostion float64  `json:"valueOfPosition"`
+    PercentageGain float64  `json:"percentageGain"`
+}
+
+type PositionRequest struct {
+    EquityTicker string `json:"equityTicker"`
+    UserId int `json:"userId"`
+}
+
+
 type Company struct {
     Value string `db:"ticker"`
     Label string `db:"name"`
@@ -320,7 +333,7 @@ func ReserveCash(db *sqlx.DB,
     ax.Commit()
 }
 
-func getAvailableCash(db *sqlx.DB,
+func GetAvailableCash(db *sqlx.DB,
                       userId int) int {
     var available int
     ax := db.MustBegin()
@@ -328,6 +341,15 @@ func getAvailableCash(db *sqlx.DB,
                                  where userId=$1`, userId)
     ax.Commit()
     return available
+}
+
+func GetPosition(db *sqlx.DB, ticker string, userId int) Position {
+    var position Position
+    ax := db.MustBegin()
+    ax.Select(&position, `select * from positionTable
+                                 where userId=$1 and ticker=$2`, userId, ticker)
+    ax.Commit()
+    return position
 }
 
 

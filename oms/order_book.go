@@ -303,13 +303,33 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
     return &transactions
 }
 
-/*
-func (b *Book) GetVolumeAtLimit(limit *Limit) int {
-    //TODO: implement
-    return 0
+func GetHighestBidOfStock(ticker string) int {
+    return int(bookMap[ticker].HighestBuy.Price)
 }
 
-func (b *Book) GetBestBid(limit *Limit) *Limit {
-    //TODO: implement
-    return nil
-} */
+func GetLowestAskOfStock(ticker string) int {
+    return int(bookMap[ticker].LowestSell.Price)
+}
+
+func getValueAndGain(ticker string, userId int) (int, int) {
+    position := db.GetPosition(database, ticker, userId)
+    cashSpent := position.CashSpentOnPosition
+    currentPriceOfStock := GetHighestBidOfStock(ticker)
+    number := position.Amount
+    value := currentPriceOfStock * number
+    return value, (int(value / cashSpent) - 1) * 100
+}
+
+func getPositionResponse(ticker string, userId int) db.PositionResponse {
+    position := db.GetPosition(database, ticker, userId)
+    currentPriceOfStock := float64(GetHighestBidOfStock(ticker)) / 100
+    value := float64(position.Amount) * currentPriceOfStock
+    gain := ((value / currentPriceOfStock) - 1) * 100
+
+    return db.PositionResponse{
+        ticker,
+        position.Amount,
+        value,
+        gain}
+}
+

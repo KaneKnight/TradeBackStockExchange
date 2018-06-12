@@ -47,7 +47,6 @@ func init() {
         200,
         time.Now()}
     db.UpdatePositionOfUsersFromTransaction(database, &t)
-
     //initiate the processor routine
     go processOrder()
 }
@@ -69,6 +68,16 @@ func OrderHandler(c *gin.Context) {
         orderRequest.EquityTicker, orderRequest.Amount, 10, time.Now())
     orderQueue.Put(order)
     c.JSON(http.StatusOK, nil)
+}
+
+func GetPositionData(c *gin.Context) {
+    var positionRequest db.PositionRequest
+    c.BindJSON(&positionRequest)
+
+    response := getPositionResponse(positionRequest.EquityTicker,
+        positionRequest.UserId)
+
+    c.JSON(http.StatusOK, response)
 }
 
 //API handler that returns a list of all equity we serve
@@ -121,3 +130,5 @@ func processOrder() {
 
     }
 }
+
+
