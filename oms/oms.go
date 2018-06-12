@@ -12,7 +12,6 @@ import (
     "github.com/jmoiron/sqlx"
     "github.com/Workiva/go-datastructures/queue"
 
-    "fmt"
 )
 
 var dbConfig = db.DBConfig{
@@ -47,19 +46,24 @@ func OrderHandler(c *gin.Context) {
     var orderRequest db.OrderRequest
     c.BindJSON(&orderRequest)
 
-    //TODO:Improve
     var buy bool
     var market bool
     switch orderRequest.OrderType {
     case "marketBid":
         market = true
         buy = true
+
+        /*TODO: update thinking for market orders.*/
+        db.ReserveCash(database, orderRequest.UserId,
+            orderRequest.Amount, int(orderRequest.Price * 100))
     case "marketAsk":
         market = true
         buy = false
     case "limitBid":
         market = false
         buy = true
+        db.ReserveCash(database, orderRequest.UserId,
+            orderRequest.Amount, int(orderRequest.Price * 100))
     case "limitAsk":
         market = false
         buy = false
@@ -130,10 +134,6 @@ func processOrder() {
 
         }
 
-        data := db.QueryCompanyDataPoints(database, "AAPL", 10)
-        for i := 0; i < len(data.CompanyData); i++ {
-            fmt.Println(data.CompanyData[i])
-        }
     }
 }
 
