@@ -28,9 +28,58 @@ class Main extends React.Component {
   constructor(props) {
     super(props);
     this.selectNewCompany = this.selectNewCompany.bind(this);
+    this.updateCurrentPrice = this.updateCurrentPrice.bind(this);
+    this.setInitialPrice = this.setInitialPrice.bind(this);
     this.state = {
       current_company: "Apple",
+      current_price: -1,
+      is_price_up: null,
+      temp_price_history: [],
     };
+  }
+
+  updateCurrentPrice(new_price) {
+    
+    //To make the inital display text not show down or up. 
+    if (this.state.current_price === -1) {
+      //Push to history so can later compare the values for initial pricing. 
+      this.state.temp_price_history.push(new_price);
+      this.setState({
+        current_price: new_price,
+      })
+      return;
+    }
+
+    var is_new_price_up;
+     
+    //Check if there is a backed up queue. massive hack, don't look. 
+    if (this.state.temp_price_history.length !== 0) {
+      
+      const len = this.state.temp_price_history.length;
+
+      const to_compare = this.state.temp_price_history[len - 1];
+
+      is_new_price_up = to_compare < new_price;
+
+      //empty the temp queue.
+      this.state.temp_price_history = [];
+    } else {
+      is_new_price_up = this.state.current_price < new_price;
+    }
+
+    // const is_new_price_up = this.state.current_price < new_price;
+    console.log("Comparing " + this.state.current_price + ' and ' + new_price);
+   
+    this.setState({
+      current_price: new_price,
+      is_price_up: is_new_price_up,
+    });
+  }
+
+  setInitialPrice(initial_price) {
+    this.setState({
+      current_price: initial_price,
+    });
   }
 
   selectNewCompany(new_company) {
@@ -46,8 +95,8 @@ class Main extends React.Component {
       <div id='Stage' className="grid-container">
         <NavigationBar />
         <CompanyList onChange = {this.selectNewCompany}/>
-        <GraphAndButtons onChange={this.selectNewCompany} current_company={this.state.current_company}/>
-        <CompanyInfo current_company={this.state.current_company}/>
+        <GraphAndButtons onChange={this.selectNewCompany} current_company={this.state.current_company} onPriceUpdate={this.updateCurrentPrice} current_price={this.state.current_price} setInitialPrice={this.setInitialPrice}/>
+        <CompanyInfo current_company={this.state.current_company} current_price={this.state.current_price} is_price_up={this.state.is_price_up}/>
         <UserInfo />
       </div>
     );
@@ -219,7 +268,7 @@ class GraphAndButtons extends React.Component {
   render() {
     return (
       <div className="grid-container-graph"> 
-        <Graph current_company={this.props.current_company}/>
+        <Graph current_company={this.props.current_company} current_price={this.props.current_price} onPriceUpdate={this.props.onPriceUpdate} setInitialPrice={this.props.setInitialPrice}/>
         <UiInterface onChange={this.props.onChange} current_company={this.props.current_company}/>
       </div>
     )
@@ -291,6 +340,10 @@ class Graph extends React.Component {
       graph_height: boundingBox.height,
       data: dataToPlot,
     }, function() {
+      const recent_price = dataToPlot[0][8].y;
+      const newest_value = dataToPlot[0][9].y;
+      this.props.setInitialPrice(recent_price);
+      this.props.onPriceUpdate(newest_value);
       this.updateDataGraph();
     }); 
 
@@ -316,6 +369,8 @@ class Graph extends React.Component {
     this.setState({
       data: wrapper,
     });
+    //Update the price to be the newly generated price for the display on the side. 
+    this.props.onPriceUpdate(rnd);
     setTimeout(this.updateDataGraph, 10 * 1000);
   }
 
@@ -379,16 +434,35 @@ function getFigures(comp) {
 
 class CompanyInfo extends React.Component {
 
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     number_of_renders: 0,
+  //   }
+  // }
+
+  // componentDidUpdate() {
+  //   const is_new_price_up = this.state.old_price < this.props.current_price;
+  //   //console.log(this.state.old_price);
+  //   //console.log(this.props.new_price);
+  //   console.log(is_new_price_up);
+  //   if (this.state.old_price !== this.props.current_price) {
+  //     this.setState({
+  //      old_price: this.props.current_price,
+  //     })
+  //   }
+  // }
+
   render() {
 
     var figures = getFigures(this.props.current_company);
     //var figures = [1, 2];
-    console.log("updated");
+    // console.log(this.state.number_of_renders);
 
     return (
       <div className="company_info_cont"> 
         Showing for {this.props.current_company}: 
-        <br/> Price: {}$
+        <br/> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')}
         <br/> Currently own {figures} shares. 
       </div>
     )
