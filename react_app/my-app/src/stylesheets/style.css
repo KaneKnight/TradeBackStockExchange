@@ -24,6 +24,7 @@ body {
   'user_information user_information user_information';
   grid-template-rows: 5% 80% 15%;
   grid-template-columns: 15% 65% 20%;
+  overflow: hidden;
 }
 
 .nav_bar_cont {
@@ -62,6 +63,7 @@ body {
 .graph_display_cont {
   grid-area: graph_display;
   background-color: beige;
+  width: 100%;
 }
 
 .graph_display {

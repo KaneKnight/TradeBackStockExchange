@@ -234,11 +234,12 @@ class Graph extends React.Component {
       graph_width: 0,
       graph_height: 0,
     };
-    //this.myRef = React.createRef();
+    this.myRef = React.createRef();
   }
 
   componentDidMount() {
-    const boundingBox = ReactDOM.findDOMNode(this.refs.graph_disp).getBoundingClientRect();
+    // const boundingBox = ReactDOM.findDOMNode(this.refs.graph_disp).getBoundingClientRect();
+    const boundingBox = this.myRef.current.getBoundingClientRect();
     console.log("Width: " + boundingBox.width);
 
     this.setState({
@@ -246,12 +247,11 @@ class Graph extends React.Component {
       graph_height: boundingBox.height,
     }); 
 
-    // window.addEventListener("resize", this.updateDimensions);
+    window.addEventListener("resize", this.updateDimensions.bind(this));
   }
 
   updateDimensions() {
-    console.log("calllllled");
-    const boundingBox = ReactDOM.findDOMNode(this.refs.graph_disp).getBoundingClientRect();
+    const boundingBox = this.myRef.current.getBoundingClientRect();
     this.setState({
       graph_width: boundingBox.width,
       graph_height: boundingBox.height,
@@ -262,7 +262,7 @@ class Graph extends React.Component {
     return (
       <div className="graph_display_cont">
         <div className="graph_display"> Showing graph for {this.props.current_company}:
-        <div className="graph_cont" ref="graph_disp">
+        <div className="graph_cont" ref={this.myRef}>
         <LineChart
           xType={'time'}
           axes
