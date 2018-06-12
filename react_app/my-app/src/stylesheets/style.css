@@ -256,6 +256,7 @@ body {
   border-radius: 5px;
   border: 1px solid black;
   text-align: center;
+  overflow: hidden;
 }
 
 .darken_bg2 {
@@ -268,9 +269,14 @@ body {
   background-color: rgba(0, 0, 0, .5);
 }
 
+.submit_wrapper {
+  width: 100%;
+  height: 100%;
+}
 
-
-.ok_confirmation_button {
+ .ok_confirmation_button {
+   width: 100%;
+   height: 100%;
   transition-duration: 0.4s;
   color:white;
   border-radius: 4px;

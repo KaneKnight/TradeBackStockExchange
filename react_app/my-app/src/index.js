@@ -451,14 +451,12 @@ class ActionConfirmation extends React.Component {
   }
 
   inputChangeStock(e) {
+    /* Disregards the decimal place, so always a whole number */ 
     var value = parseInt(e.target.value, 10);
     /* Always have a default of 0 even if input is empty. */
     if (Number.isNaN(value)) {
       value = 0;
     }
-
-    /* To prevent from people putting in a decimal number. will be floored. */
-    value = Math.floor(value);
 
     this.setState({
       number_of_stock: value
@@ -541,20 +539,11 @@ class SubmitConfirmation extends React.Component {
     return (
       <div className="darken_bg2">
         <div className="submit_window">
-          <p> Submitted! </p> 
-          <button className="ok_confirmation_button" onClick={() => this.dismiss()}> Click to close </button> 
+          <button className="ok_confirmation_button" onClick={() => this.dismiss()}> Submitted! <br /> Click to dismiss </button> 
         </div> 
       </div> 
     )
   }
 }
-
-/* Old Button function
-function Button(props) {
-  return (
-    <button className={props.button_type} onClick={props.onClick}> {props.button_name} </button>
-  )
-}
-*/
 
 ReactDOM.render(<App />, document.getElementById('root'));
