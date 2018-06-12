@@ -111,8 +111,8 @@ type CompanyDataResponse struct {
 }
 
 type CompanyData struct {
-    Time time.Time `json:"time"`
-    Price int      `json:"price"`
+    Time time.Time `json:"time" db:"timeoftrade"`
+    Price int      `json:"price" db:"price"`
 }
 
 type CompanyInfoRequest struct {
@@ -395,11 +395,12 @@ func QueryCompanyDataPoints(db *sqlx.DB, name string, num int) CompanyDataRespon
     resp.CompanyName = name
 
     //TODO: Division in the SQL Query might cause errors
-    err := db.Select(&resp.CompanyData, `select timeOfTrade, cashTraded/amountTraded 
-                                         from transactionTable join
-                                              companyTable 
-                                              using ticker
-                                         limit $1`, num)
+    err := db.Select(&resp.CompanyData,
+        `select timeOfTrade, cashTraded/amountTraded as price
+               from transactionTable join companyTable 
+               on companyTable.ticker=transactionTable.ticker
+               where transactionTable.ticker=$2
+               limit $1`, num, name)
 
     if err != nil {
       log.Fatalln(err)

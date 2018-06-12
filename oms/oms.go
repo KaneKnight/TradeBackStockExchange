@@ -130,9 +130,10 @@ func processOrder() {
 
         }
 
-        fmt.Println(GetHighestBidOfStock("AAPL"))
-        position := getPositionResponse("AAPL", 1)
-        fmt.Println("Gain: ", position.PercentageGain)
+        data := db.QueryCompanyDataPoints(database, "AAPL", 10)
+        for i := 0; i < len(data.CompanyData); i++ {
+            fmt.Println(data.CompanyData[i])
+        }
     }
 }
 
