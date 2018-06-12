@@ -68,7 +68,7 @@ class Main extends React.Component {
     }
 
     // const is_new_price_up = this.state.current_price < new_price;
-    console.log("Comparing " + this.state.current_price + ' and ' + new_price);
+    // console.log("Comparing " + this.state.current_price + ' and ' + new_price);
    
     this.setState({
       current_price: new_price,
