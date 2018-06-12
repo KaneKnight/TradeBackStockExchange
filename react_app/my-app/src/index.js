@@ -5,6 +5,7 @@ import jQuery from 'jquery';
 import './stylesheets/style.css';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
+import {LineChart} from 'react-easy-chart';
 
 class App extends React.Component {
 
@@ -226,10 +227,69 @@ class GraphAndButtons extends React.Component {
 }
 
 class Graph extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      graph_width: 0,
+      graph_height: 0,
+    };
+    //this.myRef = React.createRef();
+  }
+
+  componentDidMount() {
+    const boundingBox = ReactDOM.findDOMNode(this.refs.graph_disp).getBoundingClientRect();
+    console.log("Width: " + boundingBox.width);
+
+    this.setState({
+      graph_width: boundingBox.width,
+      graph_height: boundingBox.height,
+    }); 
+
+    // window.addEventListener("resize", this.updateDimensions);
+  }
+
+  updateDimensions() {
+    console.log("calllllled");
+    const boundingBox = ReactDOM.findDOMNode(this.refs.graph_disp).getBoundingClientRect();
+    this.setState({
+      graph_width: boundingBox.width,
+      graph_height: boundingBox.height,
+    }); 
+  }
+
   render() {
     return (
       <div className="graph_display_cont">
-        <div className="graph_display"> Showing graph for {this.props.current_company}</div>
+        <div className="graph_display"> Showing graph for {this.props.current_company}:
+        <div className="graph_cont" ref="graph_disp">
+        <LineChart
+          xType={'time'}
+          axes
+          grid
+          verticalGrid
+          interpolate={'cardinal'}
+          lineColors={['pink', 'cyan']}
+          width={this.state.graph_width}
+          height={this.state.graph_height}
+          data={[
+            [
+              { x: '1-Jan-15', y: 20 },
+              { x: '1-Feb-15', y: 10 },
+              { x: '1-Mar-15', y: 33 },
+              { x: '1-Apr-15', y: 45 },
+              { x: '1-May-15', y: 15 }
+            ], [
+              { x: '1-Jan-15', y: 10 },
+              { x: '1-Feb-15', y: 15 },
+              { x: '1-Mar-15', y: 13 },
+              { x: '1-Apr-15', y: 15 },
+              { x: '1-May-15', y: 10 }
+            ]
+          ]}
+        />
+        </div> 
+        </div>
       </div>
     )
   }
