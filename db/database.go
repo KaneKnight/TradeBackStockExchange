@@ -200,7 +200,7 @@ func UserCanBuyAmountRequested(db *sqlx.DB,
                                userId int,
                                priceOfSale int) bool {
     var userCash int
-    err := db.Get(&userCash, `select userCash from userTable
+    err := db.Get(&userCash, `select userCash - cashReserved from userTable
                               where userId=$1`, userId)
     if (err != nil) {
       log.Fatalln(err)

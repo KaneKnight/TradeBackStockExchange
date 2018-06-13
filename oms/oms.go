@@ -122,25 +122,33 @@ func GetCompanyInfo(c *gin.Context) {
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
     for true {
-        order1 := InitOrder(5, true, false, "AAPL",1, 5000, time.Now())
+        order1 := InitOrder(5, true, false,
+            "AAPL",1, 5000, time.Now())
         orderQueue.Put(order1)
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
-        book := bookMap[order.CompanyTicker]
-        if book == nil {
-            book = InitBook(order.CompanyTicker)
-            bookMap[order.CompanyTicker] = book
-        }
-        success, transactions := book.Execute(order)
-        if success {
-            length := len(*transactions)
-            for j := 0; j < length; j++ {
-                db.InsertTransaction(database, (*transactions)[j])
-                db.UpdatePositionOfUsersFromTransaction(database,
-                    (*transactions)[j])
+        priceOfSale := int(order.LimitPrice) * order.NumberOfShares
+        /* Checks if buyer can afford and that the seller can sell.*/
+        if ((order.Buy && db.UserCanBuyAmountRequested(database, order.UserId,
+            priceOfSale)) ||
+            !order.Buy && db.UserCanSellAmountOfShares(database,
+                order.UserId, order.CompanyTicker, order.NumberOfShares)) {
+            book := bookMap[order.CompanyTicker]
+            if book == nil {
+                book = InitBook(order.CompanyTicker)
+                bookMap[order.CompanyTicker] = book
             }
+            success, transactions := book.Execute(order)
+            if success {
+                length := len(*transactions)
+                for j := 0; j < length; j++ {
+                    db.InsertTransaction(database, (*transactions)[j])
+                    db.UpdatePositionOfUsersFromTransaction(database,
+                        (*transactions)[j])
+                }
 
+            }
         }
 
     }
