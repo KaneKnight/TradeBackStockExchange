@@ -269,7 +269,7 @@ class GraphAndButtons extends React.Component {
     return (
       <div className="grid-container-graph"> 
         <Graph current_company={this.props.current_company} current_price={this.props.current_price} onPriceUpdate={this.props.onPriceUpdate} setInitialPrice={this.props.setInitialPrice}/>
-        <UiInterface onChange={this.props.onChange} current_company={this.props.current_company}/>
+        <UiInterface onChange={this.props.onChange} current_company={this.props.current_company} current_price={this.props.current_price}/>
       </div>
     )
   }
@@ -371,6 +371,7 @@ class Graph extends React.Component {
     });
     //Update the price to be the newly generated price for the display on the side. 
     this.props.onPriceUpdate(rnd);
+    //10 is the timeout time in amounts of seconds. 
     setTimeout(this.updateDataGraph, 10 * 1000);
   }
 
@@ -472,7 +473,9 @@ class CompanyInfo extends React.Component {
 class UserInfo extends React.Component {
   render() {
     return (
-      <div className="user_info_cont"> User Info Here </div>
+      <div className="user_info_cont"> User Info Here 
+      <p> Name, equities owned, value </p> 
+      </div>
     )
   }
 }
@@ -482,7 +485,7 @@ class NavigationBar extends React.Component {
     return (
       <div id='nav_bar' className="nav_bar_cont">
         <div id='grid_nav_bar' className="grid-container-nav-bar">
-          <div className="app_name_cont"> App Name Here </div> 
+          <div className="app_name_cont"> UberTrade </div> 
           <div className="nav_gap_cont"> </div>
           <div className="theme_switch_cont"> Should be switch </div>
           <div className="login_btn_cont"> Login </div>
@@ -576,12 +579,14 @@ class UiInterface extends React.Component {
           onClick={() => this.buy()}
           button_name={"Bid"}
           current_company={this.props.current_company}
+          current_price={this.props.current_price}
         />
         <Button 
           button_type={"sell_button"}
           onClick={() => this.sell()}
           button_name={"Ask"}
           current_company={this.props.current_company}
+          current_price={this.props.current_price}
         />
       </div>
     )
@@ -612,7 +617,7 @@ class Button extends React.Component {
     return (
       <div className="button_and_action_wrapper">
         <button className={this.props.button_type} onClick={this.handleChildMount}> {this.props.button_name} </button> 
-        {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company} button_name={this.props.button_name}/> : null}
+        {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company} button_name={this.props.button_name} current_price={this.props.current_price}/> : null}
       </div> 
     )
   }
@@ -691,7 +696,9 @@ class ActionConfirmation extends React.Component {
 
   render() {
 
-    var current_amount = this.state.sample_stock_value * this.state.number_of_stock;
+    // Current amount is with respect to current price, that updates every graph poll. Can be changed if wanted. 
+
+    var current_amount = this.props.current_price * this.state.number_of_stock;
     var amount_left = this.state.user_budget - current_amount;
 
     return (
