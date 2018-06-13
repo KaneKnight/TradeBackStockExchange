@@ -52,18 +52,12 @@ func OrderHandler(c *gin.Context) {
     case "marketBid":
         market = true
         buy = true
-
-        /*TODO: update thinking for market orders.*/
-        db.ReserveCash(database, orderRequest.UserId,
-            orderRequest.Amount, int(orderRequest.Price * 100))
     case "marketAsk":
         market = true
         buy = false
     case "limitBid":
         market = false
         buy = true
-        db.ReserveCash(database, orderRequest.UserId,
-            orderRequest.Amount, int(orderRequest.Price * 100))
     case "limitAsk":
         market = false
         buy = false
@@ -134,6 +128,11 @@ func processOrder() {
             priceOfSale)) ||
             !order.Buy && db.UserCanSellAmountOfShares(database,
                 order.UserId, order.CompanyTicker, order.NumberOfShares)) {
+
+            if (order.Buy) {
+                db.ReserveCash(database, order.UserId,
+                    order.NumberOfShares, int(order.LimitPrice * 100))
+            }
             book := bookMap[order.CompanyTicker]
             if book == nil {
                 book = InitBook(order.CompanyTicker)
