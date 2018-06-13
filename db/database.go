@@ -48,6 +48,13 @@ type DBConfig struct {
 
 /*--------------TYPE STRUCTS USED FOR QUERIES---------------*/
 
+type UserRequest struct {
+    UserId int `json:"userId"`
+    UserName string `json:"userName"`
+    UserCash int `json:"userCash"`
+}
+
+
 type User struct {
     UserId int              `db:"userid"`
     UserName string         `db:"username"`

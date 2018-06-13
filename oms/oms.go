@@ -76,6 +76,15 @@ func OrderHandler(c *gin.Context) {
     c.JSON(http.StatusOK, nil)
 }
 
+func CreateUser(c *gin.Context) {
+    var userData db.UserRequest
+    c.BindJSON(&userData)
+
+    db.CreateUser(database, userData.UserId, userData.UserName,
+        userData.UserCash * 100)
+    c.JSON(http.StatusOK, nil)
+}
+
 func GetPositionData(c *gin.Context) {
     var positionRequest db.PositionRequest
     c.BindJSON(&positionRequest)
