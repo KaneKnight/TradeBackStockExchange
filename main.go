@@ -85,7 +85,10 @@ func main() {
 
   api.POST("/bid", oms.OrderHandler)
   api.POST("/ask", oms.OrderHandler)
+  api.POST("/order", oms.OrderHandler)
+  api.POST("/cancel-orders", oms.CancelHandler)
   api.GET("/get-company-list", oms.GetCompanyList)
+  api.POST("/highest-bid-lowest-ask", oms.HighestBidLowestAsk)
   api.GET("/get-datapoints", oms.GetCompanyDataPoints)
   api.POST("/get-company-info", oms.GetCompanyInfo)
   api.POST("/create-user", oms.CreateUser)

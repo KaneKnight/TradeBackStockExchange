@@ -166,11 +166,6 @@ func (m OrderMap) insertOrderIntoMap(order *Order) {
     m[order.IdNumber] = order
 }
 
-/* 1 arg order to be removed from book.*/
-func (b *Book) CancelOrder(order *Order) {
-    //TODO: implement
-}
-
 func (b *Book) Execute(order *Order) (bool,
     *[]*db.Transaction) {
     if (order.Buy) {
@@ -346,6 +341,10 @@ func getPositionResponse(ticker string, userId int) db.PositionResponse {
         position.Amount,
         value,
         gain}
+}
+
+func CancelOrder(cancelRequest *db.CancelOrderRequest) {
+    //TODO:Implement
 }
 
 func Round(x float64, unit float64) float64 {

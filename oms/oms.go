@@ -70,6 +70,24 @@ func OrderHandler(c *gin.Context) {
     c.JSON(http.StatusOK, nil)
 }
 
+func CancelHandler(c *gin.Context) {
+    var cancelOrder db.CancelOrderRequest
+    c.BindJSON(&cancelOrder)
+
+    CancelOrder(&cancelOrder)
+    c.JSON(http.StatusOK, nil)
+}
+
+func HighestBidLowestAsk(c *gin.Context) {
+    var priceRequest db.PriceRequest
+    c.BindJSON(&priceRequest)
+    ticker := priceRequest.Ticker
+    response := db.PriceResponse{
+        GetLowestAskOfStock(ticker),
+        GetHighestBidOfStock(ticker)}
+    c.JSON(http.StatusOK, response)
+}
+
 func CreateUser(c *gin.Context) {
     var userData db.UserRequest
     c.BindJSON(&userData)

@@ -85,6 +85,22 @@ type OrderRequest struct {
   Price float64  `json:"price"`
 }
 
+type CancelOrderRequest struct {
+    LimitPrice int `json:"limitPrice"`
+    UserId int `json:"userId"`
+    Ticker string `json:"ticker"`
+}
+
+type PriceRequest struct {
+    Ticker string `json:"ticker"`
+}
+
+type PriceResponse struct {
+    LowestAsk  int `json:"lowestAsk"`
+    HighestBid int `json:"highestBid"`
+}
+
+
 type PositionResponse struct {
     EquityTicker string  `json:"equityTicker"`
     NumberOfSharesOwned int  `json:"numberOfSharesOwned"`

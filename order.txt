@@ -1,25 +1,26 @@
+Send this json via post request to http://cloud-vm-45-112.doc.ic.ac
+.uk:8080/order
+
 {
-  /* User who placed order.*/
+  /* User who placed order. Bloomberg orders will have this userId as negative
+   */
   "userId": [0-9]*,
 
-  /* Time order placed at. Hours, minutes, seconds,
-   * fraction of seconds to 3 dp.*/
-  "orderTime": iso 8601 hh:mm:ss.sss,
-
-  /* Equity subject to order.*/
+  /* Equity subject to order. Bloomberg can request valid tickers by sending
+   * a get request to http://cloud-vm-45-112.doc.ic.ac.uk:8080/get-company-list
+   */
   "equityTicker": any valid ticker,
 
-  /* Assume 1 for beginning.*/
+  /* Size of order.*/
   "amount": [0-9]*,
 
   /* Identifies whether order is market or limit order.
    * Market bid order buys the lowest ask.
-   * Market ask order is accompanied by the priceToSellAt.
+   * Market ask order sells at the highest bid.
    * Limit bid order specifies maximum willing price to buy at.
    * Limit ask order specifies minimum willing price to sell at.*/
   "orderType": "marketBid"/"marketAsk"/"limitBid"/"limitAsk",
 
-   /* Order type specific data.
+   /* Price of limit, market orders can be any value as we do not care. */
   "limitPrice": [0-9]*
-
 }
