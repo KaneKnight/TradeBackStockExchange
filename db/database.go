@@ -108,18 +108,16 @@ type CompanyList struct {
 }
 
 type CompanyDataRequest struct {
-    CompanyName string `json:"companyName"`
-    DataNums    int    `json:"dataNums"`
+    Ticker   string `json:"companyName"`
+    DataNums int    `json:"dataNums"`
 }
 
 type CompanyDataResponse struct {
-    CompanyName string        `json:"companyName"`
     CompanyData []CompanyData `json:"data"`
 }
 
 type CompanyData struct {
-    Time time.Time `json:"time" db:"timeoftrade"`
-    Price int      `json:"price" db:"price"`
+    Price float64 `json: "price"`
 }
 
 type CompanyInfoRequest struct {
@@ -253,7 +251,6 @@ func UpdateBuyerPosition(db *sqlx.DB,
     if (err2 != nil) {
         log.Fatalln(err)
     }
-   //Minus may not recognise.
    UpdateUserCash(ax, buyerId, -cashTraded)
 }
 
@@ -397,17 +394,14 @@ func GetAllCompanies(db *sqlx.DB) CompanyList {
     return companyList
 }
 
-func QueryCompanyDataPoints(db *sqlx.DB, name string, num int) CompanyDataResponse {
+func QueryCompanyDataPoints(db *sqlx.DB, ticker string, num int) CompanyDataResponse {
     var resp CompanyDataResponse
-    resp.CompanyName = name
 
-    //TODO: Division in the SQL Query might cause errors
     err := db.Select(&resp.CompanyData,
-        `select timeOfTrade, cashTraded/amountTraded as price
-               from transactionTable join companyTable 
-               on companyTable.ticker=transactionTable.ticker
-               where transactionTable.ticker=$2
-               limit $1`, num, name)
+        `select timeOfTrade, cast(cashTraded as float(53))/cast(amountTraded as float(53))/100
+               from transactionTable
+               where transactionTable.ticker=$1
+               limit $2`, ticker, num)
 
     if err != nil {
       log.Fatalln(err)

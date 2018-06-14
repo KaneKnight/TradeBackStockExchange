@@ -1,10 +1,10 @@
 package oms
 
 import (
+    "math"
     "github.com/tomdionysus/binarytree"
     "time"
     "github.com/louiscarteron/WebApps2018/db"
-    "math"
 )
 
 /* A mapping of ids to orders.*/

@@ -11,7 +11,7 @@ import (
     "github.com/louiscarteron/WebApps2018/db"
     "github.com/jmoiron/sqlx"
     "github.com/Workiva/go-datastructures/queue"
-
+    "fmt"
 )
 
 var dbConfig = db.DBConfig{
@@ -100,7 +100,10 @@ func GetCompanyDataPoints(c *gin.Context) {
     var data db.CompanyDataRequest
     c.BindJSON(&data)
 
-    response := db.QueryCompanyDataPoints(database, data.CompanyName, data.DataNums)
+    response := db.QueryCompanyDataPoints(database, data.Ticker, data.DataNums)
+    for i := 0; i < len(response.CompanyData); i++ {
+      response.CompanyData[i].Price = Round(response.CompanyData[i].Price, 0.01)
+    }
     c.JSON(http.StatusOK, response)
 }
 
@@ -146,10 +149,9 @@ func processOrder() {
                     db.UpdatePositionOfUsersFromTransaction(database,
                         (*transactions)[j])
                 }
-
             }
+            fmt.Println(db.QueryCompanyDataPoints(database, "AAPL", 2))
         }
-
     }
 }
 
