@@ -461,6 +461,8 @@ class CompanyInfo extends React.Component {
     //var figures = [1, 2];
     // console.log(this.state.number_of_renders);
 
+    //TODO: Implement figures === 0 -> 'no shares' 
+
     return (
       <div className="company_info_cont"> 
         Showing for {this.props.current_company}: 

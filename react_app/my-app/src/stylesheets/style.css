@@ -43,6 +43,10 @@ body {
   color: white;
 }
 
+a {
+  color:white;
+}
+
 .graph_cont {
   grid-area: graph_stocks;
   background-color: var(--main-bg-color);
