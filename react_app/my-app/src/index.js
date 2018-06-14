@@ -397,6 +397,7 @@ class Graph extends React.Component {
           verticalGrid
           //interpolate={'cardinal'}
           lineColors={['cyan']}
+          style={{'background-color': '#e9ecef'}}
           width={this.state.graph_width}
           height={this.state.graph_height}
           axisLabels={{x: 'Time', y: 'Price (USD)'}}
