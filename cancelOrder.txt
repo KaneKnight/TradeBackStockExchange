@@ -1,4 +1,5 @@
-Send this json to http://cloud-vm-45-112.doc.ic.ac.uk:8080/cancel-order
+Send this json via post to http://cloud-vm-45-112.doc.ic.ac
+.uk:8080/cancel-order
 
 {
     /* Price of orders to be canceled*/
