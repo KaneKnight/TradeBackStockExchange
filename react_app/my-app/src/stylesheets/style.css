@@ -261,8 +261,8 @@ a {
 }
 
 .place_order_button {
-  background-color: green;
-  border: 2px solid green;
+  background-color: #53be53;
+  border: 2px solid #53be53;
   float: left;
   margin-top: 0%;
 }
@@ -317,8 +317,8 @@ a {
   transition-duration: 0.4s;
   color:white;
   border-radius: 4px;
-  background-color: green;
-  border: 2px solid green;
+  background-color: #53be53;
+  border: 2px solid #53be53;
 }
 
 .ok_confirmation_button:hover {
