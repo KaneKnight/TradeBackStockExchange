@@ -155,7 +155,11 @@ a {
 
 .app_name_cont {
   grid-area: app_name;
-  background-color: #728F92;
+  font-size: 30px;
+  /* text-shadow: #fff; */
+  /* background-color: #3A3F44; */
+  /* 7A8288 */
+  background: linear-gradient(to right, rgb(86, 92, 97), var(--main-bg-color));
 }
 
 .nav_gap_cont {
@@ -165,12 +169,12 @@ a {
 
 .theme_switch_cont {
   grid-area: theme_switch;
-  background-color: yellowgreen;
+  background-color: var(--main-bg-color);
 }
 
 .login_btn_cont {
   grid-area: login_btn;
-  background-color: greenyellow;
+  background-color: var(--main-bg-color);
 }
 
 .company_select {

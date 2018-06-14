@@ -504,7 +504,7 @@ class NavigationBar extends React.Component {
     return (
       <div id='nav_bar' className="nav_bar_cont">
         <div id='grid_nav_bar' className="grid-container-nav-bar">
-          <div className="app_name_cont"> UberTrade </div> 
+          <div className="app_name_cont"> TradeBack </div> 
           <div className="nav_gap_cont"> </div>
           <div className="theme_switch_cont"> Should be switch </div>
           <div className="login_btn_cont"> Login </div>
