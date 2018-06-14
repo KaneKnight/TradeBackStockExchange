@@ -1,0 +1,15 @@
+Send this json via post to http://cloud-vm-45-112.doc.ic.ac
+.uk:8080/cancel-order
+
+{
+    /* Price of orders to be canceled*/
+    "limitPrice": [0-9]*
+
+    /* User id of user whose orders are to be canceled.*/
+    "userId": [0-9]*
+
+    /* Ticker of company of which orders are to be canceled.
+     * Bloomberg can request valid tickers by sending a get request to
+     * http://cloud-vm-45-112.doc.ic.ac.uk:8080/get-company-list */
+    "ticker": any valid ticker
+}

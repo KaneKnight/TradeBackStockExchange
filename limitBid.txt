@@ -1,4 +1,0 @@
-{
-    /* Max price seller will sell at, order won't complete at a higher price.*/
-    "maximumWillingPriceToBuy": [0-9]*
-}

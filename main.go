@@ -2,18 +2,19 @@ package main
 
 import (
 
-  "fmt"
-  "net/http"
-  "encoding/json"
-  "errors"
-  //"log"
-  "os"
-  jwtmiddleware "github.com/auth0/go-jwt-middleware"
-  jwt "github.com/dgrijalva/jwt-go"
-  "github.com/gin-contrib/static"
-  "github.com/gin-gonic/gin"
-  "github.com/louiscarteron/WebApps2018/oms"
-  "runtime"
+
+  "github.com/auth0/go-jwt-middleware"
+    "github.com/dgrijalva/jwt-go"
+    "os"
+    "errors"
+    "log"
+    "runtime"
+    "github.com/gin-gonic/gin"
+    "github.com/gin-contrib/static"
+    "net/http"
+    "github.com/louiscarteron/WebApps2018/oms"
+    "fmt"
+    "encoding/json"
 )
 
 //Jwks stores a slice of JSON Web Keys
@@ -35,7 +36,7 @@ var jwtMiddleWare *jwtmiddleware.JWTMiddleware
 
 
 func main() {
-/*
+
   jwtMiddleWare_temp := jwtmiddleware.New(jwtmiddleware.Options{
     ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
       aud := os.Getenv("AUTH0_API_AUDIENCE")
@@ -65,7 +66,6 @@ func main() {
 
   //Assign global jwtMiddleWare
   jwtMiddleWare = jwtMiddleWare_temp
-*/
 
   //Allow go runtime to utilise 2 CPU cores
   runtime.GOMAXPROCS(2)
@@ -85,9 +85,13 @@ func main() {
 
   api.POST("/bid", oms.OrderHandler)
   api.POST("/ask", oms.OrderHandler)
+  api.POST("/order", oms.OrderHandler)
+  api.POST("/cancel-orders", oms.CancelHandler)
   api.GET("/get-company-list", oms.GetCompanyList)
+  api.POST("/highest-bid-lowest-ask", oms.HighestBidLowestAsk)
   api.GET("/get-datapoints", oms.GetCompanyDataPoints)
   api.POST("/get-company-info", oms.GetCompanyInfo)
+  api.POST("/create-user", oms.CreateUser)
 
 
   //run on default port 8080
@@ -137,4 +141,5 @@ func getPemCert(token *jwt.Token) (string, error) {
   }
 
   return cert, nil
+
 }
