@@ -118,8 +118,9 @@ func GetCompanyInfo(c *gin.Context) {
 
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
+    fmt.Println(db.QueryCompanyDataPoints(database, "AAPL", 2).CompanyData)
     for true {
-        order1 := InitOrder(5, true, false,
+        order1 := InitOrder(1, true, false,
             "AAPL",1, 5000, time.Now())
         orderQueue.Put(order1)
         var order *Order
@@ -150,7 +151,6 @@ func processOrder() {
                         (*transactions)[j])
                 }
             }
-            fmt.Println(db.QueryCompanyDataPoints(database, "AAPL", 2))
         }
     }
 }

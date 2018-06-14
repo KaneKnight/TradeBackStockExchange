@@ -398,7 +398,7 @@ func QueryCompanyDataPoints(db *sqlx.DB, ticker string, num int) CompanyDataResp
     var resp CompanyDataResponse
 
     err := db.Select(&resp.CompanyData,
-        `select timeOfTrade, cast(cashTraded as float(53))/cast(amountTraded as float(53))/100
+        `select cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price
                from transactionTable
                where transactionTable.ticker=$1
                limit $2`, ticker, num)
