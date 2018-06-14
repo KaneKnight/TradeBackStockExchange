@@ -1,0 +1,13 @@
+Send this json via post request to http://cloud-vm-45-112.doc.ic.ac
+.uk:8080/highest-bid-lowest-ask
+
+{
+    "ticker": any valid ticker
+}
+
+Response
+
+{
+    "lowestAsk": [0-9]*
+    "highestBid": [0-9]*
+}
