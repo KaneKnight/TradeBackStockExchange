@@ -392,15 +392,31 @@ class Graph extends React.Component {
         <LineChart
           datePattern={'%d-%b-%y %H:%M:%S'}
           xType={'time'}
+          axisLabels={{x: 'Time', y: 'Price (USD)'}}
+          // yDomainRange={[0, 100]}
           axes
           grid
           verticalGrid
-          //interpolate={'cardinal'}
+          // interpolate={'basis'}
           lineColors={['cyan']}
-          style={{'background-color': '#e9ecef'}}
+          //'#e9ecef',
+          style={{
+            // 'font-size' : '60px',
+            'background-color': '#272B30',
+            // '.tick line': {
+            //   stroke: 'red',
+            // },
+            '.axis' : {
+              stroke: 'white',
+              // strokeWidth: 1,
+              fill: 'white'
+            },
+            '.line' : {
+              strokeWidth: 4,
+            }
+          }}
           width={this.state.graph_width}
           height={this.state.graph_height}
-          axisLabels={{x: 'Time', y: 'Price (USD)'}}
           data={this.state.data}
         />
         </div> 
@@ -637,6 +653,7 @@ class ActionConfirmation extends React.Component {
       sample_stock_value: 69,
       user_budget: 6942096,
       renderSubmitted: false,
+      limit_price: 0,
     }
     this.handleCloseConfirmation = this.handleCloseConfirmation.bind(this);
   }
@@ -660,6 +677,18 @@ class ActionConfirmation extends React.Component {
 
     this.setState({
       number_of_stock: value
+    });
+  }
+
+  inputChangeLimit(e) {
+    var value = parseInt(e.target.value, 10);
+
+    if (Number.isNaN(value)) {
+      value = 0;
+    }
+
+    this.setState({
+      limit_price: value
     });
   }
 
@@ -718,12 +747,13 @@ class ActionConfirmation extends React.Component {
 
               <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice2" name="action" value="limit"/>
               <label htmlFor="actionChoice1"> Limit </label>
+              {this.state.action_type === "limit" ? <p> {this.props.button_name === "Bid" ? 'Maximum price to buy at' : 'Minimum price to sell at'}: <input type="number" onChange={e => this.inputChangeLimit(e)}/> </p> : null}
             {/* </div> */}
           </p>
           <p> Total price: {current_amount}</p>
           <p style={{color: amount_left > 0 ? "black" : "red"}}> Total funds left: {amount_left}</p> 
           <div className="place_order">
-            <button className="place_order_button" disabled={amount_left < 0 || this.state.number_of_stock <= 0} onClick={() => this.submitRequest()}> Place order </button> 
+            <button className="place_order_button" disabled={amount_left < 0 || this.state.number_of_stock <= 0 || (this.state.action_type === 'limit' && this.state.limit_price <= 0)} onClick={() => this.submitRequest()}> Place order </button> 
           </div>
         </div> 
       </div>
