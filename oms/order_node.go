@@ -23,20 +23,20 @@ type InfoAtLimit struct {
     OrderList *list.List
 
     /* Map of userIds to list of orders*/
-    UserOrderMap map[int]*[]**Order
+    UserOrderMap map[int]*([]**Order)
 }
 
 /* Pushes order to list.*/
-func (info *InfoAtLimit) pushToList(order *Order)  {
-    info.OrderList = append(info.OrderList, order)
+func (list *[]**Order) PushToList(order *Order)  {
+    list = append(list, &order)
 }
 
 /* Pops head of list, ie oldest order, returns (true,
  * order) if list is non empty and (false, nil) if empty*/
-func (info *InfoAtLimit) popFromList() (bool, *Order){
-    if len(info.OrderList) > 0 {
-        order := info.OrderList[0]
-        info.OrderList = info.OrderList[1:]
+func (list *[]**Order) PopFromList() (bool, **Order){
+    if len(list) > 0 {
+        order := list[0]
+        list = info.list[1:]
         return true, order
     }
     return false, nil

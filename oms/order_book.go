@@ -133,10 +133,14 @@ func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
     info.OrderList.PushBack(order)
-    info.UserOrderMap()[order.UserId] = 
     info.Size += order.NumberOfShares
     b.BuyTree.Set(limitPrice, info)
     b.BuyLimitMap.insertLimitInfoIntoMap(info)
+    if (info.UserOrderMap[order.UserId] == nil) {
+      list := &make([]**Order)
+      info.UserOrderMap[order.UserId] = list
+    }
+    info.UserOrderMap[order.UserId].PushToList(order)
 }
 
 /* Creates a new limit pushes the order onto its list and inserts it into the
@@ -148,6 +152,11 @@ func (b *Book) insertSellOrderAtNewLimit(order *Order) {
     info.Size += order.NumberOfShares
     b.SellTree.Set(limitPrice, info)
     b.SellLimitMap.insertLimitInfoIntoMap(info)
+    if (info.UserOrderMap[order.UserId] == nil) {
+      list := &make([]**Order)
+      info.UserOrderMap[order.User] = list
+    }
+    info.UserOrderMap[order.UserId].PushToList(order)
 }
 
 /* Takes a limit and pushes the order onto its list,
