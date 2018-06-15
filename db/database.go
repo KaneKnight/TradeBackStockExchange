@@ -87,8 +87,9 @@ type OrderRequest struct {
 
 type CancelOrderRequest struct {
     LimitPrice int `json:"limitPrice"`
-    UserId int `json:"userId"`
-    Ticker string `json:"ticker"`
+    UserId int     `json:"userId"`
+    Ticker string  `json:"ticker"`
+    Bid    bool    `json:"bid"`
 }
 
 type PriceRequest struct {
