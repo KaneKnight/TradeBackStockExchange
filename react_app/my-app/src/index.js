@@ -179,7 +179,7 @@ class CompanyList extends React.Component {
     })
   }
 
-  /*generateDummyOptions() {
+  generateDummyOptions() {
     var result = [];
     var dummy_data_str = {"packet" : "hi"};
     var dummy_data = JSON.stringify(dummy_data_str);
@@ -188,15 +188,9 @@ class CompanyList extends React.Component {
       "http://localhost:8080/api/get-company-list",
       //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-list",
       res => {
-       // console.log(res.results);
         result = res.results;
       }
     );
-    return result; 
-  }*/
-
-  generateDummyOptions() {
-    var result = [{Label: "Apple", Value: "AAPL"}, {Label: "Microsoft", Value: "MSFT"}];
     return result; 
   }
 
@@ -472,14 +466,14 @@ function getFigures(comp) {
   var dummy_data = JSON.stringify(dummy_data_comp);
   var temp;
   jQuery.ajaxSetup({async:false});
-  /*$.post(
+  $.post(
     "http://localhost:8080/api/get-company-info",
     //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
     dummy_data,
     res => {
       temp = res.Amount;  
     }
-  );*/
+  );
   console.log(temp)
   return temp;
 }
@@ -744,8 +738,7 @@ class ActionConfirmation extends React.Component {
     var data_to_send ={"userId" : 1, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
-    this.setState({renderSubmitted: true});
-    /* 
+    this.setState({renderSubmitted: true}); 
     jQuery.ajaxSetup({async:false});
     var url_type = this.props.button_name.toLowerCase();
     $.post(
@@ -753,11 +746,9 @@ class ActionConfirmation extends React.Component {
       "http://localhost:8080/api/" + url_type,
       dummy_data,
       res => {
-        window.alert("Order submitted!");
+        this.setState({renderSubmitted: true})
       }
     );
-    */
-    // this.dismiss();
   }
 
   render() {
