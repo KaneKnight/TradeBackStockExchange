@@ -1,5 +1,7 @@
+#!/bin/bash
 cd web
-rm *
-cd ../react_app/my_app
+rm -rf *
+cd ../react_app/my-app
 npm run build
-mv 
+cd build
+mv * ~/go/src/github.com/louiscarteron/WebApps2018/web/
