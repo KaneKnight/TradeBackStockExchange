@@ -119,7 +119,7 @@ a {
   background-color: transparent;
 
   float: left;
-  margin-left: 10%;
+  /* margin-left: 10%; */
 }
 
 .buy_button:hover {
@@ -134,13 +134,44 @@ a {
   color: #ee5f5b;
   background-color: transparent;
 
-  float: right;
-  margin-right: 10%;
+  /* float: right; */
+  float: left;
+  /* margin-right: 10%; */
 }
 
 .sell_button:hover {
   color:#272B30;
   background-color: #ee5f5b;
+}
+
+.buy_button_wrapper {
+  margin-top: 0.75em; 
+  float: left;
+  margin-left: 10%;
+  /* background-color: aqua; */
+}
+
+.sell_button_wrapper {
+  margin-top: 0.75em;
+  float: right;
+  margin-right: 10%;
+  /* background-color: antiquewhite; */
+}
+
+.sell_button_popup_button, .buy_button_popup_button {
+  margin-left: 0.5em; 
+  margin-top: 1em;
+  transition-duration: 0.4s;
+  color:#f89406;
+  font-size: 20px;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  background-color: transparent;
+}
+
+.sell_button_popup_button:hover, .buy_button_popup_button:hover {
+  color: black; 
+  background-color: #f89406;
 }
 
 /* CSS For nav bar */
@@ -346,6 +377,29 @@ a {
   background-color: white;
 }
 
+.speech-bubble {
+	position: relative;
+	background: #00ffff;
+	border-radius: .4em;
+}
+
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 0.75em solid transparent;
+	border-top-color: #00ffff;
+	border-bottom: 0;
+	margin-left: -0.75em;
+	margin-bottom: -0.75em;
+}
+
+.button_and_action_wrapper {
+  width: 100%; 
+}
 
 
 
@@ -364,4 +418,11 @@ input::-webkit-inner-spin-button {
     /* display: none; <- Crashes Chrome on hover */
     -webkit-appearance: none;
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+/* Increase radio button sizes.  */
+input[type="radio"] {
+  -ms-transform: scale(1.5); /* IE 9 */
+  -webkit-transform: scale(1.5); /* Chrome, Safari, Opera */
+  transform: scale(1.5);
 }

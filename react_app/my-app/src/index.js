@@ -694,11 +694,17 @@ class Button extends React.Component {
   }
 
   render() {
+
     return (
-      <div className="button_and_action_wrapper">
+      // <div className="tempIdea">
+      <div className={this.props.button_type + "_wrapper"}>
         <button className={this.props.button_type} onClick={this.handleChildMount}> {this.props.button_name} </button> 
         {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company} button_name={this.props.button_name} current_price={this.props.current_price}/> : null}
-      </div> 
+        <button className={this.props.button_type + "_popup_button"} title="What is this?"> ? </button> 
+        {/* <InfoBubble /> */}
+      {/* </div>  */}
+      {/* <button> ? </button>  */}
+      </div>
     )
   }
 }
@@ -768,7 +774,7 @@ class ActionConfirmation extends React.Component {
 
   submitRequest() {
     var ticker = this.getTicker(this.props.current_company);
-    var data_to_send ={"userId" : 1, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
+    var data_to_send ={"userId": window.MyVars.id, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
     this.setState({renderSubmitted: true});
@@ -835,6 +841,14 @@ class SubmitConfirmation extends React.Component {
           <button className="ok_confirmation_button" onClick={() => this.dismiss()}> Submitted! <br /> Click to dismiss </button> 
         </div> 
       </div> 
+    )
+  }
+}
+
+class InfoBubble extends React.Component {
+  render() {
+    return (
+      <div className="speech-bubble"> Hello </div> 
     )
   }
 }
