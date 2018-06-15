@@ -11,8 +11,8 @@ class App extends React.Component {
 
   componentWillMount() {
     window.MyVars = {
-      //id: parseInt(prompt("What user ID?", "Enter user ID")),
-      id: 1,
+      id: parseInt(prompt("What user ID?", "Enter user ID")),
+      //id: 1,
     }
   }
 
@@ -30,11 +30,13 @@ class Main extends React.Component {
     this.selectNewCompany = this.selectNewCompany.bind(this);
     this.updateCurrentPrice = this.updateCurrentPrice.bind(this);
     this.setInitialPrice = this.setInitialPrice.bind(this);
+    this.renderedNewGraph = this.renderedNewGraph.bind(this);
     this.state = {
       current_company: "Apple",
       current_price: -1,
       is_price_up: null,
       temp_price_history: [],
+      need_to_update_graph: true,
     };
   }
 
@@ -85,7 +87,16 @@ class Main extends React.Component {
   selectNewCompany(new_company) {
     //console.log("Called with " + new_company);
     //console.log("Called");
-    this.setState({current_company : new_company})
+    this.setState({
+      current_company : new_company,
+      need_to_update_graph : true, 
+    });
+  }
+
+  renderedNewGraph() {
+    this.setState({
+      need_to_update_graph : false,
+    });
   }
 
   render() {
@@ -95,7 +106,7 @@ class Main extends React.Component {
       <div id='Stage' className="grid-container">
         <NavigationBar />
         <CompanyList onChange = {this.selectNewCompany}/>
-        <GraphAndButtons onChange={this.selectNewCompany} current_company={this.state.current_company} onPriceUpdate={this.updateCurrentPrice} current_price={this.state.current_price} setInitialPrice={this.setInitialPrice}/>
+        <GraphAndButtons onChange={this.selectNewCompany} current_company={this.state.current_company} onPriceUpdate={this.updateCurrentPrice} current_price={this.state.current_price} setInitialPrice={this.setInitialPrice} need_to_update_graph={this.state.need_to_update_graph} renderedNewGraph={this.renderedNewGraph}/>
         <CompanyInfo current_company={this.state.current_company} current_price={this.state.current_price} is_price_up={this.state.is_price_up}/>
         <UserInfo />
       </div>
@@ -268,7 +279,7 @@ class GraphAndButtons extends React.Component {
   render() {
     return (
       <div className="grid-container-graph"> 
-        <Graph current_company={this.props.current_company} current_price={this.props.current_price} onPriceUpdate={this.props.onPriceUpdate} setInitialPrice={this.props.setInitialPrice}/>
+        <Graph current_company={this.props.current_company} current_price={this.props.current_price} onPriceUpdate={this.props.onPriceUpdate} setInitialPrice={this.props.setInitialPrice} need_to_update_graph={this.props.need_to_update_graph} renderedNewGraph={this.props.renderedNewGraph}/>
         <UiInterface onChange={this.props.onChange} current_company={this.props.current_company} current_price={this.props.current_price}/>
       </div>
     )
@@ -351,6 +362,23 @@ class Graph extends React.Component {
 
   }
 
+  //Todo: fix up/down not being correctly updated. Might have to flush the old value. 
+  componentDidUpdate() {
+    if (this.props.need_to_update_graph) {
+      const newDataToPlot = getInitialDataForGraph();
+      this.setState({
+        data: newDataToPlot,
+      }, function() {
+        const recent_price = newDataToPlot[0][8].y;
+        const newest_value = newDataToPlot[0][9].y;
+        this.props.setInitialPrice(recent_price);
+        this.props.onPriceUpdate(newest_value);
+        //this.updateDataGraph();
+      });
+      this.props.renderedNewGraph();
+    }
+  }
+
 
   // Function to update the graph every 10 seconds with new data points. call backend for this. 
   updateDataGraph() {
@@ -385,6 +413,12 @@ class Graph extends React.Component {
   }
 
   render() {
+
+    // if (this.props.need_to_update_graph) {
+    //   console.log("Should update to a new graph");
+    //   this.props.renderedNewGraph();
+    // }
+
     return (
       <div className="graph_display_cont">
         <div className="graph_display"> Showing graph for {this.props.current_company}:
