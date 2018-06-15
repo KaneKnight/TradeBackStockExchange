@@ -680,9 +680,12 @@ class Button extends React.Component {
     super(props);
     this.state = {
       renderChild: false,
+      renderInfoBubble: true,
     };
     this.handleChildUnmount = this.handleChildUnmount.bind(this);
-    this.handleChildMount= this.handleChildMount.bind(this);
+    this.handleChildMount = this.handleChildMount.bind(this);
+    this.handlePopupMount = this.handlePopupMount.bind(this);
+    this.handlePopupUnmount =  this.handlePopupUnmount.bind(this);
   }
 
   handleChildUnmount() {
@@ -693,18 +696,44 @@ class Button extends React.Component {
     this.setState({renderChild: true});
   }
 
+  handlePopupUnmount() {
+    this.setState({renderInfoBubble: false});
+  }
+
+  handlePopupMount() {
+    this.setState({renderInfoBubble: true});
+  }
+
   render() {
 
     return (
       // <div className="tempIdea">
       <div className={this.props.button_type + "_wrapper"}>
+        
         <button className={this.props.button_type} onClick={this.handleChildMount}> {this.props.button_name} </button> 
         {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company} button_name={this.props.button_name} current_price={this.props.current_price}/> : null}
-        <button className={this.props.button_type + "_popup_button"} title="What is this?"> ? </button> 
+        
+        <div className="temp_idea">
+          {this.state.renderInfoBubble ? <InfoBubble /> : null}
+          <button className={this.props.button_type + "_popup_button"} title="What is this?" onClick={this.handlePopupMount}> ? </button>
+        </div> 
         {/* <InfoBubble /> */}
       {/* </div>  */}
       {/* <button> ? </button>  */}
       </div>
+    )
+  }
+}
+
+class InfoBubble extends React.Component {
+  render() {
+    return (
+      <div className="info_bubble_wrapper">
+        <div className="speech-bubble"> 
+          Hello
+          <p> this is some more text </p>  
+        </div> 
+      </div> 
     )
   }
 }
@@ -841,14 +870,6 @@ class SubmitConfirmation extends React.Component {
           <button className="ok_confirmation_button" onClick={() => this.dismiss()}> Submitted! <br /> Click to dismiss </button> 
         </div> 
       </div> 
-    )
-  }
-}
-
-class InfoBubble extends React.Component {
-  render() {
-    return (
-      <div className="speech-bubble"> Hello </div> 
     )
   }
 }

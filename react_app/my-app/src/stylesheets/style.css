@@ -152,13 +152,15 @@ a {
 }
 
 .sell_button_wrapper {
+  position: relative;
   margin-top: 0.75em;
   float: right;
   margin-right: 10%;
-  /* background-color: antiquewhite; */
 }
 
 .sell_button_popup_button, .buy_button_popup_button {
+  position: absolute;
+  bottom: 0;
   margin-left: 0.5em; 
   margin-top: 1em;
   transition-duration: 0.4s;
@@ -378,6 +380,8 @@ a {
 }
 
 .speech-bubble {
+  /* width: 10vw;  */
+  /* height: 10vh; */
 	position: relative;
 	background: #00ffff;
 	border-radius: .4em;
@@ -399,6 +403,27 @@ a {
 
 .button_and_action_wrapper {
   width: 100%; 
+}
+
+.info_bubble_wrapper {
+   position: absolute;
+   bottom: 2em;
+   left: -6vw;
+   width: 15vw;
+   /* margin-left: -100%; */
+   /* left: 1000px; */
+   /* left: -100px; */
+  /* float: right; */
+  /* bottom: 50%; */
+  z-index: 20;
+  /* transform: translate(-42%, -10%); */
+}
+
+.temp_idea {
+  /* width: 1vw; */
+  float: right;
+  position: relative;
+  height: 2.75em;
 }
 
 
