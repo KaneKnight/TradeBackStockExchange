@@ -1,4 +1,8 @@
-
+:root {
+  --main-bg-color: #272B30;
+  --info: #5bc0de;
+  --light_graph: #e9ecef
+}
 
 html, body {
   height: 100%;
@@ -24,34 +28,47 @@ body {
   'user_information user_information user_information';
   grid-template-rows: 5% 80% 15%;
   grid-template-columns: 15% 65% 20%;
+  overflow: hidden;
 }
 
 .nav_bar_cont {
   grid-area: navigation_bar;
-  background-color: beige;
+  background-color: var(--main-bg-color);
+  color: white;
 }
 
 .company_list_cont {
   grid-area: company_list;
-  background-color: beige;
+  background-color: var(--main-bg-color);
+  color: white;
+}
+
+a {
+  color:white;
 }
 
 .graph_cont {
   grid-area: graph_stocks;
-  background-color: beige;
+  background-color: var(--main-bg-color);
+  color: white;
 }
 
 .user_info_cont {
   grid-area: user_information;
-  background-color: beige;
+  background-color: var(--main-bg-color);
+  color: white; 
+  /* border: 4px solid white; */
+  /* border-radius: 4px; */
 }
 
 .company_info_cont {
+  color: white;
   grid-area: company_information;
-  background-color: beige;
+  background-color: var(--main-bg-color);
 }
 
 .grid-container-graph {
+  background-color: var(--main-bg-color);
   display: grid;
   grid-template-areas:
   'graph_display'
@@ -61,12 +78,16 @@ body {
 
 .graph_display_cont {
   grid-area: graph_display;
-  background-color: beige;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  background-color: #3A3F44;
+  width: 100%;
 }
 
 .graph_display {
+  color: white;
   border-radius: 5px;
-  background-color: white;
+  background-color: var(--main-bg-color);
   height: 94%;
   width: 94%;
   margin-left: 3%;
@@ -75,40 +96,51 @@ body {
 
 .ui_buttons_cont {
   grid-area: ui_buttons;
-  background-color: beige;
+  background-color: #3A3F44;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
 }
 
 /* CSS for buttons */
-.buy_button, .sell_button {
+.buy_button, .sell_button, .place_order_button{
   padding: 16px 40px;
   transition-duration: 0.4s;
   color:white;
-  border-radius: 4px;
+  font-size: 24px;
+  border: 2px solid #272b30;
+  border-radius: 8px;
   margin-top: 1%;
 }
 
 .buy_button {
-  background-color: lightcoral;
-  border: 2px solid lightcoral;
+  /* background-color: lightcoral;
+  border: 2px solid lightcoral; */
+  color: #5bc0de;
+  background-color: transparent;
+
   float: left;
   margin-left: 10%;
 }
 
 .buy_button:hover {
-  color:black;
-  background-color: white;
+  color:#272B30;
+  background-color: #5bc0de;
 }
 
 .sell_button {
-  background-color: darkmagenta;
-  border: 2px solid darkmagenta;
+  /* background-color: darkmagenta;
+  border: 2px solid darkmagenta; */
+
+  color: #ee5f5b;
+  background-color: transparent;
+
   float: right;
   margin-right: 10%;
 }
 
 .sell_button:hover {
-  color:black;
-  background-color: white;
+  color:#272B30;
+  background-color: #ee5f5b;
 }
 
 /* CSS For nav bar */
@@ -123,22 +155,26 @@ body {
 
 .app_name_cont {
   grid-area: app_name;
-  background-color: beige;
+  font-size: 30px;
+  /* text-shadow: #fff; */
+  /* background-color: #3A3F44; */
+  /* 7A8288 */
+  background: linear-gradient(to right, rgb(86, 92, 97), var(--main-bg-color));
 }
 
 .nav_gap_cont {
   grid-area: nav_gap;
-  background-color: beige;
+  background-color: var(--main-bg-color);
 }
 
 .theme_switch_cont {
   grid-area: theme_switch;
-  background-color: yellowgreen;
+  background-color: var(--main-bg-color);
 }
 
 .login_btn_cont {
   grid-area: login_btn;
-  background-color: greenyellow;
+  background-color: var(--main-bg-color);
 }
 
 .company_select {
@@ -177,4 +213,142 @@ body {
 
 .recently_viewed_cont {
   margin-top: 2em;
+}
+
+
+/* Style for confirmation window */
+.confirmation_window {
+  width: 30vw;
+  height: 50vh;
+  position: absolute;
+  z-index: 15;
+  top: 40%;
+  left: 50%;
+  text-indent: 1em;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid black;
+}
+
+/* Center the viewing title */
+.company_viewing {
+  text-align: center;
+}
+
+.close_button {
+  border-radius: 4px;
+  float: right;
+}
+
+/* To fade background and to make viewing object easier to see. Is reusable. */
+.darken_bg {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, .7);
+}
+
+/* Not sure about this, need to test on a different viewport. should in theory work. */
+.place_order {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  transform: translate(-50%, 0%);
+}
+
+.place_order_button {
+  background-color: #53be53;
+  border: 2px solid #53be53;
+  float: left;
+  margin-top: 0%;
+}
+
+.place_order_button:hover {
+  color:black;
+  background-color: white;
+}
+
+.place_order_button:disabled {
+  background-color: gray;
+  border: 2px solid gray;
+}
+
+.place_order_button:disabled:hover {
+  color: white;
+}
+
+.submit_window {
+  width: 10vw;
+  height: 10vh;
+  position: absolute;
+  z-index: 20;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid black;
+  text-align: center;
+  overflow: hidden;
+}
+
+.darken_bg2 {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 17;
+  background-color: rgba(0, 0, 0, .5);
+}
+
+.submit_wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+ .ok_confirmation_button {
+   width: 100%;
+   height: 100%;
+  transition-duration: 0.4s;
+  color:white;
+  border-radius: 4px;
+  background-color: #53be53;
+  border: 2px solid #53be53;
+}
+
+.ok_confirmation_button:hover {
+  color:black;
+  background-color: white;
+}
+
+.graph_cont {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+
+
+
+
+
+
+/* Input styling, not important */
+input[type="number"] {
+  border: 1px solid rgba(0, 0, 0, .4);
+}
+
+/* Hide spinner in number input field. */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
