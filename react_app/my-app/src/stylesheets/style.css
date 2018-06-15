@@ -312,8 +312,8 @@ a {
 }
 
  .ok_confirmation_button {
-   width: 100%;
-   height: 100%;
+  width: 100%;
+  height: 100%;
   transition-duration: 0.4s;
   color:white;
   border-radius: 4px;
@@ -332,6 +332,19 @@ a {
   height: 100%;
 }
 
+.changeToWeek_button {
+  float: right;
+  transition-duration: 0.4s;
+  color:white;
+  border-radius: 4px;
+  background-color: #8a9196;
+  border: 2px solid #8a9196;
+}
+
+.changeToWeek_button:hover {
+  color:black;
+  background-color: white;
+}
 
 
 

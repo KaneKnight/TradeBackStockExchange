@@ -11,8 +11,8 @@ class App extends React.Component {
 
   componentWillMount() {
     window.MyVars = {
-      id: parseInt(prompt("What user ID?", "Enter user ID")),
-      //id: 1,
+      //id: parseInt(prompt("What user ID?", "Enter user ID")),
+      id: 1,
     }
   }
 
@@ -146,6 +146,9 @@ class CompanyList extends React.Component {
     });
     
     this.props.onChange(this.state.selectValue);
+    
+    //Change default text for drop down menu. 
+    $(".Select-placeholder").html("Select a company...");
 
   }
 
@@ -229,8 +232,8 @@ class CompanyList extends React.Component {
 					onBlurResetsInput={false}
 					onSelectResetsInput={false}
 					autoFocus
-					options={this.state.options}
-					simpleValue
+          options={this.state.options}
+          simpleValue
 					name="selected-state"
 					value={this.state.selectValue}
 					onChange={this.updateValue}
@@ -287,7 +290,7 @@ class GraphAndButtons extends React.Component {
 }
 
 //Function to get the initial data points, should call backend for this. 
-function getInitialDataForGraph() {
+function getInitialDataForGraph(dataPoints) {
   var initial_data = [];
   //initial_data.push({x: '1-Jan-15 10:00:00', y: 20});
   //initial_data.push({x: '1-Jan-15 10:00:30', y: 70});
@@ -295,9 +298,9 @@ function getInitialDataForGraph() {
 
   const initialDate = '1-Jan-15 ';
  
-  for(var i = 0; i < 10; i++) {
+  for(var i = 0; i < dataPoints; i++) {
 
-    var d = new Date(new Date().getTime() - ((10 - i) * 10 * 1000));
+    var d = new Date(new Date().getTime() - ((dataPoints - i) * 10 * 1000));
     var rnd = Math.floor((Math.random() * 80) + 20);
     
     var h = (d.getHours() < 10 ? '0' : '') + d.getHours();
@@ -336,23 +339,25 @@ class Graph extends React.Component {
     this.state = {
       graph_width: 0,
       graph_height: 0,
-      data: [10], 
+      dataPoints: 10,
+      data: [], 
     };
     this.updateDataGraph = this.updateDataGraph.bind(this);
     this.myRef = React.createRef();
+    this.updateToDifferentView = this.updateToDifferentView.bind(this); 
   }
 
   componentDidMount() {
     const boundingBox = this.myRef.current.getBoundingClientRect();
-    const dataToPlot = getInitialDataForGraph();
+    const dataToPlot = getInitialDataForGraph(this.state.dataPoints);
 
     this.setState({
       graph_width: boundingBox.width,
       graph_height: boundingBox.height,
       data: dataToPlot,
     }, function() {
-      const recent_price = dataToPlot[0][8].y;
-      const newest_value = dataToPlot[0][9].y;
+      const recent_price = dataToPlot[0][this.state.dataPoints - 2].y;
+      const newest_value = dataToPlot[0][this.state.dataPoints - 1].y;
       this.props.setInitialPrice(recent_price);
       this.props.onPriceUpdate(newest_value);
       this.updateDataGraph();
@@ -365,12 +370,12 @@ class Graph extends React.Component {
   //Todo: fix up/down not being correctly updated. Might have to flush the old value. 
   componentDidUpdate() {
     if (this.props.need_to_update_graph) {
-      const newDataToPlot = getInitialDataForGraph();
+      const newDataToPlot = getInitialDataForGraph(this.state.dataPoints);
       this.setState({
         data: newDataToPlot,
       }, function() {
-        const recent_price = newDataToPlot[0][8].y;
-        const newest_value = newDataToPlot[0][9].y;
+        const recent_price = newDataToPlot[0][this.state.dataPoints - 2].y;
+        const newest_value = newDataToPlot[0][this.state.dataPoints - 1].y;
         this.props.setInitialPrice(recent_price);
         this.props.onPriceUpdate(newest_value);
         //this.updateDataGraph();
@@ -403,6 +408,27 @@ class Graph extends React.Component {
     setTimeout(this.updateDataGraph, 10 * 1000);
   }
 
+  updateToDifferentView() {
+    var newDataPoints;
+    if (this.state.dataPoints === 10) {
+      newDataPoints = 50;
+    } else {
+      newDataPoints = 10; 
+    }
+    const newDataToPlot = getInitialDataForGraph(newDataPoints);
+    this.setState({
+      dataPoints: newDataPoints,
+      data: newDataToPlot,
+    }, function() {
+      const recent_price = newDataToPlot[0][newDataPoints - 2].y;
+      const newest_value = newDataToPlot[0][newDataPoints - 1].y;
+      this.props.setInitialPrice(recent_price);
+      this.props.onPriceUpdate(newest_value);
+      //this.updateDataGraph();
+    });
+    this.props.renderedNewGraph();
+  }
+
 
   updateDimensions() {
     const boundingBox = this.myRef.current.getBoundingClientRect();
@@ -421,7 +447,7 @@ class Graph extends React.Component {
 
     return (
       <div className="graph_display_cont">
-        <div className="graph_display"> Showing graph for {this.props.current_company}:
+        <div className="graph_display"> Showing graph for {this.props.current_company}: <button className="changeToWeek_button" onClick={this.updateToDifferentView}> {this.state.dataPoints === 10 ? "View Week" : "View Day"} </button> 
         <div className="graph_cont" ref={this.myRef}>
         <LineChart
           datePattern={'%d-%b-%y %H:%M:%S'}
@@ -512,12 +538,13 @@ class CompanyInfo extends React.Component {
     // console.log(this.state.number_of_renders);
 
     //TODO: Implement figures === 0 -> 'no shares' 
+    console.log(figures);
 
     return (
       <div className="company_info_cont"> 
         Showing for {this.props.current_company}: 
         <br/> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')}
-        <br/> Currently own {figures} shares. 
+        <br/> Currently own {figures === undefined ? "no" : figures} shares. 
       </div>
     )
   }
