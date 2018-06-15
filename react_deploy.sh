@@ -1,7 +1,7 @@
 #!/bin/bash
-cd web
+cd $GOPATH/src/github.com/louiscarteron/WebApps2018/web
 rm -rf *
-cd ../react_app/my-app
+cd $GOPATH/src/github.com/louiscarteron/WebApps2018/react_app/my-app
 npm run build
-cd build
-mv * ~/go/src/github.com/louiscarteron/WebApps2018/web/
+cd $GOPATH/src/github.com/louiscarteron/WebApps2018/react_app/my-app/build
+mv * $GOPATH/src/github.com/louiscarteron/WebApps2018/web/
