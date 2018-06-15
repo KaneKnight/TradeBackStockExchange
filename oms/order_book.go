@@ -5,6 +5,8 @@ import (
     "github.com/tomdionysus/binarytree"
     "time"
     "github.com/louiscarteron/WebApps2018/db"
+    "fmt"
+    "container/list"
 )
 
 /* A mapping of ids to orders.*/
@@ -56,11 +58,12 @@ func InitBook(ticker string) *Book {
 /* Initialises a limit struct with a price and initialises a slice with base
  * length of 10. Fields that are linked to the tree are ignored.*/
 func InitLimitInfo(price LimitPrice) *InfoAtLimit {
-    return &InfoAtLimit{
+  return &InfoAtLimit{
         Price:       price,
         TotalVolume: 0,
         Size:        0,
-        OrderList:   make([]*Order, 0)}
+        OrderList:   list.New(),
+        UserOrderMap make(map[int]*[]**Order)
 }
 
 /* Initalises order struct with buy or sell, number of shares,
@@ -129,7 +132,8 @@ func (b *Book) insertOrderIntoSellTree(order *Order) {
 func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
-    info.pushToList(order)
+    info.OrderList.PushBack(order)
+    info.UserOrderMap()[order.UserId] = 
     info.Size += order.NumberOfShares
     b.BuyTree.Set(limitPrice, info)
     b.BuyLimitMap.insertLimitInfoIntoMap(info)
@@ -140,7 +144,7 @@ func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
 func (b *Book) insertSellOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
-    info.pushToList(order)
+    info.OrderList.PushBack(order)
     info.Size += order.NumberOfShares
     b.SellTree.Set(limitPrice, info)
     b.SellLimitMap.insertLimitInfoIntoMap(info)
@@ -177,6 +181,8 @@ func (b *Book) Execute(order *Order) (bool,
 
 func (b *Book) MatchBuy(order *Order) (bool,
     *[]*db.Transaction) {
+    //TODO:Remove
+    fmt.Println(b.CanFillBuyOrder(order))
     if (b.CanFillBuyOrder(order)) {
         return true, b.CalculateTransactionsBuy(order)
     } else {

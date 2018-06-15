@@ -3,6 +3,8 @@ package oms
 import (
     "github.com/tomdionysus/binarytree"
     "time"
+    "container/list"
+
 )
 
 type InfoAtLimit struct {
@@ -18,7 +20,10 @@ type InfoAtLimit struct {
 
     /* A slice of order pointers. Lower indices will be earlier orders.
      * Ordered by event time.*/
-    OrderList []*Order
+    OrderList *list.List
+
+    /* Map of userIds to list of orders*/
+    UserOrderMap map[int]*[]**Order
 }
 
 /* Pushes order to list.*/

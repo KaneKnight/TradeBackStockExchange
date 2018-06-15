@@ -735,7 +735,7 @@ class ActionConfirmation extends React.Component {
 
   submitRequest() {
     var ticker = this.getTicker(this.props.current_company);
-    var data_to_send ={"userId" : 1, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name, "limitPrice" : this.state.limit_price} ;
+    var data_to_send ={"userId" : window.MyVars.id, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name, "limitPrice" : this.state.limit_price} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
     this.setState({renderSubmitted: true}); 

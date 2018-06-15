@@ -11,7 +11,7 @@ import (
     "github.com/louiscarteron/WebApps2018/db"
     "github.com/jmoiron/sqlx"
     "github.com/Workiva/go-datastructures/queue"
-    //"fmt"
+    "fmt"
 )
 
 var dbConfig = db.DBConfig{
@@ -137,28 +137,29 @@ func GetCompanyInfo(c *gin.Context) {
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
     for true {
-        order1 := InitOrder(1, true, false,
-            "AAPL",1, 5000, time.Now())
-        orderQueue.Put(order1)
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
         priceOfSale := int(order.LimitPrice) * order.NumberOfShares
         /* Checks if buyer can afford and that the seller can sell.*/
+        fmt.Println("Going into big if statement...")
         if ((order.Buy && db.UserCanBuyAmountRequested(database, order.UserId,
             priceOfSale)) ||
             !order.Buy && db.UserCanSellAmountOfShares(database,
                 order.UserId, order.CompanyTicker, order.NumberOfShares)) {
 
+            fmt.Println("Going into order.Buy if check...")
             if (order.Buy) {
+                fmt.Println("Going into ReserveCash()...")
                 db.ReserveCash(database, order.UserId,
-                    order.NumberOfShares, int(order.LimitPrice * 100))
+                    order.NumberOfShares, int(order.LimitPrice))
             }
             book := bookMap[order.CompanyTicker]
             if book == nil {
                 book = InitBook(order.CompanyTicker)
                 bookMap[order.CompanyTicker] = book
             }
+            fmt.Println("Going into Execute()...")
             success, transactions := book.Execute(order)
             if success {
                 length := len(*transactions)
@@ -171,5 +172,3 @@ func processOrder() {
         }
     }
 }
-
-
