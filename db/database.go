@@ -82,7 +82,7 @@ type OrderRequest struct {
   EquityTicker string `json:"equityTicker"`
   Amount int `json:"amount"`
   OrderType string `json:"orderType"`
-  Price float64  `json:"price"`
+  LimitPrice float64  `json:"limitPrice"`
 }
 
 type CancelOrderRequest struct {

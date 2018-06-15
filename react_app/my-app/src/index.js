@@ -735,7 +735,7 @@ class ActionConfirmation extends React.Component {
 
   submitRequest() {
     var ticker = this.getTicker(this.props.current_company);
-    var data_to_send ={"userId" : 1, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
+    var data_to_send ={"userId" : 1, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name, "limitPrice" : this.state.limit_price} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
     this.setState({renderSubmitted: true}); 
@@ -744,7 +744,7 @@ class ActionConfirmation extends React.Component {
     $.post(
       //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
       "http://localhost:8080/api/" + url_type,
-      dummy_data,
+      data,
       res => {
         this.setState({renderSubmitted: true})
       }

@@ -11,7 +11,7 @@ import (
     "github.com/louiscarteron/WebApps2018/db"
     "github.com/jmoiron/sqlx"
     "github.com/Workiva/go-datastructures/queue"
-    "fmt"
+    //"fmt"
 )
 
 var dbConfig = db.DBConfig{
@@ -63,7 +63,7 @@ func OrderHandler(c *gin.Context) {
         buy = false
     }
 
-    price := LimitPrice(orderRequest.Price * 100)
+    price := LimitPrice(orderRequest.LimitPrice * 100)
     order := InitOrder(orderRequest.UserId, buy, market,
         orderRequest.EquityTicker, orderRequest.Amount, price, time.Now())
     orderQueue.Put(order)
@@ -136,7 +136,6 @@ func GetCompanyInfo(c *gin.Context) {
 
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
-    fmt.Println(db.QueryCompanyDataPoints(database, "AAPL", 2).CompanyData)
     for true {
         order1 := InitOrder(1, true, false,
             "AAPL",1, 5000, time.Now())
