@@ -404,7 +404,8 @@ class Graph extends React.Component {
     });
     //Update the price to be the newly generated price for the display on the side. 
     this.props.onPriceUpdate(rnd);
-    //10 is the timeout time in amounts of seconds. 
+    //10 is the timeout time in amounts of seconds.
+    //TODO: save the settimeout as a var and then clearTimeout(var) to stop it.  
     setTimeout(this.updateDataGraph, 10 * 1000);
   }
 
@@ -552,10 +553,48 @@ class CompanyInfo extends React.Component {
 
 //TODO: start with this
 class UserInfo extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      renderFullProfile: false,
+    }
+
+    this.handleRenderFullProfile = this.handleRenderFullProfile.bind(this);
+    this.handleUnrenderFullProfile = this.handleUnrenderFullProfile.bind(this);
+
+  }
+
+  handleRenderFullProfile() {
+    this.setState({
+      renderFullProfile: true,
+    });
+  }
+
+  handleUnrenderFullProfile() {
+    this.setState({
+      renderFullProfile: false, 
+    });
+  }
+
+
   render() {
     return (
       <div className="user_info_cont"> User Info Here 
       <p> Name, equities owned, value </p> 
+      <button className="view_full_profile_button" onClick={this.handleRenderFullProfile}> Click To View Full Profile </button>  
+      {this.state.renderFullProfile ? <FullUserProfile unmountMe={this.handleUnrenderFullProfile}/> : null}
+      </div>
+    )
+  }
+}
+
+class FullUserProfile extends React.Component {
+  render() {
+    return (
+      <div className="full_user_profile_wrapper">
+      Hello World 
+      <button className="close_user_profile_button" onClick={this.props.unmountMe}>X</button> 
       </div>
     )
   }
@@ -681,7 +720,7 @@ class Button extends React.Component {
     super(props);
     this.state = {
       renderChild: false,
-      renderInfoBubble: true,
+      renderInfoBubble: false,
     };
     this.handleChildUnmount = this.handleChildUnmount.bind(this);
     this.handleChildMount = this.handleChildMount.bind(this);
