@@ -109,6 +109,19 @@ class Home extends React.Component {
   }
 }
 
+function sendExistingUserCheck() {
+  console.log(JSON.parse(localStorage.getItem("profile")).sub);
+  var string_data = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub};
+  var data = JSON.stringify(string_data);
+  $.post(
+    "http://localhost:8080/api/check-user-exists",
+    data,
+    res => {
+      console.log("Finished checking user");  
+    }
+  )
+}
+
 class Main extends React.Component {
 
   constructor(props) {
@@ -125,6 +138,11 @@ class Main extends React.Component {
       temp_price_history: [],
       need_to_update_graph: true,
     };
+    sendExistingUserCheck();
+    // $.post({
+    //   "http://localhost:8080/api/check-existing-user",
+    //   JSON.stringify(JSON.parse(localStorage.getItem("")))
+    // });
   }
 
   logout() {
