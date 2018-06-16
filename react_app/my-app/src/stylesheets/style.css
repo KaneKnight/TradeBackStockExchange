@@ -454,7 +454,16 @@ a {
   border-radius: 8px; 
 }
 
+.user_info_profile_wrapper {
+  text-indent: 2em; 
+}
 
+.exchange_history_wrapper {
+  height: 20vh;
+  width: 30vw; 
+  background-color: #00ffff;
+  overflow: auto;
+}
 
 
 
