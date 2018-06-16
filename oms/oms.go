@@ -102,8 +102,9 @@ func CreateUser(c *gin.Context) {
     var userData db.UserRequest
     c.BindJSON(&userData)
     userData.UserId = hash(userData.UserIdString)
-
-    //db.CreateUser(database, userData.UserId, userData.UserName, userData.UserCash * 100)
+    if !db.UserExists(database, userData.UserId) {
+      db.CreateUser(database, userData.UserId, 10000000 * 100)
+    }
     //c.JSON(http.StatusOK, nil)
 }
 

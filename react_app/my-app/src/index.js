@@ -111,7 +111,7 @@ class Home extends React.Component {
 
 function sendExistingUserCheck() {
   console.log(JSON.parse(localStorage.getItem("profile")).sub);
-  var string_data = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub};
+  var string_data = {"UserIdString" : JSON.parse(localStorage.getItem("profile")).sub};
   var data = JSON.stringify(string_data);
   $.post(
     "http://localhost:8080/api/check-user-exists",
@@ -605,7 +605,7 @@ function getFigures(comp) {
   if (result === null) {
     return "";
   }
-  var dummy_data_comp = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
+  var dummy_data_comp = {"UserIdString" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
   var dummy_data = JSON.stringify(dummy_data_comp);
   var temp;
   jQuery.ajaxSetup({async:false});
@@ -977,7 +977,7 @@ class ActionConfirmation extends React.Component {
 
   submitRequest() {
     var ticker = this.getTicker(this.props.current_company);
-    var data_to_send ={"userId": JSON.parse(localStorage.getItem("profile")).sub, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
+    var data_to_send ={"userIdString": JSON.parse(localStorage.getItem("profile")).sub, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
     this.setState({renderSubmitted: true}); 

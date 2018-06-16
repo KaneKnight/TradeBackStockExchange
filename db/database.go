@@ -23,14 +23,13 @@ create table positionTable (
     userId bigint,
     ticker text,
     amount integer,
-    cashSpentOnPosition interger
+    cashSpentOnPosition integer
 );
 
 create table userTable (
     userId bigint,
-    userName text,
-    userCash integer
-    cashReserved integer,
+    userCash integer,
+    cashReserved integer
 );
 
 create table companyTable (
@@ -50,7 +49,7 @@ type DBConfig struct {
 
 type UserRequest struct {
     UserIdString string `json:"userIdString"`
-    UserId       int    `json:"userId"`
+    UserId       int
 }
 
 
@@ -342,11 +341,19 @@ func UpdateUserCash(ax *sqlx.Tx,
  * the username and the last is the password hash.*/
 func CreateUser(db *sqlx.DB,
                 userId int,
-                userName string,
                 startingCash int) {
-    db.MustExec(`insert into userTable (userId, userName, userCash, 
+    db.MustExec(`insert into userTable (userId, userCash, 
 cashReserved)
-                 values ($1, $2, $3, $3)`, userId, userName, startingCash)
+                 values ($1, $2, $3)`, userId, startingCash, 0)
+}
+
+func UserExists(db *sqlx.DB, userId int) bool {
+  var num int
+  err := db.Get(&num, `select count(*) from userTable where userId=$1`, userId)
+  if err != nil {
+    log.Fatalln(err)
+  }
+  return num != 0
 }
 
 func ReserveCash(db *sqlx.DB,
