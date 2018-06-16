@@ -6,19 +6,105 @@ import './stylesheets/style.css';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import {LineChart} from 'react-easy-chart';
+import auth0 from 'auth0-js';
+
+const AUTH0_CLIENT_ID = "pRPNKyXdY9dNx0yzmwhhrxi1PIDmHQ0v";
+const AUTH0_DOMAIN = "ic22-webapps2018.eu.auth0.com";
+const AUTH0_CALLBACK_URL = window.location.href;
+const AUTH0_API_AUDIENCE = "webapps2018-tradingplt";
 
 class App extends React.Component {
 
-  componentWillMount() {
-    window.MyVars = {
-      //id: parseInt(prompt("What user ID?", "Enter user ID")),
-      id: 1,
+  parseHash() {
+    this.auth0 = new auth0.WebAuth({
+      domain: AUTH0_DOMAIN,
+      clientID: AUTH0_CLIENT_ID
+    });
+    this.auth0.parseHash(window.location.hash, (err, authResult) => {
+      if (err) {
+        return console.log(err);
+      }
+      if (
+        authResult !== null &&
+        authResult.accessToken !== null &&
+        authResult.idToken !== null
+      ) {
+        localStorage.setItem("access_token", authResult.accessToken);
+        localStorage.setItem("id_token", authResult.idToken);
+        localStorage.setItem(
+          "profile",
+          JSON.stringify(authResult.idTokenPayload)
+        );
+        window.location = window.location.href.substr(
+          0,
+          window.location.href.indexOf("#")
+        );
+      }
+    });
+  }
+
+  setup() {
+    $.ajaxSetup({
+      beforeSend: (r) => {
+        if (localStorage.getItem("access_token")) {
+          r.setRequestHeader(
+            "Authorization",
+            "Bearer " + localStorage.getItem("access_token")
+          );
+        }
+      }
+    });
+  }
+
+  setState() {
+    let idToken = localStorage.getItem("id_token");
+    if (idToken) {
+      this.loggedIn = true;
+    } else {
+      this.loggedIn = false;
     }
+    // window.MyVars.id = 1;
+  }
+
+  componentWillMount() {
+    this.setup();
+    this.parseHash();
+    this.setState();
+  }
+
+  render() {
+    if (this.loggedIn) {
+      return <Main />;
+    }
+    return <Home />;
+  }
+
+}
+
+class Home extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.authenticate = this.authenticate.bind(this);
+  }
+  authenticate() {
+    this.WebAuth = new auth0.WebAuth({
+      domain: AUTH0_DOMAIN,
+      clientID: AUTH0_CLIENT_ID,
+      scope: "openid profile",
+      audience: AUTH0_API_AUDIENCE,
+      responseType: "token id_token",
+      redirectUri: AUTH0_CALLBACK_URL
+    });
+    this.WebAuth.authorize();
   }
 
   render() {
     return (
-      <Main />
+      <div> 
+        Hello World 
+        <button onClick={this.authenticate}> Sign In </button> 
+      </div> 
     )
   }
 }
@@ -31,6 +117,7 @@ class Main extends React.Component {
     this.updateCurrentPrice = this.updateCurrentPrice.bind(this);
     this.setInitialPrice = this.setInitialPrice.bind(this);
     this.renderedNewGraph = this.renderedNewGraph.bind(this);
+    this.logout = this.logout.bind(this);
     this.state = {
       current_company: "Apple",
       current_price: -1,
@@ -38,6 +125,13 @@ class Main extends React.Component {
       temp_price_history: [],
       need_to_update_graph: true,
     };
+  }
+
+  logout() {
+    localStorage.removeItem("id_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("profile");
+    window.location.reload();
   }
 
   updateCurrentPrice(new_price) {
@@ -100,11 +194,15 @@ class Main extends React.Component {
   }
 
   render() {
+
+    // console.log(localStorage.getItem("id_token"));
+    // console.log(JSON.parse(localStorage.getItem("profile")).sub);
+
     //document.body.style.className = "c-container / t--light";
     return (
       //<div id='Stage' className="c-container / t--light">
       <div id='Stage' className="grid-container">
-        <NavigationBar />
+        <NavigationBar logout={this.logout}/>
         <CompanyList onChange = {this.selectNewCompany}/>
         <GraphAndButtons onChange={this.selectNewCompany} current_company={this.state.current_company} onPriceUpdate={this.updateCurrentPrice} current_price={this.state.current_price} setInitialPrice={this.setInitialPrice} need_to_update_graph={this.state.need_to_update_graph} renderedNewGraph={this.renderedNewGraph}/>
         <CompanyInfo current_company={this.state.current_company} current_price={this.state.current_price} is_price_up={this.state.is_price_up}/>
@@ -495,7 +593,7 @@ function getFigures(comp) {
   if (result === null) {
     return "";
   }
-  var dummy_data_comp = {"UserId" : window.MyVars.id, "Ticker" : result[1]};
+  var dummy_data_comp = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
   var dummy_data = JSON.stringify(dummy_data_comp);
   var temp;
   jQuery.ajaxSetup({async:false});
@@ -632,7 +730,7 @@ class NavigationBar extends React.Component {
           <div className="app_name_cont"> TradeBack </div> 
           <div className="nav_gap_cont"> </div>
           <div className="theme_switch_cont"> Should be switch </div>
-          <div className="login_btn_cont"> Login </div>
+          <div className="login_btn_cont"> <button className="logout_button" onClick={this.props.logout}> Logout </button> </div>
         </div>
       </div>
     )
@@ -685,14 +783,14 @@ class UiInterface extends React.Component {
     var thing_to_cut = this.props.current_company;
     var ticker = this.getTicker(thing_to_cut);
     console.log(ticker);
-    var dummy_data_buy = {"userId" : window.MyVars.id, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
+    var dummy_data_buy = {"userId" : 1, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
     var thing_to_cut = this.props.current_company;
     var ticker = this.getTicker(thing_to_cut);
-    var dummy_data_sell = {"userId" : window.MyVars.id, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
+    var dummy_data_sell = {"userId" : 1, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
@@ -867,7 +965,7 @@ class ActionConfirmation extends React.Component {
 
   submitRequest() {
     var ticker = this.getTicker(this.props.current_company);
-    var data_to_send ={"userId": window.MyVars.id, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
+    var data_to_send ={"userId": JSON.parse(localStorage.getItem("profile")).sub, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
     this.setState({renderSubmitted: true});
