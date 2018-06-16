@@ -119,7 +119,7 @@ a {
   background-color: transparent;
 
   float: left;
-  margin-left: 10%;
+  /* margin-left: 10%; */
 }
 
 .buy_button:hover {
@@ -134,13 +134,46 @@ a {
   color: #ee5f5b;
   background-color: transparent;
 
-  float: right;
-  margin-right: 10%;
+  /* float: right; */
+  float: left;
+  /* margin-right: 10%; */
 }
 
 .sell_button:hover {
   color:#272B30;
   background-color: #ee5f5b;
+}
+
+.buy_button_wrapper {
+  margin-top: 0.75em; 
+  float: left;
+  margin-left: 10%;
+  /* background-color: aqua; */
+}
+
+.sell_button_wrapper {
+  position: relative;
+  margin-top: 0.75em;
+  float: right;
+  margin-right: 10%;
+}
+
+.sell_button_popup_button, .buy_button_popup_button {
+  position: absolute;
+  bottom: 0;
+  margin-left: 0.5em; 
+  margin-top: 1em;
+  transition-duration: 0.4s;
+  color:#f89406;
+  font-size: 20px;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  background-color: transparent;
+}
+
+.sell_button_popup_button:hover, .buy_button_popup_button:hover {
+  color: black; 
+  background-color: #f89406;
 }
 
 /* CSS For nav bar */
@@ -159,7 +192,7 @@ a {
   /* text-shadow: #fff; */
   /* background-color: #3A3F44; */
   /* 7A8288 */
-  background: linear-gradient(to right, rgb(86, 92, 97), var(--main-bg-color));
+  /* background: linear-gradient(to right, rgb(86, 92, 97), var(--main-bg-color)); */
 }
 
 .nav_gap_cont {
@@ -312,8 +345,8 @@ a {
 }
 
  .ok_confirmation_button {
-   width: 100%;
-   height: 100%;
+  width: 100%;
+  height: 100%;
   transition-duration: 0.4s;
   color:white;
   border-radius: 4px;
@@ -332,11 +365,112 @@ a {
   height: 100%;
 }
 
+.changeToMonth_button {
+  float: right;
+  transition-duration: 0.4s;
+  color:white;
+  border-radius: 4px;
+  background-color: #8a9196;
+  border: 2px solid #8a9196;
+}
 
+.changeToMonth_button:hover {
+  color:black;
+  background-color: white;
+}
 
+.speech-bubble {
+  /* width: 10vw;  */
+  /* height: 10vh; */
+	position: relative;
+	background: #00ffff;
+	border-radius: .4em;
+}
 
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 0.75em solid transparent;
+	border-top-color: #00ffff;
+	border-bottom: 0;
+	margin-left: -0.75em;
+	margin-bottom: -0.75em;
+}
 
+.button_and_action_wrapper {
+  width: 100%; 
+}
 
+.info_bubble_wrapper {
+   position: absolute;
+   bottom: 2em;
+   left: -6vw;
+   width: 15vw;
+   /* margin-left: -100%; */
+   /* left: 1000px; */
+   /* left: -100px; */
+  /* float: right; */
+  /* bottom: 50%; */
+  z-index: 20;
+  /* transform: translate(-42%, -10%); */
+}
+
+.temp_idea {
+  /* width: 1vw; */
+  float: right;
+  position: relative;
+  height: 2.75em;
+}
+
+/* Fake bg to make it look like its a new page */
+.fake_new_page_bg {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 17;
+  background-color: var(--main-bg-color);
+}
+
+.full_user_profile_wrapper {
+  border-radius: 8px;
+  z-index: 20;
+  position: absolute;
+  width: 40vw; 
+  height: 80vh;
+  top: 50%;
+  left: 50%;  
+  transform: translate(-50%, -50%);
+  background-color: #3A3F44;
+}
+
+.close_user_profile_button {
+  float: right;
+  border-radius: 8px; 
+}
+
+.user_info_profile_wrapper {
+  text-indent: 2em; 
+}
+
+.positions_held_wrapper {
+  height: 30vh; 
+  width: 40vw; 
+  background-color: #f89406;
+  overflow: auto;
+}
+
+.exchange_history_wrapper {
+  height: 30vh;
+  width: 40vw; 
+  background-color: #00ffff;
+  overflow: auto;
+}
 
 
 
@@ -351,4 +485,11 @@ input::-webkit-inner-spin-button {
     /* display: none; <- Crashes Chrome on hover */
     -webkit-appearance: none;
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+/* Increase radio button sizes.  */
+input[type="radio"] {
+  -ms-transform: scale(1.5); /* IE 9 */
+  -webkit-transform: scale(1.5); /* Chrome, Safari, Opera */
+  transform: scale(1.5);
 }

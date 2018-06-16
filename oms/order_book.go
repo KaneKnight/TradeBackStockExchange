@@ -5,6 +5,8 @@ import (
     "github.com/tomdionysus/binarytree"
     "time"
     "github.com/louiscarteron/WebApps2018/db"
+    "fmt"
+    "container/list"
 )
 
 /* A mapping of ids to orders.*/
@@ -56,11 +58,12 @@ func InitBook(ticker string) *Book {
 /* Initialises a limit struct with a price and initialises a slice with base
  * length of 10. Fields that are linked to the tree are ignored.*/
 func InitLimitInfo(price LimitPrice) *InfoAtLimit {
-    return &InfoAtLimit{
+  return &InfoAtLimit{
         Price:       price,
         TotalVolume: 0,
         Size:        0,
-        OrderList:   make([]*Order, 0)}
+        OrderList:   list.New(),
+        UserOrderMap: make(map[int]*OrderPtrSlice)}
 }
 
 /* Initalises order struct with buy or sell, number of shares,
@@ -129,10 +132,15 @@ func (b *Book) insertOrderIntoSellTree(order *Order) {
 func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
-    info.pushToList(order)
+    elem := info.OrderList.PushBack(order)
     info.Size += order.NumberOfShares
     b.BuyTree.Set(limitPrice, info)
     b.BuyLimitMap.insertLimitInfoIntoMap(info)
+    if (info.UserOrderMap[order.UserId] == nil) {
+      list := make(OrderPtrSlice, 0)
+      info.UserOrderMap[order.UserId] = &list
+    }
+    info.UserOrderMap[order.UserId].PushToList(elem)
 }
 
 /* Creates a new limit pushes the order onto its list and inserts it into the
@@ -140,18 +148,24 @@ func (b *Book) insertBuyOrderAtNewLimit(order *Order) {
 func (b *Book) insertSellOrderAtNewLimit(order *Order) {
     limitPrice := order.LimitPrice
     info := InitLimitInfo(limitPrice)
-    info.pushToList(order)
+    elem := info.OrderList.PushBack(order)
     info.Size += order.NumberOfShares
     b.SellTree.Set(limitPrice, info)
     b.SellLimitMap.insertLimitInfoIntoMap(info)
+    if (info.UserOrderMap[order.UserId] == nil) {
+      list := make(OrderPtrSlice, 0)
+      info.UserOrderMap[order.UserId] = &list
+    }
+    info.UserOrderMap[order.UserId].PushToList(elem)
 }
 
 /* Takes a limit and pushes the order onto its list,
  * then inserts the order into its map. */
 func (b *Book) insertOrderAtLimit(limit *InfoAtLimit, order *Order) {
-    limit.OrderList = append(limit.OrderList, order)
+    elem := limit.OrderList.PushBack(order)
     b.OrderMap.insertOrderIntoMap(order)
     limit.Size += order.NumberOfShares
+    limit.UserOrderMap[order.UserId].PushToList(elem)
 }
 
 /* Inserts the limit given into the map.
@@ -177,6 +191,8 @@ func (b *Book) Execute(order *Order) (bool,
 
 func (b *Book) MatchBuy(order *Order) (bool,
     *[]*db.Transaction) {
+    //TODO:Remove
+    fmt.Println(b.CanFillBuyOrder(order))
     if (b.CanFillBuyOrder(order)) {
         return true, b.CalculateTransactionsBuy(order)
     } else {
@@ -242,21 +258,21 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
     currentPrice := b.LowestSell
     transactions := make([]*db.Transaction, 0)
     for (amountLeftToFill > 0) {
-        exists, sellOrder := currentPrice.popFromList()
-        if exists {
+        if currentPrice.OrderList.Len() != 0 {
+            sellOrder := currentPrice.OrderList.Front().Value.(*Order)
             amountLeftToFill -= sellOrder.NumberOfShares
             cashTraded := order.NumberOfShares * int(currentPrice.Price)
             transaction := InitTransaction(order.UserId, sellOrder.UserId,
-                order.CompanyTicker, sellOrder.NumberOfShares, cashTraded,
+                order.CompanyTicker, order.NumberOfShares, cashTraded,
                 time.Now())
             transactions = append(transactions, transaction)
             currentPrice.TotalVolume += sellOrder.NumberOfShares
             if (amountLeftToFill < 0) {
                 sellOrder.NumberOfShares = -1 * amountLeftToFill
-                currentPrice.OrderList = append(currentPrice.OrderList,
-                    sellOrder)
+                currentPrice.OrderList.PushBack(sellOrder)
             }
-        } else {
+            currentPrice.UserOrderMap[sellOrder.UserId].PopFromList()
+            } else {
             isNextPrice, newPrice, _ := b.SellTree.Next(currentPrice.Price)
             if (isNextPrice) {
                 currentPrice = b.SellLimitMap[newPrice.(LimitPrice)]
@@ -273,20 +289,20 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
     currentPrice := b.HighestBuy
     transactions := make([]*db.Transaction, 0)
     for (amountLeftToFill > 0) {
-        exists, buyOrder := currentPrice.popFromList()
-        if exists {
+        if currentPrice.OrderList.Len() != 0 {
+            buyOrder := currentPrice.OrderList.Front().Value.(*Order)
             amountLeftToFill -= buyOrder.NumberOfShares
             cashTraded := order.NumberOfShares * int(currentPrice.Price)
             transaction := InitTransaction(buyOrder.UserId, order.UserId,
-                order.CompanyTicker, buyOrder.NumberOfShares, cashTraded,
+                order.CompanyTicker, order.NumberOfShares, cashTraded,
                 time.Now())
             transactions = append(transactions, transaction)
             currentPrice.TotalVolume += buyOrder.NumberOfShares
             if (amountLeftToFill < 0) {
                 buyOrder.NumberOfShares = -1 * amountLeftToFill
-                currentPrice.OrderList = append(currentPrice.OrderList,
-                    buyOrder)
+                currentPrice.OrderList.PushBack(buyOrder)
             }
+            currentPrice.UserOrderMap[buyOrder.UserId].PopFromList()
         } else {
             isNextPrice, newPrice, _ := b.BuyTree.Next(currentPrice.Price)
             if (isNextPrice) {
@@ -300,14 +316,14 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
 }
 
 func GetHighestBidOfStock(ticker string) int {
-    if bookMap[ticker] == nil {
+    if bookMap[ticker] == nil || bookMap[ticker].HighestBuy == nil {
         return 0
     }
     return int(bookMap[ticker].HighestBuy.Price)
 }
 
 func GetLowestAskOfStock(ticker string) int {
-    if bookMap[ticker] == nil {
+    if bookMap[ticker] == nil || bookMap[ticker].LowestSell == nil {
         return 0
     }
     return int(bookMap[ticker].LowestSell.Price)
@@ -344,7 +360,55 @@ func getPositionResponse(ticker string, userId int) db.PositionResponse {
 }
 
 func CancelOrder(cancelRequest *db.CancelOrderRequest) {
-    //TODO:Implement
+  cancelRequest.LimitPrice = cancelRequest.LimitPrice * 100 //make sure multiple of 100
+  price := LimitPrice(cancelRequest.LimitPrice)
+  userId := cancelRequest.UserId
+  book := bookMap[cancelRequest.Ticker]
+  var userOrders *OrderPtrSlice
+  var orders *list.List
+  if cancelRequest.Bid {
+    userOrders = book.BuyLimitMap[price].UserOrderMap[userId]
+    orders = book.BuyLimitMap[price].OrderList
+  } else {
+    userOrders = book.SellLimitMap[price].UserOrderMap[userId]
+    orders = book.SellLimitMap[price].OrderList
+    fmt.Println(userOrders)
+  }
+  for i := 0; i < len(*userOrders); i++ {
+    orders.Remove((*userOrders)[i])
+  }
+  *userOrders = (*userOrders)[:0]
+  book.UpdatePriceAfterCancel(price, cancelRequest.Ticker, cancelRequest.Bid)
+}
+
+func (book *Book) UpdatePriceAfterCancel(price LimitPrice, ticker string, bid bool) {
+  if bid {
+    book.UpdateHighestBuyPrice(price, ticker)
+  } else {
+    book.UpdateLowestSellPrice(price, ticker)
+  }
+}
+
+func (book *Book) UpdateLowestSellPrice(price LimitPrice, ticker string) {
+  if int(price) == GetLowestAskOfStock(ticker) {
+    isNextPrice, newLowestAsk, _ := book.SellTree.Next(book.SellLimitMap[price].Price)
+    if isNextPrice {
+      book.LowestSell = book.SellLimitMap[newLowestAsk.(LimitPrice)]
+    } else {
+      book.LowestSell = nil
+    }
+  }
+}
+
+func (book *Book) UpdateHighestBuyPrice(price LimitPrice, ticker string) {
+  if int(price) == GetHighestBidOfStock(ticker) {
+    isNextPrice, newHighestBid, _ := book.BuyTree.Previous(book.SellLimitMap[price].Price)
+    if isNextPrice {
+      book.HighestBuy = book.BuyLimitMap[newHighestBid.(LimitPrice)]
+    } else {
+      book.LowestSell = nil
+    }
+  }
 }
 
 func Round(x float64, unit float64) float64 {

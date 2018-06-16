@@ -3,7 +3,11 @@ package oms
 import (
     "github.com/tomdionysus/binarytree"
     "time"
+    "container/list"
+
 )
+
+type OrderPtrSlice []*list.Element
 
 type InfoAtLimit struct {
     /* Price of the limit.*/
@@ -18,20 +22,23 @@ type InfoAtLimit struct {
 
     /* A slice of order pointers. Lower indices will be earlier orders.
      * Ordered by event time.*/
-    OrderList []*Order
+    OrderList *list.List
+
+    /* Map of userIds to list of orders*/
+    UserOrderMap map[int]*OrderPtrSlice
 }
 
 /* Pushes order to list.*/
-func (info *InfoAtLimit) pushToList(order *Order)  {
-    info.OrderList = append(info.OrderList, order)
+func (l *OrderPtrSlice) PushToList(order *list.Element)  {
+    *l = append(*l, order)
 }
 
 /* Pops head of list, ie oldest order, returns (true,
  * order) if list is non empty and (false, nil) if empty*/
-func (info *InfoAtLimit) popFromList() (bool, *Order){
-    if len(info.OrderList) > 0 {
-        order := info.OrderList[0]
-        info.OrderList = info.OrderList[1:]
+func (l *OrderPtrSlice) PopFromList() (bool, *list.Element){
+    if len(*l) > 0 {
+        order := (*l)[0]
+        *l = (*l)[1:]
         return true, order
     }
     return false, nil

@@ -6,21 +6,120 @@ import './stylesheets/style.css';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import {LineChart} from 'react-easy-chart';
+import auth0 from 'auth0-js';
+
+const AUTH0_CLIENT_ID = "pRPNKyXdY9dNx0yzmwhhrxi1PIDmHQ0v";
+const AUTH0_DOMAIN = "ic22-webapps2018.eu.auth0.com";
+const AUTH0_CALLBACK_URL = window.location.href;
+const AUTH0_API_AUDIENCE = "webapps2018-tradingplt";
 
 class App extends React.Component {
 
-  componentWillMount() {
-    window.MyVars = {
-      id: parseInt(prompt("What user ID?", "Enter user ID")),
-      //id: 1,
+  parseHash() {
+    this.auth0 = new auth0.WebAuth({
+      domain: AUTH0_DOMAIN,
+      clientID: AUTH0_CLIENT_ID
+    });
+    this.auth0.parseHash(window.location.hash, (err, authResult) => {
+      if (err) {
+        return console.log(err);
+      }
+      if (
+        authResult !== null &&
+        authResult.accessToken !== null &&
+        authResult.idToken !== null
+      ) {
+        localStorage.setItem("access_token", authResult.accessToken);
+        localStorage.setItem("id_token", authResult.idToken);
+        localStorage.setItem(
+          "profile",
+          JSON.stringify(authResult.idTokenPayload)
+        );
+        window.location = window.location.href.substr(
+          0,
+          window.location.href.indexOf("#")
+        );
+      }
+    });
+  }
+
+  setup() {
+    $.ajaxSetup({
+      beforeSend: (r) => {
+        if (localStorage.getItem("access_token")) {
+          r.setRequestHeader(
+            "Authorization",
+            "Bearer " + localStorage.getItem("access_token")
+          );
+        }
+      }
+    });
+  }
+
+  setState() {
+    let idToken = localStorage.getItem("id_token");
+    if (idToken) {
+      this.loggedIn = true;
+    } else {
+      this.loggedIn = false;
     }
+    // window.MyVars.id = 1;
+  }
+
+  componentWillMount() {
+    this.setup();
+    this.parseHash();
+    this.setState();
+  }
+
+  render() {
+    if (this.loggedIn) {
+      return <Main />;
+    }
+    return <Home />;
+  }
+
+}
+
+class Home extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.authenticate = this.authenticate.bind(this);
+  }
+  authenticate() {
+    this.WebAuth = new auth0.WebAuth({
+      domain: AUTH0_DOMAIN,
+      clientID: AUTH0_CLIENT_ID,
+      scope: "openid profile",
+      audience: AUTH0_API_AUDIENCE,
+      responseType: "token id_token",
+      redirectUri: AUTH0_CALLBACK_URL
+    });
+    this.WebAuth.authorize();
   }
 
   render() {
     return (
-      <Main />
+      <div> 
+        Hello World 
+        <button onClick={this.authenticate}> Sign In </button> 
+      </div> 
     )
   }
+}
+
+function sendExistingUserCheck() {
+  console.log(JSON.parse(localStorage.getItem("profile")).sub);
+  var string_data = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub};
+  var data = JSON.stringify(string_data);
+  $.post(
+    "http://localhost:8080/api/check-user-exists",
+    data,
+    res => {
+      console.log("Finished checking user");  
+    }
+  )
 }
 
 class Main extends React.Component {
@@ -31,6 +130,7 @@ class Main extends React.Component {
     this.updateCurrentPrice = this.updateCurrentPrice.bind(this);
     this.setInitialPrice = this.setInitialPrice.bind(this);
     this.renderedNewGraph = this.renderedNewGraph.bind(this);
+    this.logout = this.logout.bind(this);
     this.state = {
       current_company: "Apple",
       current_price: -1,
@@ -38,6 +138,18 @@ class Main extends React.Component {
       temp_price_history: [],
       need_to_update_graph: true,
     };
+    sendExistingUserCheck();
+    // $.post({
+    //   "http://localhost:8080/api/check-existing-user",
+    //   JSON.stringify(JSON.parse(localStorage.getItem("")))
+    // });
+  }
+
+  logout() {
+    localStorage.removeItem("id_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("profile");
+    window.location.reload();
   }
 
   updateCurrentPrice(new_price) {
@@ -100,11 +212,15 @@ class Main extends React.Component {
   }
 
   render() {
+
+    // console.log(localStorage.getItem("id_token"));
+    // console.log(JSON.parse(localStorage.getItem("profile")).sub);
+
     //document.body.style.className = "c-container / t--light";
     return (
       //<div id='Stage' className="c-container / t--light">
       <div id='Stage' className="grid-container">
-        <NavigationBar />
+        <NavigationBar logout={this.logout}/>
         <CompanyList onChange = {this.selectNewCompany}/>
         <GraphAndButtons onChange={this.selectNewCompany} current_company={this.state.current_company} onPriceUpdate={this.updateCurrentPrice} current_price={this.state.current_price} setInitialPrice={this.setInitialPrice} need_to_update_graph={this.state.need_to_update_graph} renderedNewGraph={this.renderedNewGraph}/>
         <CompanyInfo current_company={this.state.current_company} current_price={this.state.current_price} is_price_up={this.state.is_price_up}/>
@@ -146,6 +262,9 @@ class CompanyList extends React.Component {
     });
     
     this.props.onChange(this.state.selectValue);
+    
+    //Change default text for drop down menu. 
+    $(".Select-placeholder").html("Select a company...");
 
   }
 
@@ -223,8 +342,8 @@ class CompanyList extends React.Component {
 					onBlurResetsInput={false}
 					onSelectResetsInput={false}
 					autoFocus
-					options={this.state.options}
-					simpleValue
+          options={this.state.options}
+          simpleValue
 					name="selected-state"
 					value={this.state.selectValue}
 					onChange={this.updateValue}
@@ -281,7 +400,7 @@ class GraphAndButtons extends React.Component {
 }
 
 //Function to get the initial data points, should call backend for this. 
-function getInitialDataForGraph() {
+function getInitialDataForGraph(dataPoints) {
   var initial_data = [];
   //initial_data.push({x: '1-Jan-15 10:00:00', y: 20});
   //initial_data.push({x: '1-Jan-15 10:00:30', y: 70});
@@ -289,9 +408,9 @@ function getInitialDataForGraph() {
 
   const initialDate = '1-Jan-15 ';
  
-  for(var i = 0; i < 10; i++) {
+  for(var i = 0; i < dataPoints; i++) {
 
-    var d = new Date(new Date().getTime() - ((10 - i) * 10 * 1000));
+    var d = new Date(new Date().getTime() - ((dataPoints - i) * 10 * 1000));
     var rnd = Math.floor((Math.random() * 80) + 20);
     
     var h = (d.getHours() < 10 ? '0' : '') + d.getHours();
@@ -330,23 +449,25 @@ class Graph extends React.Component {
     this.state = {
       graph_width: 0,
       graph_height: 0,
-      data: [10], 
+      dataPoints: 10,
+      data: [], 
     };
     this.updateDataGraph = this.updateDataGraph.bind(this);
     this.myRef = React.createRef();
+    this.updateToDifferentView = this.updateToDifferentView.bind(this); 
   }
 
   componentDidMount() {
     const boundingBox = this.myRef.current.getBoundingClientRect();
-    const dataToPlot = getInitialDataForGraph();
+    const dataToPlot = getInitialDataForGraph(this.state.dataPoints);
 
     this.setState({
       graph_width: boundingBox.width,
       graph_height: boundingBox.height,
       data: dataToPlot,
     }, function() {
-      const recent_price = dataToPlot[0][8].y;
-      const newest_value = dataToPlot[0][9].y;
+      const recent_price = dataToPlot[0][this.state.dataPoints - 2].y;
+      const newest_value = dataToPlot[0][this.state.dataPoints - 1].y;
       this.props.setInitialPrice(recent_price);
       this.props.onPriceUpdate(newest_value);
       this.updateDataGraph();
@@ -359,12 +480,12 @@ class Graph extends React.Component {
   //Todo: fix up/down not being correctly updated. Might have to flush the old value. 
   componentDidUpdate() {
     if (this.props.need_to_update_graph) {
-      const newDataToPlot = getInitialDataForGraph();
+      const newDataToPlot = getInitialDataForGraph(this.state.dataPoints);
       this.setState({
         data: newDataToPlot,
       }, function() {
-        const recent_price = newDataToPlot[0][8].y;
-        const newest_value = newDataToPlot[0][9].y;
+        const recent_price = newDataToPlot[0][this.state.dataPoints - 2].y;
+        const newest_value = newDataToPlot[0][this.state.dataPoints - 1].y;
         this.props.setInitialPrice(recent_price);
         this.props.onPriceUpdate(newest_value);
         //this.updateDataGraph();
@@ -393,8 +514,30 @@ class Graph extends React.Component {
     });
     //Update the price to be the newly generated price for the display on the side. 
     this.props.onPriceUpdate(rnd);
-    //10 is the timeout time in amounts of seconds. 
+    //10 is the timeout time in amounts of seconds.
+    //TODO: save the settimeout as a var and then clearTimeout(var) to stop it.  
     setTimeout(this.updateDataGraph, 10 * 1000);
+  }
+
+  updateToDifferentView() {
+    var newDataPoints;
+    if (this.state.dataPoints === 10) {
+      newDataPoints = 50;
+    } else {
+      newDataPoints = 10; 
+    }
+    const newDataToPlot = getInitialDataForGraph(newDataPoints);
+    this.setState({
+      dataPoints: newDataPoints,
+      data: newDataToPlot,
+    }, function() {
+      const recent_price = newDataToPlot[0][newDataPoints - 2].y;
+      const newest_value = newDataToPlot[0][newDataPoints - 1].y;
+      this.props.setInitialPrice(recent_price);
+      this.props.onPriceUpdate(newest_value);
+      //this.updateDataGraph();
+    });
+    this.props.renderedNewGraph();
   }
 
 
@@ -415,7 +558,7 @@ class Graph extends React.Component {
 
     return (
       <div className="graph_display_cont">
-        <div className="graph_display"> Showing graph for {this.props.current_company}:
+        <div className="graph_display"> Showing graph for {this.props.current_company}: <button className="changeToMonth_button" onClick={this.updateToDifferentView}> {this.state.dataPoints === 10 ? "View Month" : "View Day"} </button> 
         <div className="graph_cont" ref={this.myRef}>
         <LineChart
           datePattern={'%d-%b-%y %H:%M:%S'}
@@ -462,7 +605,7 @@ function getFigures(comp) {
   if (result === null) {
     return "";
   }
-  var dummy_data_comp = {"UserId" : window.MyVars.id, "Ticker" : result[1]};
+  var dummy_data_comp = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
   var dummy_data = JSON.stringify(dummy_data_comp);
   var temp;
   jQuery.ajaxSetup({async:false});
@@ -506,23 +649,87 @@ class CompanyInfo extends React.Component {
     // console.log(this.state.number_of_renders);
 
     //TODO: Implement figures === 0 -> 'no shares' 
+    console.log(figures);
 
     return (
       <div className="company_info_cont"> 
         Showing for {this.props.current_company}: 
         <br/> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')}
-        <br/> Currently own {figures} shares. 
+        <br/> Currently own {figures === undefined ? "no" : figures} shares. 
       </div>
     )
   }
 }
 
+//TODO: start with this
 class UserInfo extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      renderFullProfile: false,
+    }
+
+    this.handleRenderFullProfile = this.handleRenderFullProfile.bind(this);
+    this.handleUnrenderFullProfile = this.handleUnrenderFullProfile.bind(this);
+
+  }
+
+  handleRenderFullProfile() {
+    this.setState({
+      renderFullProfile: true,
+    });
+  }
+
+  handleUnrenderFullProfile() {
+    this.setState({
+      renderFullProfile: false, 
+    });
+  }
+
+
   render() {
     return (
       <div className="user_info_cont"> User Info Here 
       <p> Name, equities owned, value </p> 
+      <button className="view_full_profile_button" onClick={this.handleRenderFullProfile}> Click To View Full Profile </button>  
+      {this.state.renderFullProfile ? <FullUserProfile unmountMe={this.handleUnrenderFullProfile}/> : null}
       </div>
+    )
+  }
+}
+
+class FullUserProfile extends React.Component {
+
+  render() {
+
+    const to_stringify = {Name: "Louis Carteron", Current_amount: 1337, Starting_amount: 1000};
+
+    //const user_profile = JSON.stringify(to_stringify);
+
+    // console.log(user_profile);
+    // console.log(to_stringify.Name);
+
+    const price_difference = to_stringify.Current_amount - to_stringify.Starting_amount; 
+
+    return (
+      <div className="fake_new_page_bg">
+        <div className="full_user_profile_wrapper"> 
+          <button className="close_user_profile_button" onClick={this.props.unmountMe}>X</button> 
+          <p style={{textAlign: "center"}}> Your User Profile: </p>
+          <div className="user_info_profile_wrapper">
+          <p> Name: {to_stringify.Name} </p>
+          <p> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
+          </div> 
+          <div className="positions_held_wrapper">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
+          </div> 
+          <br/> 
+          <div className="exchange_history_wrapper">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
+          </div> 
+        </div>
+      </div> 
     )
   }
 }
@@ -535,7 +742,7 @@ class NavigationBar extends React.Component {
           <div className="app_name_cont"> TradeBack </div> 
           <div className="nav_gap_cont"> </div>
           <div className="theme_switch_cont"> Should be switch </div>
-          <div className="login_btn_cont"> Login </div>
+          <div className="login_btn_cont"> <button className="logout_button" onClick={this.props.logout}> Logout </button> </div>
         </div>
       </div>
     )
@@ -588,14 +795,14 @@ class UiInterface extends React.Component {
     var thing_to_cut = this.props.current_company;
     var ticker = this.getTicker(thing_to_cut);
     console.log(ticker);
-    var dummy_data_buy = {"userId" : window.MyVars.id, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
+    var dummy_data_buy = {"userId" : 1, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketBid"};
     this.serverRequest(dummy_data_buy, "bid");
   }
 
   sell() {
     var thing_to_cut = this.props.current_company;
     var ticker = this.getTicker(thing_to_cut);
-    var dummy_data_sell = {"userId" : window.MyVars.id, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
+    var dummy_data_sell = {"userId" : 1, "equityTicker" : ticker, "amount" : 1, "orderType" : "marketAsk"};
     this.serverRequest(dummy_data_sell, "ask");
   }
 
@@ -647,9 +854,12 @@ class Button extends React.Component {
     super(props);
     this.state = {
       renderChild: false,
+      renderInfoBubble: false,
     };
     this.handleChildUnmount = this.handleChildUnmount.bind(this);
-    this.handleChildMount= this.handleChildMount.bind(this);
+    this.handleChildMount = this.handleChildMount.bind(this);
+    this.handlePopupMount = this.handlePopupMount.bind(this);
+    this.handlePopupUnmount =  this.handlePopupUnmount.bind(this);
   }
 
   handleChildUnmount() {
@@ -660,11 +870,43 @@ class Button extends React.Component {
     this.setState({renderChild: true});
   }
 
+  handlePopupUnmount() {
+    this.setState({renderInfoBubble: false});
+  }
+
+  handlePopupMount() {
+    this.setState({renderInfoBubble: true});
+  }
+
   render() {
+
     return (
-      <div className="button_and_action_wrapper">
+      // <div className="tempIdea">
+      <div className={this.props.button_type + "_wrapper"}>
+        
         <button className={this.props.button_type} onClick={this.handleChildMount}> {this.props.button_name} </button> 
         {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company} button_name={this.props.button_name} current_price={this.props.current_price}/> : null}
+        
+        <div className="temp_idea">
+          {this.state.renderInfoBubble ? <InfoBubble /> : null}
+          <button className={this.props.button_type + "_popup_button"} title="What is this?" onClick={this.handlePopupMount}> ? </button>
+        </div> 
+        {/* <InfoBubble /> */}
+      {/* </div>  */}
+      {/* <button> ? </button>  */}
+      </div>
+    )
+  }
+}
+
+class InfoBubble extends React.Component {
+  render() {
+    return (
+      <div className="info_bubble_wrapper">
+        <div className="speech-bubble"> 
+          Hello
+          <p> this is some more text </p>  
+        </div> 
       </div> 
     )
   }
@@ -735,7 +977,7 @@ class ActionConfirmation extends React.Component {
 
   submitRequest() {
     var ticker = this.getTicker(this.props.current_company);
-    var data_to_send ={"userId" : 1, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name, "limitPrice" : this.state.limit_price} ;
+    var data_to_send ={"userId": JSON.parse(localStorage.getItem("profile")).sub, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
     this.setState({renderSubmitted: true}); 
