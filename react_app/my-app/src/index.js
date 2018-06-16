@@ -550,6 +550,7 @@ class CompanyInfo extends React.Component {
   }
 }
 
+//TODO: start with this
 class UserInfo extends React.Component {
   render() {
     return (
