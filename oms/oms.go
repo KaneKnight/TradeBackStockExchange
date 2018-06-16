@@ -36,6 +36,7 @@ func init() {
     database = dbConfig.OpenDataBase()
     orderQueue = queue.New(100)
     bookMap = make(map[string]*Book)
+    db.ZeroReserveCashOfAllUsers(database)
 
     //initiate the processor routine
     go processOrder()
@@ -71,15 +72,11 @@ func OrderHandler(c *gin.Context) {
 }
 
 func CancelHandler(c *gin.Context) {
-    /*var cancelOrder db.CancelOrderRequest
+    var cancelOrder db.CancelOrderRequest
     c.BindJSON(&cancelOrder)
 
     CancelOrder(&cancelOrder)
-    c.JSON(http.StatusOK, nil)*/
-    fmt.Println(GetLowestAskOfStock("AAPL"))
-    CancelOrder(&db.CancelOrderRequest{1, 2, "AAPL", false})
-    fmt.Println(GetLowestAskOfStock("AAPL"))
-    c.JSON(http.StatusOK, "CANCELLED")
+    c.JSON(http.StatusOK, nil)
 }
 
 func HighestBidLowestAsk(c *gin.Context) {

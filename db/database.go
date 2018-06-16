@@ -351,8 +351,13 @@ func ReserveCash(db *sqlx.DB,
                  numberOfShares int,
                  limitPrice int) {
     db.MustExec(`update userTable
-                       set cashReserved=cashReserved+$1
-                       where userId=$2`, numberOfShares * limitPrice, userId)
+                 set cashReserved=cashReserved+$1
+                 where userId=$2`, numberOfShares * limitPrice, userId)
+}
+
+func ZeroReserveCashOfAllUsers(db *sqlx.DB) {
+    db.MustExec(`update userTable
+                 set cashReserved=0`)
 }
 
 func GetAvailableCash(db *sqlx.DB,
