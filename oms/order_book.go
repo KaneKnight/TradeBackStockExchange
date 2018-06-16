@@ -316,14 +316,14 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
 }
 
 func GetHighestBidOfStock(ticker string) int {
-    if bookMap[ticker] == nil {
+    if bookMap[ticker] == nil || bookMap[ticker].HighestBuy == nil {
         return 0
     }
     return int(bookMap[ticker].HighestBuy.Price)
 }
 
 func GetLowestAskOfStock(ticker string) int {
-    if bookMap[ticker] == nil {
+    if bookMap[ticker] == nil || bookMap[ticker].LowestSell == nil {
         return 0
     }
     return int(bookMap[ticker].LowestSell.Price)
@@ -360,6 +360,7 @@ func getPositionResponse(ticker string, userId int) db.PositionResponse {
 }
 
 func CancelOrder(cancelRequest *db.CancelOrderRequest) {
+  cancelRequest.LimitPrice = cancelRequest.LimitPrice * 100 //make sure multiple of 100
   price := LimitPrice(cancelRequest.LimitPrice)
   userId := cancelRequest.UserId
   book := bookMap[cancelRequest.Ticker]
@@ -371,11 +372,43 @@ func CancelOrder(cancelRequest *db.CancelOrderRequest) {
   } else {
     userOrders = book.SellLimitMap[price].UserOrderMap[userId]
     orders = book.SellLimitMap[price].OrderList
+    fmt.Println(userOrders)
   }
   for i := 0; i < len(*userOrders); i++ {
     orders.Remove((*userOrders)[i])
   }
   *userOrders = (*userOrders)[:0]
+  book.UpdatePriceAfterCancel(price, cancelRequest.Ticker, cancelRequest.Bid)
+}
+
+func (book *Book) UpdatePriceAfterCancel(price LimitPrice, ticker string, bid bool) {
+  if bid {
+    book.UpdateHighestBuyPrice(price, ticker)
+  } else {
+    book.UpdateLowestSellPrice(price, ticker)
+  }
+}
+
+func (book *Book) UpdateLowestSellPrice(price LimitPrice, ticker string) {
+  if int(price) == GetLowestAskOfStock(ticker) {
+    isNextPrice, newLowestAsk, _ := book.SellTree.Next(book.SellLimitMap[price].Price)
+    if isNextPrice {
+      book.LowestSell = book.SellLimitMap[newLowestAsk.(LimitPrice)]
+    } else {
+      book.LowestSell = nil
+    }
+  }
+}
+
+func (book *Book) UpdateHighestBuyPrice(price LimitPrice, ticker string) {
+  if int(price) == GetHighestBidOfStock(ticker) {
+    isNextPrice, newHighestBid, _ := book.BuyTree.Previous(book.SellLimitMap[price].Price)
+    if isNextPrice {
+      book.HighestBuy = book.BuyLimitMap[newHighestBid.(LimitPrice)]
+    } else {
+      book.LowestSell = nil
+    }
+  }
 }
 
 func Round(x float64, unit float64) float64 {

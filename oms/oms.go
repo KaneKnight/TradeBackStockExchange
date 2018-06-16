@@ -71,11 +71,15 @@ func OrderHandler(c *gin.Context) {
 }
 
 func CancelHandler(c *gin.Context) {
-    var cancelOrder db.CancelOrderRequest
+    /*var cancelOrder db.CancelOrderRequest
     c.BindJSON(&cancelOrder)
 
     CancelOrder(&cancelOrder)
-    c.JSON(http.StatusOK, nil)
+    c.JSON(http.StatusOK, nil)*/
+    fmt.Println(GetLowestAskOfStock("AAPL"))
+    CancelOrder(&db.CancelOrderRequest{1, 2, "AAPL", false})
+    fmt.Println(GetLowestAskOfStock("AAPL"))
+    c.JSON(http.StatusOK, "CANCELLED")
 }
 
 func HighestBidLowestAsk(c *gin.Context) {
