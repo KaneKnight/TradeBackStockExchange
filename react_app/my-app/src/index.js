@@ -713,7 +713,64 @@ class UserInfo extends React.Component {
   }
 }
 
+function getPositionsForUser() { 
+
+  //UNCOMMENT ME TO RUN IN NORMAL MODE 
+  /*
+  var positions = [];
+
+  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile")).sub}
+  var data = JSON.stringify(data_to_send);
+  jQuery.ajaxSetup({async:false});
+  $.post(
+    "http://localhost:8080/api/get-all-user-positions",
+    data,
+    res => {
+      positions = res;
+    }
+  )
+  */
+
+  var positions = {
+    "Positions" : [
+      {
+        "Ticker" : "AAPL",
+        "Amount" : 2,
+        "CashSpentOnPosition" : 123
+      },
+      {
+        "Ticker" : "MSFT",
+        "Amount" : 25,
+        "CashSpentOnPosition" : 1239
+      },
+      {
+        "Ticker" : "BLZD",
+        "Amount" : 5,
+        "CashSpentOnPosition" : 675
+      },
+    ]
+  }
+
+  return positions;
+
+}
+
 class FullUserProfile extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      positions: getPositionsForUser(),
+    }
+  }
+
+  // componentDidMount() {
+  //   var positions_of_user = getPositionsForUser();
+  //   console.log(positions_of_user);
+  //   this.setState({
+  //     positions: positions_of_user,
+  //   });
+  // }
 
   render() {
 
@@ -736,7 +793,7 @@ class FullUserProfile extends React.Component {
           <p> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
           </div> 
           <div className="positions_held_wrapper">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
+            <Positions listOfPositions={this.state.positions}/>
           </div> 
           <br/> 
           <div className="exchange_history_wrapper">
@@ -744,6 +801,38 @@ class FullUserProfile extends React.Component {
           </div> 
         </div>
       </div> 
+    )
+  }
+}
+
+class Positions extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      positionsToShow: [],
+    };
+  };
+
+  componentDidMount() {
+
+    console.log(this.props.listOfPositions);
+
+    var newPosToShow = [];
+    for (var i = 0; i < this.props.listOfPositions.Positions.length; i++) {
+      var text_to_show = <p> Ticker: {this.props.listOfPositions.Positions[i].Ticker} Amount: {this.props.listOfPositions.Positions[i].Amount} Cash Spent: {this.props.listOfPositions.Positions[i].CashSpentOnPosition}$</p>
+      newPosToShow.push(text_to_show);
+    }
+    this.setState({
+      positionsToShow: newPosToShow,
+    })
+  }
+
+  render() {
+    return (
+      <div className="list_of_positions">
+        {this.state.positionsToShow}
+      </div>
     )
   }
 }
