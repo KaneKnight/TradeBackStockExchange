@@ -103,12 +103,18 @@ type PriceResponse struct {
 
 
 type PositionResponse struct {
-  Positions []Position `json:"positions"`
+  Positions []JSONPosition `json:"positions"`
+}
+
+type JSONPosition struct {
+  Ticker              string `json:"ticker"`
+  Name                string `json:"name"`
+  CashSpentOnPosition int    `json:"cashSpentOnPosition"`
 }
 
 type PositionRequest struct {
     UserIdString string `json:"userIdString"`
-    UserId       int    `json:"userId"`
+    UserId       int
 }
 
 
@@ -309,7 +315,7 @@ func UpdatePosition(ax *sqlx.Tx,
                     cashTraded int) {
     ax.MustExec(`update positionTable
                  set amount=amount+$1,
-                     cashSpentOnPosition=cashSpentOnPosition+$2
+                 cashSpentOnPosition=cashSpentOnPosition+$2
                  where userId=$3 and ticker=$4`,
                  amountTraded,
                  cashTraded,
@@ -338,8 +344,7 @@ func UpdateUserCash(ax *sqlx.Tx,
 func CreateUser(db *sqlx.DB,
                 userId int,
                 startingCash int) {
-    db.MustExec(`insert into userTable (userId, userCash, 
-cashReserved)
+    db.MustExec(`insert into userTable (userId, userCash, cashReserved)
                  values ($1, $2, $3)`, userId, startingCash, 0)
 }
 
@@ -388,9 +393,11 @@ func GetPosition(db *sqlx.DB, ticker string, userId int) Position {
 }
 
 func GetAllUserPositions(db *sqlx.DB, userId int) []Position {
-  var positions []Position
-  err := db.Select(&positions, `select * from positionTable
-                                where userId=$1`, userId)
+  var positions PositionResponse
+  err := db.Select(&positions.Positions, `select ticker, name, cashSpentOnPosition 
+                                          from positionTable join companyTable
+                                          on ticker
+                                          where userId=$1`, userId)
   if err != nil {
     log.Fatalln(err)
   }
