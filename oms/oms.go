@@ -12,6 +12,7 @@ import (
     "github.com/jmoiron/sqlx"
     "github.com/Workiva/go-datastructures/queue"
     "fmt"
+    "hash/fnv"
 )
 
 var dbConfig = db.DBConfig{
@@ -42,10 +43,17 @@ func init() {
     go processOrder()
 }
 
+func hash(s string) int {
+    h := fnv.New32a()
+    h.Write([]byte(s))
+    return int(h.Sum32())
+}
+
 //orderHandler assume that API is supplied with correct JSON format
 func OrderHandler(c *gin.Context) {
     var orderRequest db.OrderRequest
     c.BindJSON(&orderRequest)
+    orderRequest.UserId = hash(orderRequest.UserIdString)
 
     var buy bool
     var market bool
@@ -74,6 +82,7 @@ func OrderHandler(c *gin.Context) {
 func CancelHandler(c *gin.Context) {
     var cancelOrder db.CancelOrderRequest
     c.BindJSON(&cancelOrder)
+    //TODO: check with bloomberg script
 
     CancelOrder(&cancelOrder)
     c.JSON(http.StatusOK, nil)
@@ -92,15 +101,16 @@ func HighestBidLowestAsk(c *gin.Context) {
 func CreateUser(c *gin.Context) {
     var userData db.UserRequest
     c.BindJSON(&userData)
+    userData.UserId = hash(userData.UserIdString)
 
-    db.CreateUser(database, userData.UserId, userData.UserName,
-        userData.UserCash * 100)
-    c.JSON(http.StatusOK, nil)
+    //db.CreateUser(database, userData.UserId, userData.UserName, userData.UserCash * 100)
+    //c.JSON(http.StatusOK, nil)
 }
 
 func GetPositionData(c *gin.Context) {
     var positionRequest db.PositionRequest
     c.BindJSON(&positionRequest)
+    positionRequest.UserId = hash(positionRequest.UserIdString)
 
     response := getPositionResponse(positionRequest.EquityTicker,
         positionRequest.UserId)
@@ -130,6 +140,7 @@ func GetCompanyDataPoints(c *gin.Context) {
 func GetCompanyInfo(c *gin.Context) {
     var data db.CompanyInfoRequest
     c.BindJSON(&data)
+    data.UserId = hash(data.UserIdString)
 
     response := db.QueryCompanyInfo(database, data.UserId, data.Ticker)
     c.JSON(http.StatusOK, response)

@@ -11,8 +11,8 @@ import (
 
 var schema = `
 create table transactionTable (
-    buyerId integer,
-    sellerId integer,
+    buyerId bigint,
+    sellerId bigint,
     ticker text,
     amountTraded integer,
     cashTraded integer,
@@ -20,14 +20,14 @@ create table transactionTable (
 );
 
 create table positionTable (
-    userId integer,
+    userId bigint,
     ticker text,
     amount integer,
     cashSpentOnPosition interger
 );
 
 create table userTable (
-    userId integer,
+    userId bigint,
     userName text,
     userCash integer
     cashReserved integer,
@@ -49,9 +49,8 @@ type DBConfig struct {
 /*--------------TYPE STRUCTS USED FOR QUERIES---------------*/
 
 type UserRequest struct {
-    UserId int `json:"userId"`
-    UserName string `json:"userName"`
-    UserCash int `json:"userCash"`
+    UserIdString string `json:"userIdString"`
+    UserId       int    `json:"userId"`
 }
 
 
@@ -78,18 +77,20 @@ type Position struct {
 }
 
 type OrderRequest struct {
-  UserId int `json:"userId"`
+  UserIdString string `json:"userIdString"`
   EquityTicker string `json:"equityTicker"`
   Amount int `json:"amount"`
   OrderType string `json:"orderType"`
   LimitPrice float64  `json:"limitPrice"`
+  UserId int `json:"userId"`
 }
 
 type CancelOrderRequest struct {
     LimitPrice int `json:"limitPrice"`
-    UserId int     `json:"userId"`
+    UserIdString string `json:"userIdString"`
     Ticker string  `json:"ticker"`
     Bid    bool    `json:"bid"`
+    UserId int `json:"userId"`
 }
 
 type PriceRequest struct {
@@ -111,7 +112,8 @@ type PositionResponse struct {
 
 type PositionRequest struct {
     EquityTicker string `json:"equityTicker"`
-    UserId int `json:"userId"`
+    UserIdString string `json:"userIdString"`
+    UserId       int    `json:"userId"`
 }
 
 
@@ -138,8 +140,9 @@ type CompanyData struct {
 }
 
 type CompanyInfoRequest struct {
-  UserId      int    `json:"UserId"`
-  Ticker      string `json:"Ticker"`
+  UserIdString string `json:"UserId"`
+  Ticker       string `json:"Ticker"`
+  UserId       int    `json:"userId"`
 }
 
 type CompanyInfoResponse struct {
