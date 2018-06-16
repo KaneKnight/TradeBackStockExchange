@@ -117,7 +117,6 @@ type PositionRequest struct {
     UserId       int
 }
 
-
 type Company struct {
     Value string `db:"ticker"`
     Label string `db:"name"`
@@ -148,6 +147,23 @@ type CompanyInfoRequest struct {
 
 type CompanyInfoResponse struct {
   Amount      int    `db:"amount"`
+}
+
+type UserTransactionsRequest struct {
+  UserIdString string `json:"userIdString"`
+  UserId       int
+}
+
+type UserTransactionsResponse struct {
+  Transactions []UserTransaction `json:"transactions"`
+}
+
+type UserTransaction struct {
+  Ticker       string  `json:"ticker"`
+  AmountTraded int     `json:"amountTraded"`
+  CashSpent    int     `json:"cashSpent"`
+  Price        float64 `json:"price"`
+  Time         string  `json:"time"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -404,6 +420,15 @@ func GetAllUserPositions(db *sqlx.DB, userId int) []Position {
   return positions
 }
 
+//TODO:split buyer seller wise
+func GetAllUserTransactions(db *sqlx.DB, userId int) UserTransactionsResponse {
+  var response UserTransactionsResponse
+  err := db.Select(&response.Transactions, `select ticker, amountTraded, cashTraded
+        cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
+        time 
+        from transactionTable
+        where buyerId=$1`, userId)
+}
 
 func GetAllCompanies(db *sqlx.DB) CompanyList {
     var companyList CompanyList
