@@ -448,7 +448,7 @@ class Graph extends React.Component {
 
     return (
       <div className="graph_display_cont">
-        <div className="graph_display"> Showing graph for {this.props.current_company}: <button className="changeToWeek_button" onClick={this.updateToDifferentView}> {this.state.dataPoints === 10 ? "View Week" : "View Day"} </button> 
+        <div className="graph_display"> Showing graph for {this.props.current_company}: <button className="changeToMonth_button" onClick={this.updateToDifferentView}> {this.state.dataPoints === 10 ? "View Month" : "View Day"} </button> 
         <div className="graph_cont" ref={this.myRef}>
         <LineChart
           datePattern={'%d-%b-%y %H:%M:%S'}
@@ -592,10 +592,12 @@ class UserInfo extends React.Component {
 class FullUserProfile extends React.Component {
   render() {
     return (
-      <div className="full_user_profile_wrapper">
-      Hello World 
-      <button className="close_user_profile_button" onClick={this.props.unmountMe}>X</button> 
-      </div>
+      <div className="fake_new_page_bg">
+        <div className="full_user_profile_wrapper"> 
+          <button className="close_user_profile_button" onClick={this.props.unmountMe}>X</button> 
+          <p style={{textAlign: "center"}}> Your User Profile: </p>
+        </div>
+      </div> 
     )
   }
 }

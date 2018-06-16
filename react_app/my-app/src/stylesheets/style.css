@@ -192,7 +192,7 @@ a {
   /* text-shadow: #fff; */
   /* background-color: #3A3F44; */
   /* 7A8288 */
-  background: linear-gradient(to right, rgb(86, 92, 97), var(--main-bg-color));
+  /* background: linear-gradient(to right, rgb(86, 92, 97), var(--main-bg-color)); */
 }
 
 .nav_gap_cont {
@@ -365,7 +365,7 @@ a {
   height: 100%;
 }
 
-.changeToWeek_button {
+.changeToMonth_button {
   float: right;
   transition-duration: 0.4s;
   color:white;
@@ -374,7 +374,7 @@ a {
   border: 2px solid #8a9196;
 }
 
-.changeToWeek_button:hover {
+.changeToMonth_button:hover {
   color:black;
   background-color: white;
 }
@@ -426,7 +426,33 @@ a {
   height: 2.75em;
 }
 
+/* Fake bg to make it look like its a new page */
+.fake_new_page_bg {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 17;
+  background-color: var(--main-bg-color);
+}
 
+.full_user_profile_wrapper {
+  border-radius: 8px;
+  z-index: 20;
+  position: absolute;
+  width: 40vw; 
+  height: 80vh;
+  top: 50%;
+  left: 50%;  
+  transform: translate(-50%, -50%);
+  background-color: #3A3F44;
+}
+
+.close_user_profile_button {
+  float: right;
+  border-radius: 8px; 
+}
 
 
 
