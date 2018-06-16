@@ -507,6 +507,19 @@ a {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+.react-tutorial-container .status {
+  margin-left: 50%;
+  transform: translate(-50%);
+}
+
+.status {
+  height: 20vh; 
+}
+
+.float-xs-right {
+  float: right !important; 
+}
+
 /* Input styling, not important */
 input[type="number"] {
   border: 1px solid rgba(0, 0, 0, .4);

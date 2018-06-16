@@ -363,7 +363,8 @@ class CompanyList extends React.Component {
           searchable={this.state.searchable}
           clearable={this.state.clearable}
 				/>
-        </div>
+        </div> 
+        {/* <div className="graph_display_text"></div> */}
         <RecentlyViewed 
           recentlyViewedList={this.state.recentlyViewedList}
           jumpToRecent={this.jumpToRecent}
@@ -750,7 +751,7 @@ class FullUserProfile extends React.Component {
 const TUTORIALS = {
   'demo': {
     key: 'demo',
-    title: 'Demo Tutorial',
+    title: 'TradeBack Tutorial',
     steps: [
       {
         key: 'anywhere',
@@ -784,7 +785,7 @@ const TUTORIALS = {
           This graph shows the current price and the history for the company's
           stock that you selected.  
         `,
-        annotateIn: 'div.graph_display > div',
+        annotateIn: 'div.graph_display_cont > div',
         // annotateSkip: 'Skip',
         annotateSkip: "Next",
         activeWhen: [
@@ -844,16 +845,78 @@ const TUTORIALS = {
           },
         ],
       },
+      {
+        key: 'company_info',
+        highlight: '.company_info_cont',
+        announce: paragraphs`
+          Here you can view usefull information about the company you selected, namely
+          what the current market price for a share in that company is and how much
+          stock you already own for that company.
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_sell_button',
+          }
+        ]
+      },
+      {
+        key: 'user_info',
+        highlight: '.user_info_cont',
+        announce: paragraphs`
+          Here you can view a short preview of your user portfolio.
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_company_info',
+          }
+        ]
+      },
+      {
+        key: 'user_info_button',
+        highlight: '.view_full_profile_button',
+        announce: paragraphs`
+          You can click this button to view your full portfolio, that will show 
+          your current portfolio value, positions owned and your transaction history.
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_user_info',
+          }
+        ]
+      },
+      {
+        key: 'complete',
+        highlight: '.buy_button_popup_button, .sell_button_popup_button',
+        announce: paragraphs`
+          You will see these buttons scattered throughout the application. Don't be scared!
+          If you feel like you don't understand the terminology, simple click this button 
+          and you will be preseneted with an explanation!
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_user_info_button',
+          }
+        ]
+      },
     ],
     complete: {
       on: 'checkpointReached',
       checkpoint: 'complete',
-      title: 'Demo Tutorial Complete!',
+      title: 'TradeBack Tutorial Complete!',
       message: paragraphs`
-        And so concludes the demo tutorial.
+        You have finished the tutorial!
 
-        Take a look at the code for this tutorial below, and get started writing your own
-        tutorials!
+        Now the market is yours. We have given you an initial amount of 10 Million USD.
+        You know the basics, now it's time to start experimenting and learning. 
+        Trade at will, and have fun! 
       `,
     },
   },
