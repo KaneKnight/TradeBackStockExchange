@@ -226,10 +226,12 @@ func UserCanBuyAmountRequested(db *sqlx.DB,
 func UpdatePositionOfUsersFromTransaction(db *sqlx.DB,
                                           t *Transaction) {
      ax := db.MustBegin()
-     UpdateBuyerPosition(db, ax, t.BuyerId, t.Ticker,
-                         t.AmountTraded, t.CashTraded)
-     UpdateSellerPosition(db, ax, t.SellerId, t.Ticker,
-                          t.AmountTraded, t.CashTraded)
+     if t.BuyerId != -1 {
+        UpdateBuyerPosition(db, ax, t.BuyerId, t.Ticker, t.AmountTraded, t.CashTraded)
+     }
+     if (t.SellerId != -1) {
+        UpdateSellerPosition(db, ax, t.SellerId, t.Ticker, t.AmountTraded, t.CashTraded)
+     }
      err := ax.Commit()
      if (err != nil) {
        log.Fatalln(err)
