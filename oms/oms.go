@@ -105,7 +105,7 @@ func CreateUser(c *gin.Context) {
     if !db.UserExists(database, userData.UserId) {
       db.CreateUser(database, userData.UserId, 10000000 * 100)
     }
-    //c.JSON(http.StatusOK, nil)
+    c.JSON(http.StatusOK, nil)
 }
 
 func GetPositionData(c *gin.Context) {
@@ -113,10 +113,10 @@ func GetPositionData(c *gin.Context) {
     c.BindJSON(&positionRequest)
     positionRequest.UserId = hash(positionRequest.UserIdString)
 
-    response := getPositionResponse(positionRequest.EquityTicker,
-        positionRequest.UserId)
+    var positionResponse db.PositionResponse
+    positionResponse.Positions = db.GetAllUserPositions(database, positionRequest.UserId)
 
-    c.JSON(http.StatusOK, response)
+    c.JSON(http.StatusOK, positionResponse)
 }
 
 //API handler that returns a list of all equity we serve

@@ -103,14 +103,10 @@ type PriceResponse struct {
 
 
 type PositionResponse struct {
-    EquityTicker string  `json:"equityTicker"`
-    NumberOfSharesOwned int  `json:"numberOfSharesOwned"`
-    ValueOfPostion float64  `json:"valueOfPosition"`
-    PercentageGain float64  `json:"percentageGain"`
+  Positions []Position `json:"positions"`
 }
 
 type PositionRequest struct {
-    EquityTicker string `json:"equityTicker"`
     UserIdString string `json:"userIdString"`
     UserId       int    `json:"userId"`
 }
@@ -384,12 +380,21 @@ func GetAvailableCash(db *sqlx.DB,
 func GetPosition(db *sqlx.DB, ticker string, userId int) Position {
     var position []Position
     err := db.Select(&position, `select * from positionTable
-                                 where userid=$1 and ticker=$2`, userId,
-        ticker)
+                                 where userid=$1 and ticker=$2`, userId, ticker)
     if (err != nil) {
         log.Fatalln(err)
     }
     return position[0]
+}
+
+func GetAllUserPositions(db *sqlx.DB, userId int) []Position {
+  var positions []Position
+  err := db.Select(&positions, `select * from positionTable
+                                where userId=$1`, userId)
+  if err != nil {
+    log.Fatalln(err)
+  }
+  return positions
 }
 
 
