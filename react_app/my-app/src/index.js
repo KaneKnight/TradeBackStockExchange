@@ -7,6 +7,13 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import {LineChart} from 'react-easy-chart';
 import auth0 from 'auth0-js';
+import 'react-interactive-tutorials/dist/react-interactive-tutorials.css';
+import interactiveTutorials from 'react-interactive-tutorials';
+import {
+  paragraphs,
+  registerTutorials,
+  startTutorial
+} from 'react-interactive-tutorials';
 
 const AUTH0_CLIENT_ID = "pRPNKyXdY9dNx0yzmwhhrxi1PIDmHQ0v";
 const AUTH0_DOMAIN = "ic22-webapps2018.eu.auth0.com";
@@ -111,7 +118,7 @@ class Home extends React.Component {
 
 function sendExistingUserCheck() {
   console.log(JSON.parse(localStorage.getItem("profile")).sub);
-  var string_data = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub};
+  var string_data = {"UserIdString" : JSON.parse(localStorage.getItem("profile")).sub};
   var data = JSON.stringify(string_data);
   $.post(
     "http://localhost:8080/api/check-user-exists",
@@ -611,7 +618,7 @@ function getFigures(comp) {
   if (result === null) {
     return "";
   }
-  var dummy_data_comp = {"UserId" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
+  var dummy_data_comp = {"UserIdString" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
   var dummy_data = JSON.stringify(dummy_data_comp);
   var temp;
   jQuery.ajaxSetup({async:false});
@@ -740,14 +747,141 @@ class FullUserProfile extends React.Component {
   }
 }
 
+const TUTORIALS = {
+  'demo': {
+    key: 'demo',
+    title: 'Demo Tutorial',
+    steps: [
+      {
+        key: 'anywhere',
+        announce: paragraphs`
+          This tutorial will explain how to use TradeBack so you can dive straight in 
+          and experiment with trading, to figure out if it's for you!
+        `,
+        announceDismiss: "Okay, let's begin",
+        activeWhen: [],
+      },
+      {
+        key: 'beginning',
+        highlight: '#test2',
+        announce: paragraphs`
+          This is where you can choose which company's stock you want to trade. 
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_anywhere',
+          },
+        ],
+      },
+      {
+        key: 'graph',
+        highlight: '.graph_display',
+        annotate: paragraphs`
+          This graph shows the current price and the history for the company's
+          stock that you selected.  
+        `,
+        annotateIn: 'div.graph_display > div',
+        // annotateSkip: 'Skip',
+        annotateSkip: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_beginning',
+          },
+        ],
+      },
+      {
+        key: 'view_month',
+        highlight: '.changeToMonth_button',
+        announce: paragraphs`
+          Click this button to view the price history for the past month.  
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_graph',
+          },
+        ],
+      },
+      {
+        key: 'buy_button',
+        highlight: '.buy_button',
+        announce: paragraphs`
+          This is where you can place a bid order to buy some stock for the company
+          that you selected. 
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_view_month',
+          },
+        ],
+      },
+      {
+        key: 'sell_button',
+        highlight: '.sell_button',
+        announce: paragraphs`
+          This is where you can place an ask order to sell some stock that you
+          own for the company that you selected. 
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_buy_button',
+          },
+        ],
+      },
+    ],
+    complete: {
+      on: 'checkpointReached',
+      checkpoint: 'complete',
+      title: 'Demo Tutorial Complete!',
+      message: paragraphs`
+        And so concludes the demo tutorial.
+
+        Take a look at the code for this tutorial below, and get started writing your own
+        tutorials!
+      `,
+    },
+  },
+};
+
+registerTutorials(TUTORIALS);
+
 class NavigationBar extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.launchTutorial = this.launchTutorial.bind(this);
+  }
+
+  launchTutorial() {
+    console.log("called");
+    startTutorial('demo');
+    console.log("Finished");
+  }
+
+  
   render() {
     return (
       <div id='nav_bar' className="nav_bar_cont">
         <div id='grid_nav_bar' className="grid-container-nav-bar">
           <div className="app_name_cont"> TradeBack </div> 
           <div className="nav_gap_cont"> </div>
-          <div className="theme_switch_cont"> Should be switch </div>
+          <div className="theme_switch_cont"> <button className="view_tutorial_button" onClick={this.launchTutorial}> View Tutorial </button> </div>
           <div className="login_btn_cont"> <button className="logout_button" onClick={this.props.logout}> Logout </button> </div>
         </div>
       </div>
@@ -983,7 +1117,7 @@ class ActionConfirmation extends React.Component {
 
   submitRequest() {
     var ticker = this.getTicker(this.props.current_company);
-    var data_to_send ={"userId": JSON.parse(localStorage.getItem("profile")).sub, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
+    var data_to_send ={"userIdString": JSON.parse(localStorage.getItem("profile")).sub, "equityTicker" : ticker, "amount" : this.state.number_of_stock, "orderType" : this.state.action_type + this.props.button_name} ;
     var data = JSON.stringify(data_to_send);
     console.log(data);
     this.setState({renderSubmitted: true});
