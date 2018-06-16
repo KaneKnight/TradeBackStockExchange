@@ -611,6 +611,10 @@ class FullUserProfile extends React.Component {
           <p> Name: {to_stringify.Name} </p>
           <p> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
           </div> 
+          <div className="positions_held_wrapper">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
+          </div> 
+          <br/> 
           <div className="exchange_history_wrapper">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
           </div> 

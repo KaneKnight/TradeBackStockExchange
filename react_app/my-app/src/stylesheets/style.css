@@ -458,9 +458,16 @@ a {
   text-indent: 2em; 
 }
 
+.positions_held_wrapper {
+  height: 30vh; 
+  width: 40vw; 
+  background-color: #f89406;
+  overflow: auto;
+}
+
 .exchange_history_wrapper {
-  height: 20vh;
-  width: 30vw; 
+  height: 30vh;
+  width: 40vw; 
   background-color: #00ffff;
   overflow: auto;
 }
