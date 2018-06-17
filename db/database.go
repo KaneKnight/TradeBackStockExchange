@@ -108,9 +108,9 @@ type PositionResponse struct {
 
 type JSONPosition struct {
   Ticker string  `json:"ticker"`
-  Amount int     `json:"amount"`
-  Value  float64 `json:"value"`
-  Gain   float64 `json:"gain"`
+  Amount int     `json:"numberOfSharesOwned"`
+  Value  float64 `json:"valueOfPosition"`
+  Gain   float64 `json:"percentageGain"`
   Name   string  `json:"name"`
 }
 
@@ -432,6 +432,7 @@ func GetAllUserPositions(db *sqlx.DB, userId int) []Pos {
 
 func GetAllUserTransactions(db *sqlx.DB, userId int) UserTransactionsResponse {
   var response UserTransactionsResponse
+  fmt.Println(userId)
   err1 := db.Select(&response.BuyTransactions, `select ticker, amountTraded, cashTraded,
         cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
         timeOfTrade 
@@ -448,6 +449,7 @@ func GetAllUserTransactions(db *sqlx.DB, userId int) UserTransactionsResponse {
   if err2 != nil {
     log.Fatalln(err2)
   }
+  fmt.Println(response)
   return response
 }
 

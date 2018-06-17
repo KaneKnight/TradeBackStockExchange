@@ -84,8 +84,9 @@ func OrderHandler(c *gin.Context) {
 func UserTransactionsHandler(c *gin.Context) {
   var request db.UserTransactionsRequest
   var response db.UserTransactionsResponse
-  c.BindJSON(&response)
-  if request.UserId != 1 {
+  c.BindJSON(&request)
+  fmt.Println(request.UserIdString)
+  if request.UserId != -1 {
     request.UserId = hash(request.UserIdString)
   }
 

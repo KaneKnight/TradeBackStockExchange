@@ -544,7 +544,7 @@ class Graph extends React.Component {
   updateToDifferentView() {
     var newDataPoints;
     if (this.state.dataPoints === 10) {
-      newDataPoints = 50;
+      newDataPoints = 30;
     } else {
       newDataPoints = 10; 
     }
@@ -557,7 +557,7 @@ class Graph extends React.Component {
       const newest_value = newDataToPlot[0][newDataPoints - 1].y;
       this.props.setInitialPrice(recent_price);
       this.props.onPriceUpdate(newest_value);
-      this.updateDataGraph(newDataPoints === 50);
+      this.updateDataGraph(newDataPoints === 30);
     });
     this.props.renderedNewGraph();
   }
@@ -748,9 +748,9 @@ function getPositionsForUser() {
     }
   )
   
-
-  /*var positions = {
-    "Positions" : [
+  /*
+  var positions = {
+    "positions" : [
       {
         "ticker" : "AAPL",
         "numberOfSharesOwned" : 10,
@@ -774,9 +774,8 @@ function getPositionsForUser() {
       },
     ]
   }*/
-  console.log(positions.positions);
-  return positions;
 
+  return positions.positions;
 }
 
 function getTransactionHistoryForUser() {
@@ -790,13 +789,14 @@ function getTransactionHistoryForUser() {
     "http://localhost:8080/api/get-transaction-history",
     data,
     res => {
-      transactionHistory = res;
+      transactionHistory[0] = res.BuyTransactions;
+      transactionHistory[1] = res.SellTransactions;
     }
   )
   console.log(transactionHistory);
   
-  /*
-  const transactionHistory = {
+  
+  /*const transactionHistory = {
     "BuyTransactions" : [
       {
         "ticker": "AAPL",
@@ -914,9 +914,9 @@ class Positions extends React.Component {
     console.log(this.props.listOfPositions);
 
     var newPosToShow = [];
-    for (var i = 0; i < this.props.listOfPositions.positions.length; i++) {
+    for (var i = 0; this.props.listOfPositions !== null && i < this.props.listOfPositions.length; i++) {
       // var text_to_show = <p> Ticker: {this.props.listOfPositions.Positions[i].Ticker} Amount: {this.props.listOfPositions.Positions[i].Amount} Cash Spent: {this.props.listOfPositions.Positions[i].CashSpentOnPosition}$</p>
-      var text_to_show = <div className="position_list_elem"> Company : {this.props.listOfPositions.positions[i].name} ({this.props.listOfPositions.positions[i].ticker}), <br/> Number of shares owned: {this.props.listOfPositions.positions[i].numberOfSharesOwned}, <br/> Value of Position: {this.props.listOfPositions.positions[i].valueOfPosition}, <br/> Percentage Gain: {this.props.listOfPositions.positions[i].percentageGain}% </div>
+      var text_to_show = <div className="position_list_elem"> Company : {this.props.listOfPositions[i].name} ({this.props.listOfPositions[i].ticker}), <br/> Number of shares owned: {this.props.listOfPositions[i].numberOfSharesOwned}, <br/> Value of Position: {this.props.listOfPositions[i].valueOfPosition} USD, <br/> Percentage Gain: {this.props.listOfPositions[i].percentageGain}% </div>
       newPosToShow.push(text_to_show);
     }
     this.setState({
@@ -947,24 +947,24 @@ class TransactionHistory extends React.Component {
     const buy_text = <p style={{color: "green"}}> Your Buy Transaction History: </p>;
     historyToShow.push(buy_text);
     //Looping through the Buy Transactions
-    for (var i = 0; i < this.props.transactionHistory.BuyTransactions.length; i++) {
-      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory.BuyTransactions[i].ticker} <br/>
-        Amount Traded: {this.props.transactionHistory.BuyTransactions[i].amountTraded}<br/>
-        Cash Spent: {this.props.transactionHistory.BuyTransactions[i].cashSpent} USD<br/>
-        Price Bought At: {this.props.transactionHistory.BuyTransactions[i].price} USD<br/>
-        Transaction Time: {this.props.transactionHistory.BuyTransactions[i].time.toString()}</div>
+    for (var i = 0; this.props.transactionHistory[0] !== null && i < this.props.transactionHistory[0].length; i++) {
+      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory[0][i].ticker} <br/>
+        Amount Traded: {this.props.transactionHistory[0][i].amountTraded}<br/>
+        Cash Spent: {this.props.transactionHistory[0][i].cashSpent} USD<br/>
+        Price Bought At: {this.props.transactionHistory[0][i].price} USD<br/>
+        Transaction Time: {this.props.transactionHistory[0][i].time}</div>
       historyToShow.push(text_to_show_for_buy);
     }
 
     const sell_text = <p style={{color: "red"}}> Your Sell Transaction History: </p>;
     historyToShow.push(sell_text);
     //Looping through the Sell Transactions
-    for (var i = 0; i < this.props.transactionHistory.SellTransactions.length; i++) {
-      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory.SellTransactions[i].ticker} <br/>
-        Amount Traded: {this.props.transactionHistory.SellTransactions[i].amountTraded} <br/>
-        Cash Spent: {this.props.transactionHistory.SellTransactions[i].cashSpent} USD<br/>
-        Price Bought At: {this.props.transactionHistory.SellTransactions[i].price} USD<br/>
-        Transaction Time: {this.props.transactionHistory.SellTransactions[i].time.toString()}</div>
+    for (var i = 0; this.props.transactionHistory[1] !== null && i < this.props.transactionHistory[1].length; i++) {
+      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory[1][i].ticker} <br/>
+        Amount Traded: {this.props.transactionHistory[1][i].amountTraded} <br/>
+        Cash Spent: {this.props.transactionHistory[1][i].cashSpent} USD<br/>
+        Price Bought At: {this.props.transactionHistory[1][i].price} USD<br/>
+        Transaction Time: {this.props.transactionHistory[1][i].time}</div>
       historyToShow.push(text_to_show_for_buy);
     }
 
@@ -1443,6 +1443,7 @@ class ActionConfirmation extends React.Component {
         <div className="confirmation_window"> 
           <button className="close_button" onClick={() => this.dismiss()}> X </button> 
           <p className="company_viewing"> Viewing for {this.props.current_company} - {this.props.button_name}:</p>
+          <div className="text_confirmation_window">
           <p> Number of stock: <input type="number" onChange={e => this.inputChangeStock(e)}/> </p>
           <p> Type of action: 
             {/* <div> */}
@@ -1455,9 +1456,10 @@ class ActionConfirmation extends React.Component {
             {/* </div> */}
           </p>
           <p> Total price: {current_amount}</p>
-          <p style={{color: amount_left > 0 ? "black" : "red"}}> Total funds left: {amount_left}</p> 
+          <p style={{color: amount_left > 0 ? "default" : "red"}}> Total funds left: {amount_left}</p> 
           <div className="place_order">
             <button className="place_order_button" disabled={amount_left < 0 || this.state.number_of_stock <= 0 || (this.state.action_type === 'limit' && this.state.limit_price <= 0)} onClick={() => this.submitRequest()}> Place order </button> 
+          </div>
           </div>
         </div> 
       </div>
