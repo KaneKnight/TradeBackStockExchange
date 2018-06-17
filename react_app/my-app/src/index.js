@@ -108,9 +108,14 @@ class Home extends React.Component {
 
   render() {
     return (
-      <div> 
-        Hello World 
+      <div className="landing_page"> 
+      <div className="background_landing_page">
+        {/* <img className="image_for_bg" src="https://fthmb.tqn.com/ATfDpAdTb-ZCXOQYyCih61tmEp4=/1255x837/filters:fill(auto,1)/how-to-start-trading-stocks-56a22ddb5f9b58b7d0c78746.jpg"/> */}
+      </div>
+      <div className="landing_page_text">
+        Welcome to TradeBack, the sandbox platform to see if financial trading is for you! 
         <button onClick={this.authenticate}> Sign In </button> 
+        </div>
       </div> 
     )
   }
