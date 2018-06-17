@@ -701,6 +701,14 @@ a {
   background-color: #3A3F44;
 }
 
+.text_confirmation_window {
+  background-color: #3A3F44;
+  height: auto;
+  border-radius: 8px;
+  margin-left: 5%;
+  width: 90%;
+}
+
 
 
 /* For tutorial */

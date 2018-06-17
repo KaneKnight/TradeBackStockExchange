@@ -1451,6 +1451,7 @@ class ActionConfirmation extends React.Component {
         <div className="confirmation_window"> 
           <button className="close_button" onClick={() => this.dismiss()}> X </button> 
           <p className="company_viewing"> Viewing for {this.props.current_company} - {this.props.button_name}:</p>
+          <div className="text_confirmation_window">
           <p> Number of stock: <input type="number" onChange={e => this.inputChangeStock(e)}/> </p>
           <p> Type of action: 
             {/* <div> */}
@@ -1466,6 +1467,7 @@ class ActionConfirmation extends React.Component {
           <p style={{color: amount_left > 0 ? "default" : "red"}}> Total funds left: {amount_left}</p> 
           <div className="place_order">
             <button className="place_order_button" disabled={amount_left < 0 || this.state.number_of_stock <= 0 || (this.state.action_type === 'limit' && this.state.limit_price <= 0)} onClick={() => this.submitRequest()}> Place order </button> 
+          </div>
           </div>
         </div> 
       </div>
