@@ -384,7 +384,7 @@ class RecentlyViewed extends React.Component {
 
     return (
       <div id='recent_list' className='recently_viewed_cont'> 
-        Recently viewed: 
+        <p className="indent_recent_title"> Recently viewed: </p> 
         {this.props.recentlyViewedList}
       </div>
     )
@@ -671,9 +671,11 @@ class CompanyInfo extends React.Component {
 
     return (
       <div className="company_info_cont"> 
-        Showing for {this.props.current_company}: 
-        <br/> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')}
-        <br/> Currently own {figures === undefined ? "no" : figures} shares. 
+        <div className="company_info_text">
+          Showing for <u> {this.props.current_company} </u>: 
+          <p> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')} </p>
+          <p> Currently own {figures === undefined ? "no" : figures} shares. </p>
+        </div>
       </div>
     )
   }

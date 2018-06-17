@@ -273,6 +273,13 @@ a {
 
 .recently_viewed_cont {
   margin-top: 2em;
+  text-indent: 1em;
+  /* text-align: center; */
+}
+
+.indent_recent_title {
+  text-align: center;
+  text-indent: 0;
 }
 
 
@@ -640,6 +647,18 @@ a {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+.company_info_text {
+  margin-top: 3em; 
+  margin-left: 0.25em;
+}
+
+.company_info_text p {
+  text-indent: 0.75em;
+}
+
+
+
 
 
 
