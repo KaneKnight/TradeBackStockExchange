@@ -384,8 +384,10 @@ class RecentlyViewed extends React.Component {
 
     return (
       <div id='recent_list' className='recently_viewed_cont'> 
-        <p className="indent_recent_title"> Recently viewed: </p> 
-        {this.props.recentlyViewedList}
+        <p className="indent_recent_title"> Recently viewed: </p>
+        <ul> 
+          {this.props.recentlyViewedList}
+        </ul>
       </div>
     )
   }
@@ -400,7 +402,7 @@ class RecentElem extends React.Component {
   render() {
     return (
       <div className='recent_elem'>
-        <a id={this.props.recentId} href="javascript:;" onClick={() => this.doTheJump(this.props.recentId)}> {this.props.recentId} </a>
+        <li> <a id={this.props.recentId} href="javascript:;" onClick={() => this.doTheJump(this.props.recentId)}> {this.props.recentId} </a> </li> 
       </div>
     )
   }
