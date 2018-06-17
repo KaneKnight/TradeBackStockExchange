@@ -1350,6 +1350,8 @@ class Button extends React.Component {
     this.state = {
       renderChild: false,
       renderInfoBubble: false,
+      textForBuy: "A bid is a market offer to buy an amount of stock you want to own.",
+      textForSell: "An ask is a market offer to sell an amount of stock you own.",
     };
     this.handleChildUnmount = this.handleChildUnmount.bind(this);
     this.handleChildMount = this.handleChildMount.bind(this);
@@ -1383,8 +1385,12 @@ class Button extends React.Component {
         {this.state.renderChild ? <ActionConfirmation unmountMe={this.handleChildUnmount} current_company={this.props.current_company} button_name={this.props.button_name} current_price={this.props.current_price}/> : null}
         
         <div className="temp_idea">
-          {this.state.renderInfoBubble ? <InfoBubble /> : null}
           <button className={this.props.button_type + "_popup_button"} title="What is this?" onClick={this.handlePopupMount}> ? </button>
+          <div className="temp_idea2">
+            <div className="temp_idea3">
+              {this.state.renderInfoBubble ? <InfoBubble text={this.props.button_type === "buy_button" ? this.state.textForBuy : this.state.textForSell}/> : null}
+            </div>
+          </div>
         </div> 
         {/* <InfoBubble /> */}
       {/* </div>  */}
@@ -1399,8 +1405,9 @@ class InfoBubble extends React.Component {
     return (
       <div className="info_bubble_wrapper">
         <div className="speech-bubble"> 
-          Hello
-          <p> this is some more text </p>  
+          <p>
+          {this.props.text} 
+          </p>
         </div> 
       </div> 
     )
