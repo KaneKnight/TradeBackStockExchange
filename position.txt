@@ -10,4 +10,7 @@
 
     /* Percentage gain/loss on position.*/
     "percentageGain": [0-9]*
+
+    /* Name of company.*/
+    "name": companyname
 }
