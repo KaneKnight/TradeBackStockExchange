@@ -420,7 +420,7 @@ function getInitialDataForGraph(dataPoints) {
   //initial_data.push({x: '1-Jan-15 10:00:30', y: 70});
   //initial_data.push({x: '1-Jan-15 10:01:00' , y: 40});
 
-  const initialDate = '1-Jan-15 ';
+  /*const initialDate = '1-Jan-15 ';
  
   for(var i = 0; i < dataPoints; i++) {
 

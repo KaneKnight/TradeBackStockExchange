@@ -350,13 +350,13 @@ func GetUserPositionsResponse(userId int) db.PositionResponse {
   for i := 0; i < len(allUserPositions); i++ {
     ticker := allUserPositions[i].Ticker
     position := db.GetPosition(database, ticker, userId)
-    currentPriceOfStock := float64(GetHighestBidOfStock(ticker)) / 100
+    currentPriceOfStock := float64(GetHighestBidOfStock(ticker))/100
     var value float64
     var gain float64
     if (&position != nil && currentPriceOfStock != 0) {
-      value = float64(position.Amount) * currentPriceOfStock
+      value = (float64(position.Amount) * currentPriceOfStock)
       cashSpent := float64(position.CashSpentOnPosition)
-      gain = ((value / cashSpent) - 1) * 100
+      gain = ((value / cashSpent) - 1)
       gain = Round(gain, 0.01)
     } else {
       value = 0

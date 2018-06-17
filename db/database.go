@@ -129,7 +129,7 @@ type CompanyList struct {
 }
 
 type CompanyDataRequest struct {
-    Ticker   string `json:"companyName"`
+    Ticker   string `json:"ticker"`
     DataNums int    `json:"dataNums"`
 }
 
