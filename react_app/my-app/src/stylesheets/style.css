@@ -61,6 +61,33 @@ a {
   /* border-radius: 4px; */
 }
 
+.user_info_area {
+  margin-left: 10vw;
+  width: 75vw; 
+  /* background-color: rebeccapurple; */
+  display: grid;
+  grid-template-areas:
+  'text_preview button_location_profile';
+  grid-template-columns: 60% 40%;
+}
+
+.info_overview {
+  height: 100%;
+  grid-area: text_preview;
+  margin-top: 0.5em;
+}
+
+.info_overview p {
+  text-indent: 2em;
+}
+
+.profile_button_cont {
+  grid-area: button_location_profile;
+  height: 100%;
+}
+
+
+
 .company_info_cont {
   color: white;
   grid-area: company_information;
@@ -526,6 +553,14 @@ a {
   background-color: #272B30;
 }
 
+.view_full_profile_button {
+  padding: 16px 40px;
+  transition-delay: 0.4s;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  float: right;
+  margin-top: 2em;
+}
 
 .landing_page {
   background: radial-gradient(ellipse, var(--main-bg-color), #0E162A);

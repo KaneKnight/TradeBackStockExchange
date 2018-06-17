@@ -708,11 +708,19 @@ class UserInfo extends React.Component {
 
   render() {
     return (
-      <div className="user_info_cont"> User Info Here 
-      <p> Name, equities owned, value </p> 
-      <button className="view_full_profile_button" onClick={this.handleRenderFullProfile}> Click To View Full Profile </button>  
-      {this.state.renderFullProfile ? <FullUserProfile unmountMe={this.handleUnrenderFullProfile}/> : null}
-      </div>
+      <div className="user_info_cont">
+        <div className="user_info_area">
+          <div className="info_overview">
+            <span style={{fontSize: "20px", fontWeight: "bold"}}>User Portfolio preview: </span> 
+            <p> Equities owned: </p>
+            <p> Portfolio value: </p>  
+          </div> 
+          <div className="profile_button_cont">
+            <button className="view_full_profile_button" onClick={this.handleRenderFullProfile}> Click To View Full Profile </button>  
+            {this.state.renderFullProfile ? <FullUserProfile unmountMe={this.handleUnrenderFullProfile}/> : null}
+          </div>
+        </div>
+      </div> 
     )
   }
 }
