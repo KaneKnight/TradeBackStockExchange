@@ -285,6 +285,7 @@ a {
 
 /* Style for confirmation window */
 .confirmation_window {
+  color: white;
   width: 30vw;
   height: 50vh;
   position: absolute;
@@ -293,10 +294,21 @@ a {
   left: 50%;
   text-indent: 1em;
   transform: translate(-50%, -50%);
-  background-color: var(--main-bg-color);
-  color: white;
+  background-color: #f7f7f7;
+  /* color: black; */
   border-radius: 5px;
   border: 1px solid black;
+  background-color: rgba(0, 0, 0, .4);
+}
+
+.text_confirmation_window {
+  color: black;
+  background-color: #f7f7f7;
+  height: auto;
+  border-radius: 8px;
+  margin-left: 5%;
+  width: 90%;
+  /* margin-bottom: 3em; */
 }
 
 /* Center the viewing title */
@@ -699,14 +711,6 @@ a {
   border-radius: 8px;
   margin-bottom: 1em;
   background-color: #3A3F44;
-}
-
-.text_confirmation_window {
-  background-color: #3A3F44;
-  height: auto;
-  border-radius: 8px;
-  margin-left: 5%;
-  width: 90%;
 }
 
 
