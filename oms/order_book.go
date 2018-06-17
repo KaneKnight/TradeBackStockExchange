@@ -338,27 +338,6 @@ func getValueAndGain(ticker string, userId int) (int, int) {
     return value, (int(value / cashSpent) - 1) * 100
 }
 
-func getPositionResponse(ticker string, userId int) db.PositionResponse {
-    position := db.GetPosition(database, ticker, userId)
-    currentPriceOfStock := float64(GetHighestBidOfStock(ticker)) / 100
-    var value float64
-    var gain float64
-    if (&position != nil && currentPriceOfStock != 0) {
-        value = float64(position.Amount) * currentPriceOfStock
-        cashSpent := float64(position.CashSpentOnPosition)
-        gain = ((value / cashSpent) - 1) * 100
-        gain = Round(gain, 0.01)
-    } else {
-        value = 0
-        gain = 0
-    }
-    return db.PositionResponse{
-        ticker,
-        position.Amount,
-        value,
-        gain}
-}
-
 func CancelOrder(cancelRequest *db.CancelOrderRequest) {
   cancelRequest.LimitPrice = cancelRequest.LimitPrice * 100 //make sure multiple of 100
   price := LimitPrice(cancelRequest.LimitPrice)

@@ -107,9 +107,11 @@ type PositionResponse struct {
 }
 
 type JSONPosition struct {
-  Ticker              string `json:"ticker"`
-  Name                string `json:"name"`
-  CashSpentOnPosition int    `json:"cashSpentOnPosition"`
+  Ticker string  `json:"ticker"`
+  Amount int     `json:"amount"`
+  Value  float64 `json:"value"`
+  Gain   float64 `json:"gain"`
+  Name   string  `json:"name"`
 }
 
 type PositionRequest struct {
@@ -155,7 +157,8 @@ type UserTransactionsRequest struct {
 }
 
 type UserTransactionsResponse struct {
-  Transactions []UserTransaction `json:"transactions"`
+  BuyTransactions []UserTransaction  `json:"buyTransactions"`
+  SellTransactions []UserTransaction `json:"SellTransactions"`
 }
 
 type UserTransaction struct {
@@ -408,26 +411,66 @@ func GetPosition(db *sqlx.DB, ticker string, userId int) Position {
     return position[0]
 }
 
-func GetAllUserPositions(db *sqlx.DB, userId int) []Position {
-  var positions PositionResponse
-  err := db.Select(&positions.Positions, `select ticker, name, cashSpentOnPosition 
-                                          from positionTable join companyTable
-                                          on ticker
-                                          where userId=$1`, userId)
+func getPositionResponse(ticker string, userId int) JSONPosition {
+  position := GetPosition(database, ticker, userId)
+  currentPriceOfStock := float64(GetHighestBidOfStock(ticker)) / 100
+  var value float64
+  var gain float64
+  if (&position != nil && currentPriceOfStock != 0) {
+    value = float64(position.Amount) * currentPriceOfStock
+    cashSpent := float64(position.CashSpentOnPosition)
+    gain = ((value / cashSpent) - 1) * 100
+    gain = Round(gain, 0.01)
+  } else {
+    value = 0
+    gain = 0
+  }
+  return JSONPosition{
+     ticker,
+     position.Amount,
+     value,
+     gain
+  }
+}
+
+type pos struct {
+  ticker string
+  name   string
+}
+func GetAllUserPositions(db *sqlx.DB, userId int) PositionResponse {
+  var positions []pos
+  err := db.Select(&positions, `select ticker, name from positionTable join companyTable on ticker where userId=$1`, userId)
   if err != nil {
     log.Fatalln(err)
   }
-  return positions
+
+  var response PositionResponse
+  for i := 0; i < len(positions); i++ {
+    response.Positions[i] = getPositionResponse(positions[i].ticker, userId)
+  }
+  return response
 }
 
 //TODO:split buyer seller wise
 func GetAllUserTransactions(db *sqlx.DB, userId int) UserTransactionsResponse {
   var response UserTransactionsResponse
-  err := db.Select(&response.Transactions, `select ticker, amountTraded, cashTraded
+  err1 := db.Select(&response.BuyTransactions, `select ticker, amountTraded, cashTraded
         cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
         time 
         from transactionTable
         where buyerId=$1`, userId)
+  if err1 != nil {
+    log.Fatalln(err1)
+  }
+  err2 := db.Select(&response.SellTransactions, `select ticker, amountTraded, cashTraded
+        cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
+        time 
+        from transactionTable
+        where sellerId=$1`, userId)
+  if err2 != nil {
+    log.Fatalln(err2)
+  }
+  return response
 }
 
 func GetAllCompanies(db *sqlx.DB) CompanyList {

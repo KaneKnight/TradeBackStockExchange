@@ -79,6 +79,10 @@ func OrderHandler(c *gin.Context) {
     c.JSON(http.StatusOK, nil)
 }
 
+func UserTransactionsHandler(c *gin.Context) {
+  var request db.UserTransactionsRequest
+}
+
 func CancelHandler(c *gin.Context) {
     var cancelOrder db.CancelOrderRequest
     c.BindJSON(&cancelOrder)
@@ -114,7 +118,7 @@ func GetPositionData(c *gin.Context) {
     positionRequest.UserId = hash(positionRequest.UserIdString)
 
     var positionResponse db.PositionResponse
-    positionResponse.Positions = db.GetAllUserPositions(database, positionRequest.UserId)
+    positionResponse = db.GetAllUserPositions(database, positionRequest.UserId)
 
     c.JSON(http.StatusOK, positionResponse)
 }
