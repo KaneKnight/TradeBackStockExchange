@@ -113,8 +113,8 @@ class Home extends React.Component {
         {/* <img className="image_for_bg" src="https://fthmb.tqn.com/ATfDpAdTb-ZCXOQYyCih61tmEp4=/1255x837/filters:fill(auto,1)/how-to-start-trading-stocks-56a22ddb5f9b58b7d0c78746.jpg"/> */}
       </div>
       <div className="landing_page_text">
-        Welcome to TradeBack, the sandbox platform to see if financial trading is for you! 
-        <button onClick={this.authenticate}> Sign In </button> 
+        Welcome to <span style={{fontWeight: "bold", color: "white"}}>TradeBack</span>, the sandbox platform to see if financial trading is for you! 
+        <button className="sign_in_button" onClick={this.authenticate}> Sign In To Get Started! </button> 
         </div>
       </div> 
     )

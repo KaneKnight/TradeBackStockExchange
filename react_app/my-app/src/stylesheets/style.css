@@ -473,6 +473,7 @@ a {
 }
 
 .landing_page_text {
+  color: #f7f7f7;
   position: absolute;
   top: 20%;
   left: 50%;
@@ -481,6 +482,24 @@ a {
   z-index: 50;
   font-size: 48px;
   text-align: center;
+}
+
+.sign_in_button {
+  position: absolute;
+  padding: 16px 40px;
+  transition-duration: 0.4s;
+  color: var(--main-bg-color);
+  font-size: 30px;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  top: 50vh;
+  left:50%;
+  transform: translate(-50%);
+}
+
+.sign_in_button:hover {
+  background-color: #8a9196;
+  color: white; 
 }
 
 .landing_page {
