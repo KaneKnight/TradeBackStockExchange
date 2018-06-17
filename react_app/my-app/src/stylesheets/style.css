@@ -650,7 +650,7 @@ a {
 }
 
 .company_info_text {
-  margin-top: 3em; 
+  margin-top: 10em; 
   margin-left: 0.25em;
 }
 
@@ -658,6 +658,9 @@ a {
   text-indent: 0.75em;
 }
 
+#test2 {
+  margin-top: 1em;
+}
 
 
 
