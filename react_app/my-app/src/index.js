@@ -919,9 +919,9 @@ class Positions extends React.Component {
     console.log(this.props.listOfPositions);
 
     var newPosToShow = [];
-    for (var i = 0; i < this.props.listOfPositions.Positions.length; i++) {
+    for (var i = 0; i < this.props.listOfPositions.positions.length; i++) {
       // var text_to_show = <p> Ticker: {this.props.listOfPositions.Positions[i].Ticker} Amount: {this.props.listOfPositions.Positions[i].Amount} Cash Spent: {this.props.listOfPositions.Positions[i].CashSpentOnPosition}$</p>
-      var text_to_show = <div className="position_list_elem"> Company : {this.props.listOfPositions.Positions[i].name} ({this.props.listOfPositions.Positions[i].ticker}), <br/> Number of shares owned: {this.props.listOfPositions.Positions[i].numberOfSharesOwned}, <br/> Value of Position: {this.props.listOfPositions.Positions[i].valueOfPosition}, <br/> Percentage Gain: {this.props.listOfPositions.Positions[i].percentageGain}% </div>
+      var text_to_show = <div className="position_list_elem"> Company : {this.props.listOfPositions.positions[i].name} ({this.props.listOfPositions.positions[i].ticker}), <br/> Number of shares owned: {this.props.listOfPositions.positions[i].numberOfSharesOwned}, <br/> Value of Position: {this.props.listOfPositions.positions[i].valueOfPosition}, <br/> Percentage Gain: {this.props.listOfPositions.positions[i].percentageGain}% </div>
       newPosToShow.push(text_to_show);
     }
     this.setState({
