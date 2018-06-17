@@ -462,6 +462,8 @@ function getNextDataPointForGraph() {
   return dateToAdd;
 }
 
+var timeOutVar;
+
 class Graph extends React.Component {
 
   constructor(props) {
@@ -516,7 +518,12 @@ class Graph extends React.Component {
 
 
   // Function to update the graph every 10 seconds with new data points. call backend for this. 
-  updateDataGraph() {
+  //Set default for function to false; 
+  updateDataGraph(stopUpdate = false) {
+
+    if(stopUpdate) {
+      clearTimeout(timeOutVar);
+    } else {
   
     if (this.state.data.length === 0) {
       setTimeout(this.updateDataGraph, 1 * 1000);
@@ -536,7 +543,8 @@ class Graph extends React.Component {
     this.props.onPriceUpdate(rnd);
     //10 is the timeout time in amounts of seconds.
     //TODO: save the settimeout as a var and then clearTimeout(var) to stop it.  
-    setTimeout(this.updateDataGraph, 10 * 1000);
+    timeOutVar = setTimeout(this.updateDataGraph, 10 * 1000);
+  }
   }
 
   updateToDifferentView() {
@@ -555,7 +563,7 @@ class Graph extends React.Component {
       const newest_value = newDataToPlot[0][newDataPoints - 1].y;
       this.props.setInitialPrice(recent_price);
       this.props.onPriceUpdate(newest_value);
-      //this.updateDataGraph();
+      this.updateDataGraph(newDataPoints === 50);
     });
     this.props.renderedNewGraph();
   }
