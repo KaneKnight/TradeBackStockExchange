@@ -7,6 +7,13 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import {LineChart} from 'react-easy-chart';
 import auth0 from 'auth0-js';
+import 'react-interactive-tutorials/dist/react-interactive-tutorials.css';
+import interactiveTutorials from 'react-interactive-tutorials';
+import {
+  paragraphs,
+  registerTutorials,
+  startTutorial
+} from 'react-interactive-tutorials';
 
 const AUTH0_CLIENT_ID = "pRPNKyXdY9dNx0yzmwhhrxi1PIDmHQ0v";
 const AUTH0_DOMAIN = "ic22-webapps2018.eu.auth0.com";
@@ -101,9 +108,13 @@ class Home extends React.Component {
 
   render() {
     return (
-      <div> 
-        Hello World 
-        <button onClick={this.authenticate}> Sign In </button> 
+      <div className="landing_page"> 
+      <div className="background_landing_page">
+      </div>
+      <div className="landing_page_text">
+        Welcome to <span style={{fontWeight: "bold", color: "white"}}>TradeBack</span>, the sandbox platform to see if financial trading is for you! 
+        <button className="sign_in_button" onClick={this.authenticate}> Sign In To Get Started! </button> 
+        </div>
       </div> 
     )
   }
@@ -350,7 +361,8 @@ class CompanyList extends React.Component {
           searchable={this.state.searchable}
           clearable={this.state.clearable}
 				/>
-        </div>
+        </div> 
+        {/* <div className="graph_display_text"></div> */}
         <RecentlyViewed 
           recentlyViewedList={this.state.recentlyViewedList}
           jumpToRecent={this.jumpToRecent}
@@ -366,8 +378,10 @@ class RecentlyViewed extends React.Component {
 
     return (
       <div id='recent_list' className='recently_viewed_cont'> 
-        Recently viewed: 
-        {this.props.recentlyViewedList}
+        <p className="indent_recent_title"> Recently viewed: </p>
+        <ul> 
+          {this.props.recentlyViewedList}
+        </ul>
       </div>
     )
   }
@@ -382,7 +396,7 @@ class RecentElem extends React.Component {
   render() {
     return (
       <div className='recent_elem'>
-        <a id={this.props.recentId} href="javascript:;" onClick={() => this.doTheJump(this.props.recentId)}> {this.props.recentId} </a>
+        <li> <a id={this.props.recentId} href="javascript:;" onClick={() => this.doTheJump(this.props.recentId)}> {this.props.recentId} </a> </li> 
       </div>
     )
   }
@@ -442,6 +456,8 @@ function getNextDataPointForGraph() {
   return dateToAdd;
 }
 
+var timeOutVar;
+
 class Graph extends React.Component {
 
   constructor(props) {
@@ -496,7 +512,12 @@ class Graph extends React.Component {
 
 
   // Function to update the graph every 10 seconds with new data points. call backend for this. 
-  updateDataGraph() {
+  //Set default for function to false; 
+  updateDataGraph(stopUpdate = false) {
+
+    if(stopUpdate) {
+      clearTimeout(timeOutVar);
+    } else {
   
     if (this.state.data.length === 0) {
       setTimeout(this.updateDataGraph, 1 * 1000);
@@ -516,7 +537,8 @@ class Graph extends React.Component {
     this.props.onPriceUpdate(rnd);
     //10 is the timeout time in amounts of seconds.
     //TODO: save the settimeout as a var and then clearTimeout(var) to stop it.  
-    setTimeout(this.updateDataGraph, 10 * 1000);
+    timeOutVar = setTimeout(this.updateDataGraph, 10 * 1000);
+  }
   }
 
   updateToDifferentView() {
@@ -535,7 +557,7 @@ class Graph extends React.Component {
       const newest_value = newDataToPlot[0][newDataPoints - 1].y;
       this.props.setInitialPrice(recent_price);
       this.props.onPriceUpdate(newest_value);
-      //this.updateDataGraph();
+      this.updateDataGraph(newDataPoints === 50);
     });
     this.props.renderedNewGraph();
   }
@@ -653,9 +675,11 @@ class CompanyInfo extends React.Component {
 
     return (
       <div className="company_info_cont"> 
-        Showing for {this.props.current_company}: 
-        <br/> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')}
-        <br/> Currently own {figures === undefined ? "no" : figures} shares. 
+        <div className="company_info_text">
+          Showing for <u> {this.props.current_company} </u>: 
+          <p> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')} </p>
+          <p> Currently own {figures === undefined ? "no" : figures} shares. </p>
+        </div>
       </div>
     )
   }
@@ -690,16 +714,156 @@ class UserInfo extends React.Component {
 
   render() {
     return (
-      <div className="user_info_cont"> User Info Here 
-      <p> Name, equities owned, value </p> 
-      <button className="view_full_profile_button" onClick={this.handleRenderFullProfile}> Click To View Full Profile </button>  
-      {this.state.renderFullProfile ? <FullUserProfile unmountMe={this.handleUnrenderFullProfile}/> : null}
-      </div>
+      <div className="user_info_cont">
+        <div className="user_info_area">
+          <div className="info_overview">
+            <span style={{fontSize: "20px", fontWeight: "bold"}}>User Portfolio preview: </span> 
+            <p> Equities owned: </p>
+            <p> Portfolio value: </p>  
+          </div> 
+          <div className="profile_button_cont">
+            <button className="view_full_profile_button" onClick={this.handleRenderFullProfile}> Click To View Full Profile </button>  
+            {this.state.renderFullProfile ? <FullUserProfile unmountMe={this.handleUnrenderFullProfile}/> : null}
+          </div>
+        </div>
+      </div> 
     )
   }
 }
 
+function getPositionsForUser() { 
+
+  //UNCOMMENT ME TO RUN IN NORMAL MODE 
+  /*
+  var positions = [];
+
+  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile")).sub}
+  var data = JSON.stringify(data_to_send);
+  jQuery.ajaxSetup({async:false});
+  $.post(
+    "http://localhost:8080/api/get-all-user-positions",
+    data,
+    res => {
+      positions = res;
+    }
+  )
+  */
+
+  var positions = {
+    "Positions" : [
+      {
+        "ticker" : "AAPL",
+        "numberOfSharesOwned" : 10,
+        "valueOfPosition" : 1467,
+        "percentageGain" : 1.6,
+        "name" : "Apple"
+      },
+      {
+        "ticker" : "MSFT",
+        "numberOfSharesOwned" : 20,
+        "valueOfPosition" : 14237,
+        "percentageGain" : 10.6,
+        "name" : "Microsoft"
+      },
+      {
+        "ticker" : "BLZD",
+        "numberOfSharesOwned" : 5,
+        "valueOfPosition" : 762,
+        "percentageGain" : -8,
+        "name" : "Blizzard"
+      },
+    ]
+  }
+
+  return positions;
+
+}
+
+function getTransactionHistoryForUser() {
+  //Uncomment me to run with api call 
+  /*
+  var transactionHistory = [];
+  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile").sub)}
+  var data = JSON.stringify(data_to_send);
+  jQuery.ajaxSetup({async: false});
+  $.post(
+    "http://localhost:8080/api/get-transaction-history",
+    data,
+    res => {
+      transactionHistory = res;
+    }
+  )
+  */
+
+  const transactionHistory = {
+    "BuyTransactions" : [
+      {
+        "ticker": "AAPL",
+        "amountTraded": 1,
+        "cashSpent" : 100,
+        "price" : 100,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "MSFT",
+        "amountTraded": 4,
+        "cashSpent" : 600,
+        "price" : 150,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "BLZD",
+        "amountTraded": 3,
+        "cashSpent" : 60,
+        "price" : 20,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+    ],
+    "SellTransactions" : [
+      {
+        "ticker": "AAPL",
+        "amountTraded": 1,
+        "cashSpent" : 100,
+        "price" : 100,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "MSFT",
+        "amountTraded": 4,
+        "cashSpent" : 600,
+        "price" : 150,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "BLZD",
+        "amountTraded": 3,
+        "cashSpent" : 60,
+        "price" : 20,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+    ],
+  }
+
+  return transactionHistory;
+}
+
 class FullUserProfile extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      positions: getPositionsForUser(),
+      transactionHistory: getTransactionHistoryForUser(),
+    }
+  }
+
+  // componentDidMount() {
+  //   var positions_of_user = getPositionsForUser();
+  //   console.log(positions_of_user);
+  //   this.setState({
+  //     positions: positions_of_user,
+  //   });
+  // }
 
   render() {
 
@@ -716,17 +880,18 @@ class FullUserProfile extends React.Component {
       <div className="fake_new_page_bg">
         <div className="full_user_profile_wrapper"> 
           <button className="close_user_profile_button" onClick={this.props.unmountMe}>X</button> 
-          <p style={{textAlign: "center"}}> Your User Profile: </p>
+          <p style={{textAlign: "center"}}> Your User Portfolio: </p>
           <div className="user_info_profile_wrapper">
-          <p> Name: {to_stringify.Name} </p>
-          <p> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
+          <p style={{textAlign: "center"}}> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
           </div> 
+          <p style={{textAlign: "center", textDecoration: "underline"}}> Positions Owned: </p> 
           <div className="positions_held_wrapper">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
+            <Positions listOfPositions={this.state.positions}/>
           </div> 
           <br/> 
+          <p style={{textAlign: "center", textDecoration: "underline"}}> Transaction History: </p>
           <div className="exchange_history_wrapper">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
+            <TransactionHistory transactionHistory={this.state.transactionHistory} />
           </div> 
         </div>
       </div> 
@@ -734,14 +899,285 @@ class FullUserProfile extends React.Component {
   }
 }
 
+class Positions extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      positionsToShow: [],
+    };
+  };
+
+  componentDidMount() {
+
+    console.log(this.props.listOfPositions);
+
+    var newPosToShow = [];
+    for (var i = 0; i < this.props.listOfPositions.Positions.length; i++) {
+      // var text_to_show = <p> Ticker: {this.props.listOfPositions.Positions[i].Ticker} Amount: {this.props.listOfPositions.Positions[i].Amount} Cash Spent: {this.props.listOfPositions.Positions[i].CashSpentOnPosition}$</p>
+      var text_to_show = <div className="position_list_elem"> Company : {this.props.listOfPositions.Positions[i].name} ({this.props.listOfPositions.Positions[i].ticker}), <br/> Number of shares owned: {this.props.listOfPositions.Positions[i].numberOfSharesOwned}, <br/> Value of Position: {this.props.listOfPositions.Positions[i].valueOfPosition}, <br/> Percentage Gain: {this.props.listOfPositions.Positions[i].percentageGain}% </div>
+      newPosToShow.push(text_to_show);
+    }
+    this.setState({
+      positionsToShow: newPosToShow,
+    })
+  }
+
+  render() {
+    return (
+      <div className="list_of_positions">
+        {this.state.positionsToShow}
+      </div>
+    )
+  }
+}
+
+class TransactionHistory extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      transactionHistoryToShow: [],
+    };
+  };
+
+  componentDidMount() {
+    var historyToShow = [];
+
+    const buy_text = <p style={{color: "green"}}> Your Buy Transaction History: </p>;
+    historyToShow.push(buy_text);
+    //Looping through the Buy Transactions
+    for (var i = 0; i < this.props.transactionHistory.BuyTransactions.length; i++) {
+      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory.BuyTransactions[i].ticker} <br/>
+        Amount Traded: {this.props.transactionHistory.BuyTransactions[i].amountTraded}<br/>
+        Cash Spent: {this.props.transactionHistory.BuyTransactions[i].cashSpent} USD<br/>
+        Price Bought At: {this.props.transactionHistory.BuyTransactions[i].price} USD<br/>
+        Transaction Time: {this.props.transactionHistory.BuyTransactions[i].time.toString()}</div>
+      historyToShow.push(text_to_show_for_buy);
+    }
+
+    const sell_text = <p style={{color: "red"}}> Your Sell Transaction History: </p>;
+    historyToShow.push(sell_text);
+    //Looping through the Sell Transactions
+    for (var i = 0; i < this.props.transactionHistory.SellTransactions.length; i++) {
+      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory.SellTransactions[i].ticker} <br/>
+        Amount Traded: {this.props.transactionHistory.SellTransactions[i].amountTraded} <br/>
+        Cash Spent: {this.props.transactionHistory.SellTransactions[i].cashSpent} USD<br/>
+        Price Bought At: {this.props.transactionHistory.SellTransactions[i].price} USD<br/>
+        Transaction Time: {this.props.transactionHistory.SellTransactions[i].time.toString()}</div>
+      historyToShow.push(text_to_show_for_buy);
+    }
+
+    this.setState({
+      transactionHistoryToShow: historyToShow,
+    })
+  }
+
+  render() {
+    return (
+      <div className="transaction_history">
+        {this.state.transactionHistoryToShow}
+      </div>
+    )
+  }
+}
+
+const TUTORIALS = {
+  'demo': {
+    key: 'demo',
+    title: 'TradeBack Tutorial',
+    steps: [
+      {
+        key: 'anywhere',
+        announce: paragraphs`
+          This tutorial will explain how to use TradeBack so you can dive straight in 
+          and experiment with trading, to figure out if it's for you!
+        `,
+        announceDismiss: "Okay, let's begin",
+        activeWhen: [],
+      },
+      {
+        key: 'beginning',
+        highlight: '#test2',
+        announce: paragraphs`
+          This is where you can choose which company's stock you want to trade. 
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_anywhere',
+          },
+        ],
+      },
+      {
+        key: 'graph',
+        highlight: '.graph_display',
+        annotate: paragraphs`
+          This graph shows the current price and the history for the company's
+          stock that you selected.  
+        `,
+        annotateIn: 'div.graph_display_cont > div',
+        // annotateSkip: 'Skip',
+        annotateSkip: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_beginning',
+          },
+        ],
+      },
+      {
+        key: 'view_month',
+        highlight: '.changeToMonth_button',
+        announce: paragraphs`
+          Click this button to view the price history for the past month.  
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_graph',
+          },
+        ],
+      },
+      {
+        key: 'buy_button',
+        highlight: '.buy_button',
+        announce: paragraphs`
+          This is where you can place a bid order to buy some stock for the company
+          that you selected. 
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_view_month',
+          },
+        ],
+      },
+      {
+        key: 'sell_button',
+        highlight: '.sell_button',
+        announce: paragraphs`
+          This is where you can place an ask order to sell some stock that you
+          own for the company that you selected. 
+        `,
+        // annotateIn: 'div#test2 > div',
+        // annotateSkip: 'Skip',
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_buy_button',
+          },
+        ],
+      },
+      {
+        key: 'company_info',
+        highlight: '.company_info_cont',
+        announce: paragraphs`
+          Here you can view usefull information about the company you selected, namely
+          what the current market price for a share in that company is and how much
+          stock you already own for that company.
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_sell_button',
+          }
+        ]
+      },
+      {
+        key: 'user_info',
+        highlight: '.user_info_cont',
+        announce: paragraphs`
+          Here you can view a short preview of your user portfolio.
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_company_info',
+          }
+        ]
+      },
+      {
+        key: 'user_info_button',
+        highlight: '.view_full_profile_button',
+        announce: paragraphs`
+          You can click this button to view your full portfolio, that will show 
+          your current portfolio value, positions owned and your transaction history.
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_user_info',
+          }
+        ]
+      },
+      {
+        key: 'complete',
+        highlight: '.buy_button_popup_button, .sell_button_popup_button',
+        announce: paragraphs`
+          You will see these buttons scattered throughout the application. Don't be scared!
+          If you feel like you don't understand the terminology, simple click this button 
+          and you will be preseneted with an explanation!
+        `,
+        announceDismiss: "Next",
+        activeWhen: [
+          {
+            compare: 'checkpointComplete',
+            checkpoint: 'demo_user_info_button',
+          }
+        ]
+      },
+    ],
+    complete: {
+      on: 'checkpointReached',
+      checkpoint: 'complete',
+      title: 'TradeBack Tutorial Complete!',
+      message: paragraphs`
+        You have finished the tutorial!
+
+        Now the market is yours. We have given you an initial amount of 10 Million USD.
+        You know the basics, now it's time to start experimenting and learning. 
+        Trade at will, and have fun! 
+      `,
+    },
+  },
+};
+
+registerTutorials(TUTORIALS);
+
 class NavigationBar extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.launchTutorial = this.launchTutorial.bind(this);
+  }
+
+  launchTutorial() {
+    console.log("called");
+    startTutorial('demo');
+    console.log("Finished");
+  }
+
+  
   render() {
     return (
       <div id='nav_bar' className="nav_bar_cont">
         <div id='grid_nav_bar' className="grid-container-nav-bar">
           <div className="app_name_cont"> TradeBack </div> 
           <div className="nav_gap_cont"> </div>
-          <div className="theme_switch_cont"> Should be switch </div>
+          <div className="theme_switch_cont"> <button className="view_tutorial_button" onClick={this.launchTutorial}> View Tutorial </button> </div>
           <div className="login_btn_cont"> <button className="logout_button" onClick={this.props.logout}> Logout </button> </div>
         </div>
       </div>
@@ -875,7 +1311,7 @@ class Button extends React.Component {
   }
 
   handlePopupMount() {
-    this.setState({renderInfoBubble: true});
+    this.setState({renderInfoBubble: !this.state.renderInfoBubble});
   }
 
   render() {

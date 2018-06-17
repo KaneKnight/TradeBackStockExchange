@@ -61,6 +61,33 @@ a {
   /* border-radius: 4px; */
 }
 
+.user_info_area {
+  margin-left: 10vw;
+  width: 75vw; 
+  /* background-color: rebeccapurple; */
+  display: grid;
+  grid-template-areas:
+  'text_preview button_location_profile';
+  grid-template-columns: 60% 40%;
+}
+
+.info_overview {
+  height: 100%;
+  grid-area: text_preview;
+  margin-top: 0.5em;
+}
+
+.info_overview p {
+  text-indent: 2em;
+}
+
+.profile_button_cont {
+  grid-area: button_location_profile;
+  height: 100%;
+}
+
+
+
 .company_info_cont {
   color: white;
   grid-area: company_information;
@@ -246,6 +273,13 @@ a {
 
 .recently_viewed_cont {
   margin-top: 2em;
+  /* text-indent: -0.5em; */
+  /* text-align: center; */
+}
+
+.indent_recent_title {
+  text-align: center;
+  text-indent: 0;
 }
 
 
@@ -434,19 +468,35 @@ a {
   top: 0;
   left: 0;
   z-index: 17;
-  background-color: var(--main-bg-color);
+  /* background-color: var(--main-bg-color); */
+  background-color: #0E162A;
+  background:url(https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/H8WuRINimqur8ud/forex-stock-market-abstract-background-finance-chart-forex-numbers-at-background-of-financial-city-financial-concept-background-infografics-with-abstract-growth-chart-finance-business-background_ryrqdgch__F0000.png) no-repeat center;
+  /* background: url("https://fthmb.tqn.com/ATfDpAdTb-ZCXOQYyCih61tmEp4=/1255x837/filters:fill(auto,1)/how-to-start-trading-stocks-56a22ddb5f9b58b7d0c78746.jpg") no-repeat center; */
+  background-size: contain;
+}
+.fake_new_page_bg:after {
+  display: block;
+  position: relative;
+  background-image: radial-gradient(ellipse, rgba(0, 0, 0, .1) 30%, #0E162A 70%);
+  /* margin-top: -150px; */
+  /* height: 150px; */
+  width: 100%;
+  height: 100%;
+  content: '';
 }
 
 .full_user_profile_wrapper {
+  border: 2px solid black;
   border-radius: 8px;
   z-index: 20;
   position: absolute;
   width: 40vw; 
-  height: 80vh;
+  height: 90vh;
   top: 50%;
   left: 50%;  
   transform: translate(-50%, -50%);
-  background-color: #3A3F44;
+  /* background-color: #3A3F44; */
+  background-color: var(--main-bg-color);
 }
 
 .close_user_profile_button {
@@ -459,20 +509,242 @@ a {
 }
 
 .positions_held_wrapper {
-  height: 30vh; 
-  width: 40vw; 
-  background-color: #f89406;
+  height: 12em; 
+  width: 90%;
+  margin-left: 5%; 
+  /* background-color: #f89406; */
   overflow: auto;
+  margin-bottom: 1em;
 }
 
 .exchange_history_wrapper {
-  height: 30vh;
-  width: 40vw; 
-  background-color: #00ffff;
+  height: 11em;
+  width: 90%; 
+  margin-left: 5%;
+  /* background-color: #00ffff; */
   overflow: auto;
 }
 
+.landing_page_text {
+  color: #f7f7f7;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%);
+  width: 70vw;
+  z-index: 50;
+  font-size: 48px;
+  text-align: center;
+}
 
+.sign_in_button {
+  position: absolute;
+  padding: 16px 40px;
+  transition-duration: 0.4s;
+  color: var(--main-bg-color);
+  font-size: 30px;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  top: 50vh;
+  left:50%;
+  transform: translate(-50%);
+}
+
+.sign_in_button:hover {
+  background-color: #8a9196;
+  color: white; 
+}
+
+.view_tutorial_button, .logout_button {
+  padding: 8px 20px;
+  transition-duration: 0.4s;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  margin-top: 1%; 
+}
+
+.logout_button {
+  float: right;
+}
+
+.view_tutorial_button:hover {
+  border: 2px solid white;
+  color: white; 
+  background-color: #272B30;
+}
+
+.logout_button:hover {
+  border: 2px solid white;
+  color: white;
+  background-color: #272B30;
+}
+
+.view_full_profile_button {
+  padding: 16px 10px;
+  transition-delay: 0.4s;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  float: right;
+  margin-top: 2em;
+}
+
+.landing_page {
+  background: radial-gradient(ellipse, var(--main-bg-color), #0E162A);
+  background-color: #0E162A;
+  color:white;
+  width: 100vw;
+  height: 100vh;
+  -webkit-animation: fadein 2s;
+  -moz-animation: fadein 2s;
+  -o-animation: fadein 2s;
+  animation: fadein 2s;
+}
+
+.background_landing_page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* background-image: url("https://fthmb.tqn.com/ATfDpAdTb-ZCXOQYyCih61tmEp4=/1255x837/filters:fill(auto,1)/how-to-start-trading-stocks-56a22ddb5f9b58b7d0c78746.jpg"); */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: url("https://fthmb.tqn.com/ATfDpAdTb-ZCXOQYyCih61tmEp4=/1255x837/filters:fill(auto,1)/how-to-start-trading-stocks-56a22ddb5f9b58b7d0c78746.jpg") no-repeat center;
+  background-size: contain;
+}
+
+.background_landing_page:after {
+  display: block;
+  position: relative;
+  background-image: radial-gradient(ellipse, rgba(0, 0, 0, .7) 40%, #0E162A 60%);
+  /* margin-top: -150px; */
+  /* height: 150px; */
+  width: 100%;
+  height: 100%;
+  content: '';
+}
+
+.image_for_bg {
+  position: absolute;
+  height:auto;
+  width: auto;
+  max-width: 75%;
+  max-height: 75%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(5px) brightness(50%);
+  border-radius: 50%;
+}
+
+/* Fade in animation for the good stuff */
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.company_info_text {
+  margin-top: 10em; 
+  margin-left: 0.25em;
+}
+
+.company_info_text p {
+  text-indent: 0.75em;
+}
+
+#test2 {
+  margin-top: 1em;
+}
+
+.position_list_elem {
+  width: 90%;
+  padding-left: 1em;
+  height: 5em;
+  border: 2px solid white;
+  border-radius: 8px;
+  margin-bottom: 1em;
+  background-color: #3A3F44;
+}
+
+.transaction_list_elem {
+  width: 90%;
+  height: 7em;
+  padding-left: 1em;
+  border: 2px solid white;
+  border-radius: 8px;
+  margin-bottom: 1em;
+  background-color: #3A3F44;
+}
+
+
+
+/* For tutorial */
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.react-tutorial-container .status {
+  margin-left: 50%;
+  transform: translate(-50%);
+}
+
+.status {
+  height: 20vh; 
+}
+
+.float-xs-right {
+  float: right !important; 
+}
 
 /* Input styling, not important */
 input[type="number"] {
@@ -484,6 +756,7 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     /* display: none; <- Crashes Chrome on hover */
     -webkit-appearance: none;
+    appearance: none;
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
