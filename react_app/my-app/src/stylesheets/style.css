@@ -491,11 +491,12 @@ a {
   z-index: 20;
   position: absolute;
   width: 40vw; 
-  height: 80vh;
+  height: 90vh;
   top: 50%;
   left: 50%;  
   transform: translate(-50%, -50%);
-  background-color: #3A3F44;
+  /* background-color: #3A3F44; */
+  background-color: var(--main-bg-color);
 }
 
 .close_user_profile_button {
@@ -508,15 +509,18 @@ a {
 }
 
 .positions_held_wrapper {
-  height: 30vh; 
-  width: 40vw; 
+  height: 12em; 
+  width: 90%;
+  margin-left: 5%; 
   /* background-color: #f89406; */
   overflow: auto;
+  margin-bottom: 1em;
 }
 
 .exchange_history_wrapper {
-  height: 30vh;
-  width: 40vw; 
+  height: 11em;
+  width: 90%; 
+  margin-left: 5%;
   /* background-color: #00ffff; */
   overflow: auto;
 }
@@ -676,8 +680,25 @@ a {
   margin-top: 1em;
 }
 
+.position_list_elem {
+  width: 90%;
+  padding-left: 1em;
+  height: 5em;
+  border: 2px solid white;
+  border-radius: 8px;
+  margin-bottom: 1em;
+  background-color: #3A3F44;
+}
 
-
+.transaction_list_elem {
+  width: 90%;
+  height: 7em;
+  padding-left: 1em;
+  border: 2px solid white;
+  border-radius: 8px;
+  margin-bottom: 1em;
+  background-color: #3A3F44;
+}
 
 
 

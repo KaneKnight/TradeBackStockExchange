@@ -750,19 +750,25 @@ function getPositionsForUser() {
   var positions = {
     "Positions" : [
       {
-        "Ticker" : "AAPL",
-        "Amount" : 2,
-        "CashSpentOnPosition" : 123
+        "ticker" : "AAPL",
+        "numberOfSharesOwned" : 10,
+        "valueOfPosition" : 1467,
+        "percentageGain" : 1.6,
+        "name" : "Apple"
       },
       {
-        "Ticker" : "MSFT",
-        "Amount" : 25,
-        "CashSpentOnPosition" : 1239
+        "ticker" : "MSFT",
+        "numberOfSharesOwned" : 20,
+        "valueOfPosition" : 14237,
+        "percentageGain" : 10.6,
+        "name" : "Microsoft"
       },
       {
-        "Ticker" : "BLZD",
-        "Amount" : 5,
-        "CashSpentOnPosition" : 675
+        "ticker" : "BLZD",
+        "numberOfSharesOwned" : 5,
+        "valueOfPosition" : 762,
+        "percentageGain" : -8,
+        "name" : "Blizzard"
       },
     ]
   }
@@ -872,15 +878,16 @@ class FullUserProfile extends React.Component {
       <div className="fake_new_page_bg">
         <div className="full_user_profile_wrapper"> 
           <button className="close_user_profile_button" onClick={this.props.unmountMe}>X</button> 
-          <p style={{textAlign: "center"}}> Your User Profile: </p>
+          <p style={{textAlign: "center"}}> Your User Portfolio: </p>
           <div className="user_info_profile_wrapper">
-          <p> Name: {to_stringify.Name} </p>
-          <p> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
+          <p style={{textAlign: "center"}}> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
           </div> 
+          <p style={{textAlign: "center", textDecoration: "underline"}}> Positions Owned: </p> 
           <div className="positions_held_wrapper">
             <Positions listOfPositions={this.state.positions}/>
           </div> 
           <br/> 
+          <p style={{textAlign: "center", textDecoration: "underline"}}> Transaction History: </p>
           <div className="exchange_history_wrapper">
             <TransactionHistory transactionHistory={this.state.transactionHistory} />
           </div> 
@@ -905,7 +912,8 @@ class Positions extends React.Component {
 
     var newPosToShow = [];
     for (var i = 0; i < this.props.listOfPositions.Positions.length; i++) {
-      var text_to_show = <p> Ticker: {this.props.listOfPositions.Positions[i].Ticker} Amount: {this.props.listOfPositions.Positions[i].Amount} Cash Spent: {this.props.listOfPositions.Positions[i].CashSpentOnPosition}$</p>
+      // var text_to_show = <p> Ticker: {this.props.listOfPositions.Positions[i].Ticker} Amount: {this.props.listOfPositions.Positions[i].Amount} Cash Spent: {this.props.listOfPositions.Positions[i].CashSpentOnPosition}$</p>
+      var text_to_show = <div className="position_list_elem"> Company : {this.props.listOfPositions.Positions[i].name} ({this.props.listOfPositions.Positions[i].ticker}), <br/> Number of shares owned: {this.props.listOfPositions.Positions[i].numberOfSharesOwned}, <br/> Value of Position: {this.props.listOfPositions.Positions[i].valueOfPosition}, <br/> Percentage Gain: {this.props.listOfPositions.Positions[i].percentageGain}% </div>
       newPosToShow.push(text_to_show);
     }
     this.setState({
@@ -937,11 +945,11 @@ class TransactionHistory extends React.Component {
     historyToShow.push(buy_text);
     //Looping through the Buy Transactions
     for (var i = 0; i < this.props.transactionHistory.BuyTransactions.length; i++) {
-      var text_to_show_for_buy = <p> Ticker: {this.props.transactionHistory.BuyTransactions[i].ticker} &nbsp;
-        Amount Traded: {this.props.transactionHistory.BuyTransactions[i].amountTraded} &nbsp;
-        Cash Spent: {this.props.transactionHistory.BuyTransactions[i].cashSpent} &nbsp;
-        Price Bought At: {this.props.transactionHistory.BuyTransactions[i].price} &nbsp;
-        Transaction Time: {this.props.transactionHistory.BuyTransactions[i].time.toString()}</p>
+      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory.BuyTransactions[i].ticker} <br/>
+        Amount Traded: {this.props.transactionHistory.BuyTransactions[i].amountTraded}<br/>
+        Cash Spent: {this.props.transactionHistory.BuyTransactions[i].cashSpent} USD<br/>
+        Price Bought At: {this.props.transactionHistory.BuyTransactions[i].price} USD<br/>
+        Transaction Time: {this.props.transactionHistory.BuyTransactions[i].time.toString()}</div>
       historyToShow.push(text_to_show_for_buy);
     }
 
@@ -949,11 +957,11 @@ class TransactionHistory extends React.Component {
     historyToShow.push(sell_text);
     //Looping through the Sell Transactions
     for (var i = 0; i < this.props.transactionHistory.SellTransactions.length; i++) {
-      var text_to_show_for_buy = <p> Ticker: {this.props.transactionHistory.SellTransactions[i].ticker} &nbsp;
-        Amount Traded: {this.props.transactionHistory.SellTransactions[i].amountTraded} &nbsp;
-        Cash Spent: {this.props.transactionHistory.SellTransactions[i].cashSpent} &nbsp;
-        Price Bought At: {this.props.transactionHistory.SellTransactions[i].price} &nbsp;
-        Transaction Time: {this.props.transactionHistory.SellTransactions[i].time.toString()}</p>
+      var text_to_show_for_buy = <div className="transaction_list_elem"> Ticker: {this.props.transactionHistory.SellTransactions[i].ticker} <br/>
+        Amount Traded: {this.props.transactionHistory.SellTransactions[i].amountTraded} <br/>
+        Cash Spent: {this.props.transactionHistory.SellTransactions[i].cashSpent} USD<br/>
+        Price Bought At: {this.props.transactionHistory.SellTransactions[i].price} USD<br/>
+        Transaction Time: {this.props.transactionHistory.SellTransactions[i].time.toString()}</div>
       historyToShow.push(text_to_show_for_buy);
     }
 
