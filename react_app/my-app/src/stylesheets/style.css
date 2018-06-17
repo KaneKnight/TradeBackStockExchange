@@ -157,7 +157,7 @@ a {
 .sell_button {
   /* background-color: darkmagenta;
   border: 2px solid darkmagenta; */
-
+  position: relative;
   color: #ee5f5b;
   background-color: transparent;
 
@@ -179,7 +179,7 @@ a {
 }
 
 .sell_button_wrapper {
-  position: relative;
+  /* position: relative; */
   margin-top: 0.75em;
   float: right;
   margin-right: 10%;
@@ -293,7 +293,8 @@ a {
   left: 50%;
   text-indent: 1em;
   transform: translate(-50%, -50%);
-  background-color: white;
+  background-color: var(--main-bg-color);
+  color: white;
   border-radius: 5px;
   border: 1px solid black;
 }

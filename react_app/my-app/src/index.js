@@ -550,7 +550,7 @@ class Graph extends React.Component {
   updateToDifferentView() {
     var newDataPoints;
     if (this.state.dataPoints === 10) {
-      newDataPoints = 50;
+      newDataPoints = 30;
     } else {
       newDataPoints = 10; 
     }
@@ -563,7 +563,7 @@ class Graph extends React.Component {
       const newest_value = newDataToPlot[0][newDataPoints - 1].y;
       this.props.setInitialPrice(recent_price);
       this.props.onPriceUpdate(newest_value);
-      this.updateDataGraph(newDataPoints === 50);
+      this.updateDataGraph(newDataPoints === 30);
     });
     this.props.renderedNewGraph();
   }
@@ -789,7 +789,7 @@ function getTransactionHistoryForUser() {
   //Uncomment me to run with api call 
   /*
   var transactionHistory = [];
-  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile").sub)}
+  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile")).sub}
   var data = JSON.stringify(data_to_send);
   jQuery.ajaxSetup({async: false});
   $.post(
@@ -1463,7 +1463,7 @@ class ActionConfirmation extends React.Component {
             {/* </div> */}
           </p>
           <p> Total price: {current_amount}</p>
-          <p style={{color: amount_left > 0 ? "black" : "red"}}> Total funds left: {amount_left}</p> 
+          <p style={{color: amount_left > 0 ? "default" : "red"}}> Total funds left: {amount_left}</p> 
           <div className="place_order">
             <button className="place_order_button" disabled={amount_left < 0 || this.state.number_of_stock <= 0 || (this.state.action_type === 'limit' && this.state.limit_price <= 0)} onClick={() => this.submitRequest()}> Place order </button> 
           </div>
