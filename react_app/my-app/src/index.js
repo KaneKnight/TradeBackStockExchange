@@ -1422,12 +1422,27 @@ class ActionConfirmation extends React.Component {
     this.state ={
       number_of_stock: 0,
       action_type: "market",
+      help_type: "market",
       sample_stock_value: 69,
       user_budget: 6942096,
       renderSubmitted: false,
       limit_price: 0,
+      showHelp: false,
+      helpBidLimit: "A limit buy is an order to buy equity shares at either the price specified by the investor or below. This should be the most used type of buy. A limit buy ensures that the investor only pays a certain maximum price for the shares, and is therefore only executed when this price is available. ",
+      helpBidMarket: "A market buy is an order to buy equity shares at the current available market price. The order will be completed at the current market price, assuming enough trading volume is available. Market buys should ONLY be used for trades that need to happen quickly, with less priority given to price.",
+      helpAskLimit: "An order to sell equity shares at a specified price, or better. Sell-limit orders can be used to specify a minimum price for which you are willing to sell equity shares, and will be executed only once that price (or a better one) is available. They can be useful if you have a target selling price in mind but are unable to frequently monitor your portfolio. This should be used by investors who aren’t in a hurry to sell, to try and get a better price. However if the market is incredibly volatile, often your order can be “leapfrogged,” such that it expires and the day could end with a lower price. So these should be used with caution.",
+      helpAskMarket: "A market sell is an order to sell equity shares at the current available market price. This order will be filled at the current market price, provided there is enough trading volume to process a trade. Market sells should be used when the investor wants to sell quickly. This could be because either the price is rapidly dropping and the investor is trying to cut losses, or to reinvest that money in a better stock.",
     }
+    this.handleInfoPopup = this.handleInfoPopup.bind(this);
     this.handleCloseConfirmation = this.handleCloseConfirmation.bind(this);
+  }
+
+  handleInfoPopup(i) {
+    // console.log(i);
+    this.setState({
+      help_type: i,
+      showHelp: !this.state.showHelp,
+    });
   }
 
   dismiss() {
@@ -1516,12 +1531,19 @@ class ActionConfirmation extends React.Component {
           <p> Type of action: 
             {/* <div> */}
               <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice1" name="action" value="market" defaultChecked/>
-              <label htmlFor="actionChoice1"> Market </label>
+              <label htmlFor="actionChoice1"> Market <a style={{color:"black"}} href="javascript:;" onClick={() => this.handleInfoPopup("market")}>(?)</a></label>
 
               <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice2" name="action" value="limit"/>
-              <label htmlFor="actionChoice1"> Limit </label>
+              <label htmlFor="actionChoice1"> Limit <a style={{color:"black"}} href="javascript:;" onClick={() => this.handleInfoPopup("limit")}>(?)</a></label>
               {this.state.action_type === "limit" ? <p> {this.props.button_name === "Bid" ? 'Maximum price to buy at' : 'Minimum price to sell at'}: <input type="number" onChange={e => this.inputChangeLimit(e)}/> </p> : null}
             {/* </div> */}
+            <div className="temp_idea12">
+              <div className="temp_idea13">
+                {this.state.showHelp ? <InfoBubble2 text={
+                  this.props.button_name === "Bid" ? (this.state.help_type === "limit" ? this.state.helpBidLimit : this.state.helpBidMarket) : (this.state.help_type === "limit" ? this.state.helpAskLimit : this.state.helpAskMarket) 
+                }/> : null}
+              </div>
+            </div>
           </p>
           <p> Total price: {current_amount}</p>
           <p style={{color: amount_left > 0 ? "default" : "red"}}> Total funds left: {amount_left}</p> 
@@ -1531,6 +1553,20 @@ class ActionConfirmation extends React.Component {
           </div>
         </div> 
       </div>
+    )
+  }
+}
+
+class InfoBubble2 extends React.Component {
+  render() {
+    return (
+      <div className="info_bubble_wrapper">
+        <div className="speech-bubble2"> 
+          <p>
+          {this.props.text} 
+          </p>
+        </div> 
+      </div> 
     )
   }
 }

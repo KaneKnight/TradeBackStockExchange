@@ -475,6 +475,34 @@ a {
 	margin-left: -0.625em;
 }
 
+.speech-bubble2 {
+  font-size: 20px;
+	position: relative;
+	background: #5bc0de;
+  border-radius: .4em;
+  width: 20em;
+  height: auto;
+  top: -1em;
+}
+
+.speech-bubble2 p {
+  margin: 0.5em; 
+}
+
+.speech-bubble2:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 0.625em solid transparent;
+	border-right-color: #5bc0de;
+	border-left: 0;
+	margin-top: -0.625em;
+	margin-left: -0.625em;
+}
+
 .button_and_action_wrapper {
   width: 100%; 
 }
@@ -510,6 +538,17 @@ a {
 }
 
 .temp_idea3 {
+  width: 10vw;
+  height: 10vh;
+}
+
+.temp_idea12 {
+  float: right;
+  width: 0;
+  height: 0;
+}
+
+.temp_idea13 {
   width: 10vw;
   height: 10vh;
 }
