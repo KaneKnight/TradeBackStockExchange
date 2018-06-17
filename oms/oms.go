@@ -107,8 +107,8 @@ func HighestBidLowestAsk(c *gin.Context) {
     c.BindJSON(&priceRequest)
     ticker := priceRequest.Ticker
     response := db.PriceResponse{
-        GetLowestAskOfStock(ticker),
-        GetHighestBidOfStock(ticker)}
+        GetLowestAskOfStock(ticker)/100,
+        GetHighestBidOfStock(ticker)/100}
     c.JSON(http.StatusOK, response)
 }
 
@@ -171,7 +171,7 @@ func GetCompanyInfo(c *gin.Context) {
 func processOrder() {
     for true {
         fmt.Println(orderQueue.Len())
-        time.Sleep(100*time.Millisecond)
+        time.Sleep(10*time.Millisecond)
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
@@ -182,7 +182,7 @@ func processOrder() {
             !order.Buy && db.UserCanSellAmountOfShares(database,
                 order.UserId, order.CompanyTicker, order.NumberOfShares)) {
 
-            if (order.Buy) {
+            if (order.Buy && order.UserId != -1) {
                 db.ReserveCash(database, order.UserId,
                     order.NumberOfShares, int(order.LimitPrice))
             }

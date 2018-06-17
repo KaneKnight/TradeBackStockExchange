@@ -122,7 +122,7 @@ class Home extends React.Component {
 
 function sendExistingUserCheck() {
   console.log(JSON.parse(localStorage.getItem("profile")).sub);
-  var string_data = {"UserIdString" : JSON.parse(localStorage.getItem("profile")).sub};
+  var string_data = {"userIdString" : JSON.parse(localStorage.getItem("profile")).sub};
   var data = JSON.stringify(string_data);
   $.post(
     "http://localhost:8080/api/check-user-exists",
@@ -627,7 +627,7 @@ function getFigures(comp) {
   if (result === null) {
     return "";
   }
-  var dummy_data_comp = {"UserIdString" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
+  var dummy_data_comp = {"userIdString" : JSON.parse(localStorage.getItem("profile")).sub, "Ticker" : result[1]};
   var dummy_data = JSON.stringify(dummy_data_comp);
   var temp;
   jQuery.ajaxSetup({async:false});
@@ -734,7 +734,7 @@ class UserInfo extends React.Component {
 function getPositionsForUser() { 
 
   //UNCOMMENT ME TO RUN IN NORMAL MODE 
-  /*
+  
   var positions = [];
 
   var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile")).sub}
@@ -747,9 +747,9 @@ function getPositionsForUser() {
       positions = res;
     }
   )
-  */
+  
 
-  var positions = {
+  /*var positions = {
     "Positions" : [
       {
         "ticker" : "AAPL",
@@ -773,7 +773,7 @@ function getPositionsForUser() {
         "name" : "Blizzard"
       },
     ]
-  }
+  }*/
 
   return positions;
 
@@ -781,9 +781,9 @@ function getPositionsForUser() {
 
 function getTransactionHistoryForUser() {
   //Uncomment me to run with api call 
-  /*
+  
   var transactionHistory = [];
-  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile").sub)}
+  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile")).sub}
   var data = JSON.stringify(data_to_send);
   jQuery.ajaxSetup({async: false});
   $.post(
@@ -793,8 +793,8 @@ function getTransactionHistoryForUser() {
       transactionHistory = res;
     }
   )
-  */
-
+  
+  /*
   const transactionHistory = {
     "BuyTransactions" : [
       {
@@ -842,7 +842,7 @@ function getTransactionHistoryForUser() {
         "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
       },
     ],
-  }
+  }*/
 
   return transactionHistory;
 }

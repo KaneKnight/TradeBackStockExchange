@@ -186,6 +186,7 @@ func (db DBConfig) OpenDataBase() (*sqlx.DB) {
  * into the database.*/
 func InsertTransaction(db *sqlx.DB, t *Transaction) {
     ax := db.MustBegin()
+    fmt.Println(*t)
     ax.MustExec(`insert into transactionTable (buyerId, sellerId,
                                           ticker, amountTraded,
                                           cashTraded, timeOfTrade)
@@ -383,6 +384,7 @@ func ReserveCash(db *sqlx.DB,
                  userId int,
                  numberOfShares int,
                  limitPrice int) {
+    fmt.Println(userId, numberOfShares, limitPrice)
     db.MustExec(`update userTable
                  set cashReserved=cashReserved+$1
                  where userId=$2`, numberOfShares * limitPrice, userId)
@@ -420,7 +422,7 @@ type Pos struct {
 }
 func GetAllUserPositions(db *sqlx.DB, userId int) []Pos {
   var positions []Pos
-  err := db.Select(&positions, `select ticker, name from positionTable join companyTable on ticker where userId=$1`, userId)
+  err := db.Select(&positions, `select positionTable.ticker, name from positionTable join companyTable on positionTable.ticker=companyTable.ticker where userId=$1`, userId)
   if err != nil {
     log.Fatalln(err)
   }

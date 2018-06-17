@@ -91,6 +91,7 @@ func main() {
   api.POST("/check-user-exists", oms.CreateUser)
   api.POST("/get-all-user-positions", oms.GetPositionData)
   api.POST("/order", oms.OrderHandler)
+  api.POST("/get-transaction-history", oms.UserTransactionsHandler)
 
 
   //run on default port 8080
