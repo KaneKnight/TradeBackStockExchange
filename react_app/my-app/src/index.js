@@ -143,7 +143,7 @@ class Main extends React.Component {
     this.renderedNewGraph = this.renderedNewGraph.bind(this);
     this.logout = this.logout.bind(this);
     this.state = {
-      current_company: "Apple",
+      current_company: "Apple Inc. (AAPL)",
       current_price: -1,
       is_price_up: null,
       temp_price_history: [],
@@ -420,14 +420,14 @@ class GraphAndButtons extends React.Component {
 }
 
 //Function to get the initial data points, should call backend for this. 
-function getInitialDataForGraph(dataPoints) {
+function getInitialDataForGraph(comp) {
   var initial_data = [];
   //initial_data.push({x: '1-Jan-15 10:00:00', y: 20});
   //initial_data.push({x: '1-Jan-15 10:00:30', y: 70});
   //initial_data.push({x: '1-Jan-15 10:01:00' , y: 40});
 
-  const initialDate = '1-Jan-15 ';
- 
+  const initialDate = '18-Jun-18 ';
+  /*
   for(var i = 0; i < dataPoints; i++) {
 
     var d = new Date(new Date().getTime() - ((dataPoints - i) * 10 * 1000));
@@ -440,16 +440,45 @@ function getInitialDataForGraph(dataPoints) {
     const dateToAdd = initialDate + h + ':' + m + ':' + s;
 
     initial_data.push({x: dateToAdd, y: rnd});
+  }*/
+
+  var regExp = /\(([^)]+)\)/;
+  var result = regExp.exec(comp);
+
+  const data_to_send = {"ticker" : result[1], "dataNums" : 1};
+  const data = JSON.stringify(data_to_send);
+  var temp; 
+  
+  jQuery.ajaxSetup({async:false});
+  $.post(
+    "http://localhost:8080/api/get-datapoints",
+    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
+    data,
+    res => {
+      temp = res.price;  
+    }
+  );
+
+  var d = new Date();
+  var h = (d.getHours() < 10 ? '0' : '') + d.getHours();
+  var m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+  var s = (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
+
+  const dateToAdd = initialDate + h + ':' + m + ':' + s;
+  if (temp === undefined) {
+    temp = 420;
   }
 
+  initial_data.push({x: dateToAdd, y: temp});
+  
   var wrapper = [];
   wrapper.push(initial_data);
   return wrapper;
 }
 
 // Function to get the next data point, should call backend for this. 
-function getNextDataPointForGraph() {
-  const initialDate = '1-Jan-15 ';
+function getNextDataPointForGraph(comp) {
+  const initialDate = '18-Jun-18 ';
   // var rnd = Math.floor((Math.random() * 80) + 20);
   var d = new Date();
   var h = (d.getHours() < 10 ? '0' : '') + d.getHours();
@@ -458,8 +487,29 @@ function getNextDataPointForGraph() {
 
   const dateToAdd = initialDate + h + ':' + m + ':' + s;
   
-  // var nextPoint = {x: dateToAdd, y: rnd};
-  return dateToAdd;
+  var regExp = /\(([^)]+)\)/;
+  var result = regExp.exec(comp);
+
+  const data_to_send = {"ticker" : result[1], "dataNums" : 1};
+  const data = JSON.stringify(data_to_send);
+  var temp; 
+  
+  jQuery.ajaxSetup({async:false});
+  $.post(
+    "http://localhost:8080/api/get-datapoints",
+    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
+    data,
+    res => {
+      temp = res.price;  
+    }
+  );
+
+  if (temp === undefined) {
+    temp = 420;
+  }
+
+  var nextPoint = {x: dateToAdd, y: temp};
+  return nextPoint;
 }
 
 var timeOutVar;
@@ -481,15 +531,15 @@ class Graph extends React.Component {
 
   componentDidMount() {
     const boundingBox = this.myRef.current.getBoundingClientRect();
-    const dataToPlot = getInitialDataForGraph(this.state.dataPoints);
+    const dataToPlot = getInitialDataForGraph(this.props.current_company);
 
     this.setState({
       graph_width: boundingBox.width,
       graph_height: boundingBox.height,
       data: dataToPlot,
     }, function() {
-      const recent_price = dataToPlot[0][this.state.dataPoints - 2].y;
-      const newest_value = dataToPlot[0][this.state.dataPoints - 1].y;
+      const recent_price = dataToPlot[0][0].y;
+      const newest_value = dataToPlot[0][0].y;
       this.props.setInitialPrice(recent_price);
       this.props.onPriceUpdate(newest_value);
       this.updateDataGraph();
@@ -502,12 +552,13 @@ class Graph extends React.Component {
   //Todo: fix up/down not being correctly updated. Might have to flush the old value. 
   componentDidUpdate() {
     if (this.props.need_to_update_graph) {
-      const newDataToPlot = getInitialDataForGraph(this.state.dataPoints);
+      const newDataToPlot = getInitialDataForGraph(this.props.current_company);
       this.setState({
         data: newDataToPlot,
       }, function() {
-        const recent_price = newDataToPlot[0][this.state.dataPoints - 2].y;
-        const newest_value = newDataToPlot[0][this.state.dataPoints - 1].y;
+        var recentIndex = this.state.data.length > 1 ? this.state.data.length - 2 : 0 ;
+        const recent_price = newDataToPlot[0][recentIndex].y;
+        const newest_value = newDataToPlot[0][this.state.data.length - 1].y;
         this.props.setInitialPrice(recent_price);
         this.props.onPriceUpdate(newest_value);
         //this.updateDataGraph();
@@ -528,22 +579,24 @@ class Graph extends React.Component {
     if (this.state.data.length === 0) {
       setTimeout(this.updateDataGraph, 1 * 1000);
     }
-    const nextDataPointTime = getNextDataPointForGraph();
+    const nextDataPointTime = getNextDataPointForGraph(this.props.current_company);
     var new_data_set = this.state.data[0].slice();
-    new_data_set.shift();
-    var rnd = Math.floor((Math.random() * 80) + 20);
+    if (new_data_set.length === 10) {
+      new_data_set.shift();
+    }
+    // var rnd = Math.floor((Math.random() * 80) + 20);
     console.log(nextDataPointTime);
-    new_data_set.push({x: nextDataPointTime, y: rnd});
+    new_data_set.push(nextDataPointTime);
     var wrapper = [];
     wrapper.push(new_data_set);
     this.setState({
       data: wrapper,
     });
     //Update the price to be the newly generated price for the display on the side. 
-    this.props.onPriceUpdate(rnd);
+    this.props.onPriceUpdate(nextDataPointTime.y);
     //10 is the timeout time in amounts of seconds.
     //TODO: save the settimeout as a var and then clearTimeout(var) to stop it.  
-    timeOutVar = setTimeout(this.updateDataGraph, 10 * 1000);
+    timeOutVar = setTimeout(this.updateDataGraph, 5 * 1000);
   }
   }
 
@@ -592,7 +645,7 @@ class Graph extends React.Component {
           datePattern={'%d-%b-%y %H:%M:%S'}
           xType={'time'}
           axisLabels={{x: 'Time', y: 'Price (USD)'}}
-          // yDomainRange={[0, 100]}
+          yDomainRange={[100, 700]}
           axes
           grid
           verticalGrid
