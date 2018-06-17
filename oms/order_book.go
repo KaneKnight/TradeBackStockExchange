@@ -265,29 +265,32 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
             sellOrderElem := currentPrice.OrderList.Front()
             currentPrice.OrderList.Remove(sellOrderElem)
             sellOrder := sellOrderElem.Value.(*Order)
+            transactionNum := amountLeftToFill
             amountLeftToFill -= sellOrder.NumberOfShares
+            var transaction *db.Transaction
             if (amountLeftToFill < 0) {
                 sellOrder.NumberOfShares = -1 * amountLeftToFill
                 currentPrice.OrderList.PushFront(sellOrder)
-                cashTraded += order.NumberOfShares * int(currentPrice.Price)
+                cashTraded = transactionNum * int(currentPrice.Price)
+                transaction = InitTransaction(order.UserId, sellOrder.UserId,
+                    order.CompanyTicker, transactionNum, cashTraded,
+                    time.Now())
               } else {
-                fmt.Println("Shares: ", sellOrder.NumberOfShares)
-                fmt.Println("Price: ", currentPrice.Price)
-                cashTraded += sellOrder.NumberOfShares * int(currentPrice.Price)
+                cashTraded = sellOrder.NumberOfShares * int(currentPrice.Price)
+                transaction = InitTransaction(order.UserId, sellOrder.UserId, 
+                    order.CompanyTicker, sellOrder.NumberOfShares, cashTraded,
+                    time.Now())
               }
-            transaction := InitTransaction(order.UserId, sellOrder.UserId,
-                order.CompanyTicker, order.NumberOfShares, cashTraded,
-                time.Now())
             transactions = append(transactions, transaction)
             currentPrice.TotalVolume += sellOrder.NumberOfShares
             currentPrice.UserOrderMap[sellOrder.UserId].PopFromList()
             } else {
-            isNextPrice, newPrice, _ := b.SellTree.Next(currentPrice.Price)
-            if (isNextPrice) {
-                currentPrice = b.SellLimitMap[newPrice.(LimitPrice)]
-                b.LowestSell = currentPrice
-            } else {
-                return &transactions
+                isNextPrice, newPrice, _ := b.SellTree.Next(currentPrice.Price)
+                if (isNextPrice) {
+                    currentPrice = b.SellLimitMap[newPrice.(LimitPrice)]
+                    b.LowestSell = currentPrice
+                } else {
+                   return &transactions
             }
         }
     }
@@ -304,17 +307,21 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
             buyOrderElem := currentPrice.OrderList.Front()
             currentPrice.OrderList.Remove(buyOrderElem)
             buyOrder := buyOrderElem.Value.(*Order)
+            transactionNum := amountLeftToFill
             amountLeftToFill -= buyOrder.NumberOfShares
+            var transaction *db.Transaction
             if (amountLeftToFill < 0) {
                 buyOrder.NumberOfShares = -1 * amountLeftToFill
                 currentPrice.OrderList.PushFront(buyOrder)
-                cashTraded += order.NumberOfShares * int(currentPrice.Price)
+                cashTraded = transactionNum * int(currentPrice.Price)
+                transaction = InitTransaction(buyOrder.UserId, order.UserId,
+                    order.CompanyTicker, transactionNum, cashTraded,
+                    time.Now())
               } else {
-                cashTraded += buyOrder.NumberOfShares * int(currentPrice.Price)
+                cashTraded = buyOrder.NumberOfShares * int(currentPrice.Price)
+                transaction = InitTransaction(buyOrder.UserId, order.UserId,
+                   order.CompanyTicker, buyOrder.NumberOfShares, cashTraded, time.Now())
               }
-            transaction := InitTransaction(buyOrder.UserId, order.UserId,
-                order.CompanyTicker, order.NumberOfShares, cashTraded,
-                time.Now())
             transactions = append(transactions, transaction)
             currentPrice.TotalVolume += buyOrder.NumberOfShares
             currentPrice.UserOrderMap[buyOrder.UserId].PopFromList()
@@ -322,6 +329,7 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
             isNextPrice, newPrice, _ := b.BuyTree.Next(currentPrice.Price)
             if (isNextPrice) {
                 currentPrice = b.BuyLimitMap[newPrice.(LimitPrice)]
+                b.HighestBuy = currentPrice
             } else {
                 return &transactions
             }
