@@ -502,6 +502,31 @@ a {
   color: white; 
 }
 
+.view_tutorial_button, .logout_button {
+  padding: 8px 20px;
+  transition-duration: 0.4s;
+  border: 2px solid #272b30;
+  border-radius: 8px;
+  margin-top: 1%; 
+}
+
+.logout_button {
+  float: right;
+}
+
+.view_tutorial_button:hover {
+  border: 2px solid white;
+  color: white; 
+  background-color: #272B30;
+}
+
+.logout_button:hover {
+  border: 2px solid white;
+  color: white;
+  background-color: #272B30;
+}
+
+
 .landing_page {
   background: radial-gradient(ellipse, var(--main-bg-color), #0E162A);
   background-color: #0E162A;
