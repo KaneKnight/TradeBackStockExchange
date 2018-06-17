@@ -273,7 +273,7 @@ a {
 
 .recently_viewed_cont {
   margin-top: 2em;
-  text-indent: 1em;
+  /* text-indent: -0.5em; */
   /* text-align: center; */
 }
 
@@ -468,7 +468,21 @@ a {
   top: 0;
   left: 0;
   z-index: 17;
-  background-color: var(--main-bg-color);
+  /* background-color: var(--main-bg-color); */
+  background-color: #0E162A;
+  background:url(https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/H8WuRINimqur8ud/forex-stock-market-abstract-background-finance-chart-forex-numbers-at-background-of-financial-city-financial-concept-background-infografics-with-abstract-growth-chart-finance-business-background_ryrqdgch__F0000.png) no-repeat center;
+  /* background: url("https://fthmb.tqn.com/ATfDpAdTb-ZCXOQYyCih61tmEp4=/1255x837/filters:fill(auto,1)/how-to-start-trading-stocks-56a22ddb5f9b58b7d0c78746.jpg") no-repeat center; */
+  background-size: contain;
+}
+.fake_new_page_bg:after {
+  display: block;
+  position: relative;
+  background-image: radial-gradient(ellipse, rgba(0, 0, 0, .1) 30%, #0E162A 70%);
+  /* margin-top: -150px; */
+  /* height: 150px; */
+  width: 100%;
+  height: 100%;
+  content: '';
 }
 
 .full_user_profile_wrapper {
