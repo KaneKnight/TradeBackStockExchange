@@ -14,8 +14,10 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, parentdir)
 
 SPREAD = 0.01
-# SERVER_URL = "http://localhost:3000/"
-SERVER_URL = 'http://cloud-vm-45-112.doc.ic.ac.uk:8080/'
+# Test Server
+SERVER_URL = "http://localhost:8080/api/"
+# Deployed Server
+# SERVER_URL = 'http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/'
 REQUEST_TYPES = {
     'order': 'order',
     'price': 'highest-bid-lowest-ask',
@@ -27,7 +29,7 @@ def create_order_json(mkt_mkr_id, ticker, amount, ord_type, limit_price):
         'userId': mkt_mkr_id,
         'equityTicker': ticker,
         'amount': amount,
-        'orderType': ord_type, 
+        'orderType': ord_type,
         'limitPrice': limit_price
     }
 
@@ -121,7 +123,7 @@ def init(tickers_prices, market_maker_id):
     for ticker, target_price in tickers_prices.iteritems():
         bids = populate_bids(get_highest_bid(target_price))
         asks = populate_asks(get_lowest_ask(target_price))
-        
+
         for bid_price, bid_amount in bids:
             requests.append(create_order_json(market_maker_id, ticker, bid_amount, "limitBid", bid_price))
 
