@@ -73,7 +73,7 @@ func OrderHandler(c *gin.Context) {
         market = false
         buy = false
     }
-
+    fmt.Println(orderRequest.LimitPrice)
     price := LimitPrice(orderRequest.LimitPrice * 100)
     order := InitOrder(orderRequest.UserId, buy, market,
         orderRequest.EquityTicker, orderRequest.Amount, price, time.Now())
@@ -175,6 +175,7 @@ func processOrder() {
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
+        fmt.Println(order)
         priceOfSale := int(order.LimitPrice) * order.NumberOfShares
         /* Checks if buyer can afford and that the seller can sell.*/
         if ((order.Buy && db.UserCanBuyAmountRequested(database, order.UserId,
@@ -183,6 +184,7 @@ func processOrder() {
                 order.UserId, order.CompanyTicker, order.NumberOfShares)) {
 
             if (order.Buy && order.UserId != -1) {
+              fmt.Println("Here:  ", order.UserId)
                 db.ReserveCash(database, order.UserId,
                     order.NumberOfShares, int(order.LimitPrice))
             }
