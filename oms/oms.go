@@ -53,7 +53,9 @@ func hash(s string) int {
 func OrderHandler(c *gin.Context) {
     var orderRequest db.OrderRequest
     c.BindJSON(&orderRequest)
-    orderRequest.UserId = hash(orderRequest.UserIdString)
+    if orderRequest.UserId != -1 {
+      orderRequest.UserId = hash(orderRequest.UserIdString)
+    }
 
     var buy bool
     var market bool
@@ -83,7 +85,9 @@ func UserTransactionsHandler(c *gin.Context) {
   var request db.UserTransactionsRequest
   var response db.UserTransactionsResponse
   c.BindJSON(&response)
-  request.UserId = hash(request.UserIdString)
+  if request.UserId != 1 {
+    request.UserId = hash(request.UserIdString)
+  }
 
   response = db.GetAllUserTransactions(database, request.UserId)
   c.JSON(http.StatusOK, response)
@@ -111,7 +115,9 @@ func HighestBidLowestAsk(c *gin.Context) {
 func CreateUser(c *gin.Context) {
     var userData db.UserRequest
     c.BindJSON(&userData)
-    userData.UserId = hash(userData.UserIdString)
+    if userData.UserId != -1 {
+      userData.UserId = hash(userData.UserIdString)
+    }
     if !db.UserExists(database, userData.UserId) {
       db.CreateUser(database, userData.UserId, 10000000 * 100)
     }
@@ -121,7 +127,9 @@ func CreateUser(c *gin.Context) {
 func GetPositionData(c *gin.Context) {
     var positionRequest db.PositionRequest
     c.BindJSON(&positionRequest)
-    positionRequest.UserId = hash(positionRequest.UserIdString)
+    if positionRequest.UserId != -1 {
+      positionRequest.UserId = hash(positionRequest.UserIdString)
+    }
 
     var positionResponse db.PositionResponse
     positionResponse = GetUserPositionsResponse(positionRequest.UserId)
@@ -151,7 +159,9 @@ func GetCompanyDataPoints(c *gin.Context) {
 func GetCompanyInfo(c *gin.Context) {
     var data db.CompanyInfoRequest
     c.BindJSON(&data)
-    data.UserId = hash(data.UserIdString)
+    if data.UserId != -1 {
+      data.UserId = hash(data.UserIdString)
+    }
 
     response := db.QueryCompanyInfo(database, data.UserId, data.Ticker)
     c.JSON(http.StatusOK, response)
@@ -160,20 +170,19 @@ func GetCompanyInfo(c *gin.Context) {
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
     for true {
+        fmt.Println(orderQueue.Len())
+        time.Sleep(100*time.Millisecond)
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
         priceOfSale := int(order.LimitPrice) * order.NumberOfShares
         /* Checks if buyer can afford and that the seller can sell.*/
-        fmt.Println("Going into big if statement...")
         if ((order.Buy && db.UserCanBuyAmountRequested(database, order.UserId,
             priceOfSale)) ||
             !order.Buy && db.UserCanSellAmountOfShares(database,
                 order.UserId, order.CompanyTicker, order.NumberOfShares)) {
 
-            fmt.Println("Going into order.Buy if check...")
             if (order.Buy) {
-                fmt.Println("Going into ReserveCash()...")
                 db.ReserveCash(database, order.UserId,
                     order.NumberOfShares, int(order.LimitPrice))
             }
@@ -182,7 +191,6 @@ func processOrder() {
                 book = InitBook(order.CompanyTicker)
                 bookMap[order.CompanyTicker] = book
             }
-            fmt.Println("Going into Execute()...")
             success, transactions := book.Execute(order)
             if success {
                 length := len(*transactions)

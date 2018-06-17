@@ -216,6 +216,9 @@ func UserCanSellAmountOfShares(db *sqlx.DB,
                               userId int,
                               ticker string,
                               requestedAmount int) bool {
+    if userId == -1 {
+      return true
+    }
     var numberOfSharesOwned int
     err := db.Get(&numberOfSharesOwned, `select amount from positionTable
                                          where userId=$1
@@ -233,10 +236,13 @@ func UserCanSellAmountOfShares(db *sqlx.DB,
 func UserCanBuyAmountRequested(db *sqlx.DB,
                                userId int,
                                priceOfSale int) bool {
+    if userId == -1 {
+      return true
+    }
+
     var userCash int
     err := db.Get(&userCash, `select userCash - cashReserved from userTable
                               where userId=$1`, userId)
-    fmt.Println(userCash)
     if (err != nil) {
       log.Fatalln(err)
     }
@@ -340,8 +346,6 @@ func UpdatePosition(ax *sqlx.Tx,
                  cashTraded,
                  userId,
                  ticker)
-    fmt.Println("AmountTraded:", amountTraded, "cashTaded:", cashTraded, "userId:", userId, "ticker:", ticker)
-    fmt.Println("GOT HERE BITCH")
 }
 
 /* 3 args, the sqlx transaction object pointer, the userId of the user
@@ -353,7 +357,6 @@ func UpdateUserCash(ax *sqlx.Tx,
     ax.MustExec(`update userTable
                  set userCash=userCash+$1
                  where userId=$2`, cashTraded, userId)
-    fmt.Println("cashTraded:", cashTraded, "userId:", userId)
 }
 
 

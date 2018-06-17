@@ -183,7 +183,9 @@ func (m OrderMap) insertOrderIntoMap(order *Order) {
 func (b *Book) Execute(order *Order) (bool,
     *[]*db.Transaction) {
     if (order.Buy) {
-        return b.MatchBuy(order)
+        res, transactions := b.MatchBuy(order)
+        fmt.Println(transactions)
+        return res, transactions
     } else {
         return b.MatchSell(order)
     }
@@ -191,8 +193,7 @@ func (b *Book) Execute(order *Order) (bool,
 
 func (b *Book) MatchBuy(order *Order) (bool,
     *[]*db.Transaction) {
-    //TODO:Remove
-    fmt.Println(b.CanFillBuyOrder(order))
+      fmt.Println("Can fill: ", b.CanFillBuyOrder(order))
     if (b.CanFillBuyOrder(order)) {
         return true, b.CalculateTransactionsBuy(order)
     } else {
@@ -203,6 +204,7 @@ func (b *Book) MatchBuy(order *Order) (bool,
 
 func (b *Book) MatchSell(order *Order) (bool,
     *[]*db.Transaction) {
+      fmt.Println("Can sell: ", b.canFillSellOrder(order))
     if (b.canFillSellOrder(order)) {
         return true, b.CalculateTransactionsSell(order)
     } else {
@@ -229,6 +231,7 @@ func (b *Book) CanFillBuyOrder(order *Order) bool {
             break
         }
     }
+    fmt.Println("AMount left: ", amountLeftToFill)
     return amountLeftToFill <= 0
 }
 
@@ -379,7 +382,6 @@ func CancelOrder(cancelRequest *db.CancelOrderRequest) {
   } else {
     userOrders = book.SellLimitMap[price].UserOrderMap[userId]
     orders = book.SellLimitMap[price].OrderList
-    fmt.Println(userOrders)
   }
   for i := 0; i < len(*userOrders); i++ {
     orders.Remove((*userOrders)[i])

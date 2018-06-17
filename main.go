@@ -90,6 +90,7 @@ func main() {
   api.POST("/get-company-info", oms.GetCompanyInfo)
   api.POST("/check-user-exists", oms.CreateUser)
   api.POST("/get-all-user-positions", oms.GetPositionData)
+  api.POST("/order", oms.OrderHandler)
 
 
   //run on default port 8080
