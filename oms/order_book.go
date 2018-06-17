@@ -337,6 +337,34 @@ func getValueAndGain(ticker string, userId int) (int, int) {
     value := currentPriceOfStock * number
     return value, (int(value / cashSpent) - 1) * 100
 }
+//Horrible function but will have to do
+func GetUserPositionsResponse(userId int) db.PositionResponse {
+  allUserPositions := db.GetAllUserPositions(database, userId)
+
+  var response db.PositionResponse
+  response.Positions = make([]db.JSONPosition, len(allUserPositions))
+
+  for i := 0; i < len(allUserPositions); i++ {
+    ticker := allUserPositions[i].Ticker
+    position := db.GetPosition(database, ticker, userId)
+    currentPriceOfStock := float64(GetHighestBidOfStock(ticker)) / 100
+    var value float64
+    var gain float64
+    if (&position != nil && currentPriceOfStock != 0) {
+      value = float64(position.Amount) * currentPriceOfStock
+      cashSpent := float64(position.CashSpentOnPosition)
+      gain = ((value / cashSpent) - 1) * 100
+      gain = Round(gain, 0.01)
+    } else {
+      value = 0
+      gain = 0
+    }
+    jsonPosition := db.JSONPosition{ticker, position.Amount, value, gain, allUserPositions[i].Name}
+
+    response.Positions[i] = jsonPosition
+  }
+  return response
+}
 
 func CancelOrder(cancelRequest *db.CancelOrderRequest) {
   cancelRequest.LimitPrice = cancelRequest.LimitPrice * 100 //make sure multiple of 100
