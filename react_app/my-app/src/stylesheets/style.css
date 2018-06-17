@@ -490,7 +490,7 @@ a {
 .fake_new_page_bg:after {
   display: block;
   position: relative;
-  background-image: radial-gradient(ellipse, rgba(0, 0, 0, .1) 30%, #0E162A 70%);
+  background-image: radial-gradient(ellipse, rgba(0, 0, 0, .1) 30%, #000000 70%);
   /* margin-top: -150px; */
   /* height: 150px; */
   width: 100%;
