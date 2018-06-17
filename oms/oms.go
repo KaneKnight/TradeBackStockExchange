@@ -79,6 +79,10 @@ func OrderHandler(c *gin.Context) {
     c.JSON(http.StatusOK, nil)
 }
 
+func UserTransactionsHandler(c *gin.Context) {
+  var request db.UserTransactionsRequest
+}
+
 func CancelHandler(c *gin.Context) {
     var cancelOrder db.CancelOrderRequest
     c.BindJSON(&cancelOrder)
@@ -102,9 +106,10 @@ func CreateUser(c *gin.Context) {
     var userData db.UserRequest
     c.BindJSON(&userData)
     userData.UserId = hash(userData.UserIdString)
-
-    //db.CreateUser(database, userData.UserId, userData.UserName, userData.UserCash * 100)
-    //c.JSON(http.StatusOK, nil)
+    if !db.UserExists(database, userData.UserId) {
+      db.CreateUser(database, userData.UserId, 10000000 * 100)
+    }
+    c.JSON(http.StatusOK, nil)
 }
 
 func GetPositionData(c *gin.Context) {
@@ -112,10 +117,10 @@ func GetPositionData(c *gin.Context) {
     c.BindJSON(&positionRequest)
     positionRequest.UserId = hash(positionRequest.UserIdString)
 
-    response := getPositionResponse(positionRequest.EquityTicker,
-        positionRequest.UserId)
+    var positionResponse db.PositionResponse
+    positionResponse = db.GetAllUserPositions(database, positionRequest.UserId)
 
-    c.JSON(http.StatusOK, response)
+    c.JSON(http.StatusOK, positionResponse)
 }
 
 //API handler that returns a list of all equity we serve

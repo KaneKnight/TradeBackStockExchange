@@ -23,14 +23,13 @@ create table positionTable (
     userId bigint,
     ticker text,
     amount integer,
-    cashSpentOnPosition interger
+    cashSpentOnPosition integer
 );
 
 create table userTable (
     userId bigint,
-    userName text,
-    userCash integer
-    cashReserved integer,
+    userCash integer,
+    cashReserved integer
 );
 
 create table companyTable (
@@ -50,7 +49,7 @@ type DBConfig struct {
 
 type UserRequest struct {
     UserIdString string `json:"userIdString"`
-    UserId       int    `json:"userId"`
+    UserId       int
 }
 
 
@@ -104,18 +103,21 @@ type PriceResponse struct {
 
 
 type PositionResponse struct {
-    EquityTicker string  `json:"equityTicker"`
-    NumberOfSharesOwned int  `json:"numberOfSharesOwned"`
-    ValueOfPostion float64  `json:"valueOfPosition"`
-    PercentageGain float64  `json:"percentageGain"`
+  Positions []JSONPosition `json:"positions"`
+}
+
+type JSONPosition struct {
+  Ticker string  `json:"ticker"`
+  Amount int     `json:"amount"`
+  Value  float64 `json:"value"`
+  Gain   float64 `json:"gain"`
+  Name   string  `json:"name"`
 }
 
 type PositionRequest struct {
-    EquityTicker string `json:"equityTicker"`
     UserIdString string `json:"userIdString"`
-    UserId       int    `json:"userId"`
+    UserId       int
 }
-
 
 type Company struct {
     Value string `db:"ticker"`
@@ -147,6 +149,24 @@ type CompanyInfoRequest struct {
 
 type CompanyInfoResponse struct {
   Amount      int    `db:"amount"`
+}
+
+type UserTransactionsRequest struct {
+  UserIdString string `json:"userIdString"`
+  UserId       int
+}
+
+type UserTransactionsResponse struct {
+  BuyTransactions []UserTransaction  `json:"buyTransactions"`
+  SellTransactions []UserTransaction `json:"SellTransactions"`
+}
+
+type UserTransaction struct {
+  Ticker       string  `json:"ticker"`
+  AmountTraded int     `json:"amountTraded"`
+  CashSpent    int     `json:"cashSpent"`
+  Price        float64 `json:"price"`
+  Time         string  `json:"time"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -314,7 +334,7 @@ func UpdatePosition(ax *sqlx.Tx,
                     cashTraded int) {
     ax.MustExec(`update positionTable
                  set amount=amount+$1,
-                     cashSpentOnPosition=cashSpentOnPosition+$2
+                 cashSpentOnPosition=cashSpentOnPosition+$2
                  where userId=$3 and ticker=$4`,
                  amountTraded,
                  cashTraded,
@@ -342,11 +362,18 @@ func UpdateUserCash(ax *sqlx.Tx,
  * the username and the last is the password hash.*/
 func CreateUser(db *sqlx.DB,
                 userId int,
-                userName string,
                 startingCash int) {
-    db.MustExec(`insert into userTable (userId, userName, userCash, 
-cashReserved)
-                 values ($1, $2, $3, $3)`, userId, userName, startingCash)
+    db.MustExec(`insert into userTable (userId, userCash, cashReserved)
+                 values ($1, $2, $3)`, userId, startingCash, 0)
+}
+
+func UserExists(db *sqlx.DB, userId int) bool {
+  var num int
+  err := db.Get(&num, `select count(*) from userTable where userId=$1`, userId)
+  if err != nil {
+    log.Fatalln(err)
+  }
+  return num != 0
 }
 
 func ReserveCash(db *sqlx.DB,
@@ -377,14 +404,74 @@ func GetAvailableCash(db *sqlx.DB,
 func GetPosition(db *sqlx.DB, ticker string, userId int) Position {
     var position []Position
     err := db.Select(&position, `select * from positionTable
-                                 where userid=$1 and ticker=$2`, userId,
-        ticker)
+                                 where userid=$1 and ticker=$2`, userId, ticker)
     if (err != nil) {
         log.Fatalln(err)
     }
     return position[0]
 }
 
+func getPositionResponse(ticker string, userId int) JSONPosition {
+  position := GetPosition(database, ticker, userId)
+  currentPriceOfStock := float64(GetHighestBidOfStock(ticker)) / 100
+  var value float64
+  var gain float64
+  if (&position != nil && currentPriceOfStock != 0) {
+    value = float64(position.Amount) * currentPriceOfStock
+    cashSpent := float64(position.CashSpentOnPosition)
+    gain = ((value / cashSpent) - 1) * 100
+    gain = Round(gain, 0.01)
+  } else {
+    value = 0
+    gain = 0
+  }
+  return JSONPosition{
+     ticker,
+     position.Amount,
+     value,
+     gain
+  }
+}
+
+type pos struct {
+  ticker string
+  name   string
+}
+func GetAllUserPositions(db *sqlx.DB, userId int) PositionResponse {
+  var positions []pos
+  err := db.Select(&positions, `select ticker, name from positionTable join companyTable on ticker where userId=$1`, userId)
+  if err != nil {
+    log.Fatalln(err)
+  }
+
+  var response PositionResponse
+  for i := 0; i < len(positions); i++ {
+    response.Positions[i] = getPositionResponse(positions[i].ticker, userId)
+  }
+  return response
+}
+
+//TODO:split buyer seller wise
+func GetAllUserTransactions(db *sqlx.DB, userId int) UserTransactionsResponse {
+  var response UserTransactionsResponse
+  err1 := db.Select(&response.BuyTransactions, `select ticker, amountTraded, cashTraded
+        cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
+        time 
+        from transactionTable
+        where buyerId=$1`, userId)
+  if err1 != nil {
+    log.Fatalln(err1)
+  }
+  err2 := db.Select(&response.SellTransactions, `select ticker, amountTraded, cashTraded
+        cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
+        time 
+        from transactionTable
+        where sellerId=$1`, userId)
+  if err2 != nil {
+    log.Fatalln(err2)
+  }
+  return response
+}
 
 func GetAllCompanies(db *sqlx.DB) CompanyList {
     var companyList CompanyList
