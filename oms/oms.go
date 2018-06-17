@@ -73,7 +73,6 @@ func OrderHandler(c *gin.Context) {
         market = false
         buy = false
     }
-    fmt.Println(orderRequest.LimitPrice)
     price := LimitPrice(orderRequest.LimitPrice * 100)
     order := InitOrder(orderRequest.UserId, buy, market,
         orderRequest.EquityTicker, orderRequest.Amount, price, time.Now())
@@ -108,8 +107,8 @@ func HighestBidLowestAsk(c *gin.Context) {
     c.BindJSON(&priceRequest)
     ticker := priceRequest.Ticker
     response := db.PriceResponse{
-        GetLowestAskOfStock(ticker)/100,
-        GetHighestBidOfStock(ticker)/100}
+        float64(GetLowestAskOfStock(ticker))/100.0,
+        float64(GetHighestBidOfStock(ticker))/100.0}
     c.JSON(http.StatusOK, response)
 }
 
@@ -149,10 +148,12 @@ func GetCompanyDataPoints(c *gin.Context) {
     var data db.CompanyDataRequest
     c.BindJSON(&data)
 
-    response := db.QueryCompanyDataPoints(database, data.Ticker, data.DataNums)
+    response := db.CompanyDataResponse{make([]db.CompanyData, 1)}
+    response.CompanyData[0] = db.CompanyData{float64(GetLowestAskOfStock(data.Ticker))/100.0}
+    /*response := db.QueryCompanyDataPoints(database, data.Ticker, data.DataNums)
     for i := 0; i < len(response.CompanyData); i++ {
       response.CompanyData[i].Price = Round(response.CompanyData[i].Price, 0.01)
-    }
+    }*/
     c.JSON(http.StatusOK, response)
 }
 
@@ -172,12 +173,11 @@ func GetCompanyInfo(c *gin.Context) {
 func processOrder() {
     for true {
         fmt.Println(orderQueue.Len())
-        time.Sleep(10*time.Millisecond)
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
-        fmt.Println(order)
         priceOfSale := int(order.LimitPrice) * order.NumberOfShares
+        fmt.Println("casted: " , int(order.LimitPrice))
         /* Checks if buyer can afford and that the seller can sell.*/
         if ((order.Buy && db.UserCanBuyAmountRequested(database, order.UserId,
             priceOfSale)) ||

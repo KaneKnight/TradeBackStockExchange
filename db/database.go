@@ -97,8 +97,8 @@ type PriceRequest struct {
 }
 
 type PriceResponse struct {
-    LowestAsk  int `json:"lowestAsk"`
-    HighestBid int `json:"highestBid"`
+    LowestAsk  float64 `json:"lowestAsk"`
+    HighestBid float64 `json:"highestBid"`
 }
 
 

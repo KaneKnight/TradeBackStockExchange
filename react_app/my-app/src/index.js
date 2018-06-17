@@ -449,7 +449,8 @@ function getInitialDataForGraph(comp) {
     //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
     data,
     res => {
-      temp = res.price;  
+      console.log(res.data[0].Price);
+      temp = res.data[0].Price;
     }
   );
 
@@ -494,7 +495,7 @@ function getNextDataPointForGraph(comp) {
     //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
     data,
     res => {
-      temp = res.price;  
+      temp = res.data[0].Price;  
     }
   );
 
@@ -692,7 +693,7 @@ function getFigures(comp) {
       temp = res.Amount;  
     }
   );
-  console.log(temp)
+  console.log('Figures returned was ' + temp);
   return temp;
 }
 
@@ -1441,7 +1442,7 @@ class ActionConfirmation extends React.Component {
   }
 
   inputChangeLimit(e) {
-    var value = parseInt(e.target.value, 10);
+    var value =parseFloat(e.target.value);
 
     if (Number.isNaN(value)) {
       value = 0;
@@ -1505,7 +1506,7 @@ class ActionConfirmation extends React.Component {
 
               <input type="radio" onClick={e => this.inputChangeAction(e)} id="actionChoice2" name="action" value="limit"/>
               <label htmlFor="actionChoice1"> Limit </label>
-              {this.state.action_type === "limit" ? <p> {this.props.button_name === "Bid" ? 'Maximum price to buy at' : 'Minimum price to sell at'}: <input type="number" onChange={e => this.inputChangeLimit(e)}/> </p> : null}
+              {this.state.action_type === "limit" ? <p> {this.props.button_name === "Bid" ? 'Maximum price to buy at' : 'Minimum price to sell at'}: <input type="number" step="0.01" onChange={e => this.inputChangeLimit(e)}/> </p> : null}
             {/* </div> */}
           </p>
           <p> Total price: {current_amount}</p>
