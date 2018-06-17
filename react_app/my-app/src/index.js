@@ -1289,7 +1289,7 @@ class Button extends React.Component {
   }
 
   handlePopupMount() {
-    this.setState({renderInfoBubble: true});
+    this.setState({renderInfoBubble: !this.state.renderInfoBubble});
   }
 
   render() {
