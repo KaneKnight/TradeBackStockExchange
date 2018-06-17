@@ -64,7 +64,7 @@ type Transaction struct {
     SellerId int          `db:"sellerid"`
     Ticker string         `db:"ticker"`
     AmountTraded int      `db:"amounttraded"`
-    CashTraded  int   `db:"cashtraded"`
+    CashTraded  int       `db:"cashtraded"`
     TimeOfTrade time.Time `db:"timeoftrade"`
 }
 
@@ -157,16 +157,16 @@ type UserTransactionsRequest struct {
 }
 
 type UserTransactionsResponse struct {
-  BuyTransactions []UserTransaction  `json:"buyTransactions"`
+  BuyTransactions []UserTransaction  `json:"BuyTransactions"`
   SellTransactions []UserTransaction `json:"SellTransactions"`
 }
 
 type UserTransaction struct {
   Ticker       string  `json:"ticker"`
   AmountTraded int     `json:"amountTraded"`
-  CashSpent    int     `json:"cashSpent"`
+  CashTraded   int     `json:"cashSpent"`
   Price        float64 `json:"price"`
-  Time         string  `json:"time"`
+  TimeOfTrade  string  `json:"time"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -432,17 +432,17 @@ func GetAllUserPositions(db *sqlx.DB, userId int) []Pos {
 
 func GetAllUserTransactions(db *sqlx.DB, userId int) UserTransactionsResponse {
   var response UserTransactionsResponse
-  err1 := db.Select(&response.BuyTransactions, `select ticker, amountTraded, cashTraded
+  err1 := db.Select(&response.BuyTransactions, `select ticker, amountTraded, cashTraded,
         cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
-        time 
+        timeOfTrade 
         from transactionTable
         where buyerId=$1`, userId)
   if err1 != nil {
     log.Fatalln(err1)
   }
-  err2 := db.Select(&response.SellTransactions, `select ticker, amountTraded, cashTraded
+  err2 := db.Select(&response.SellTransactions, `select ticker, amountTraded, cashTraded,
         cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
-        time 
+        timeOfTrade 
         from transactionTable
         where sellerId=$1`, userId)
   if err2 != nil {
