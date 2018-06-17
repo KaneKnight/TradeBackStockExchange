@@ -755,12 +755,81 @@ function getPositionsForUser() {
 
 }
 
+function getTransactionHistoryForUser() {
+  //Uncomment me to run with api call 
+  /*
+  var transactionHistory = [];
+  var data_to_send = {"userIdString": JSON.parse(localStorage.getItem("profile").sub)}
+  var data = JSON.stringify(data_to_send);
+  jQuery.ajaxSetup({async: false});
+  $.post(
+    "http://localhost:8080/api/get-transaction-history",
+    data,
+    res => {
+      transactionHistory = res;
+    }
+  )
+  */
+
+  const transactionHistory = {
+    "BuyTransactions" : [
+      {
+        "ticker": "AAPL",
+        "amountTraded": 1,
+        "cashSpent" : 100,
+        "price" : 100,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "MSFT",
+        "amountTraded": 4,
+        "cashSpent" : 600,
+        "price" : 150,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "BLZD",
+        "amountTraded": 3,
+        "cashSpent" : 60,
+        "price" : 20,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+    ],
+    "SellTransactions" : [
+      {
+        "ticker": "AAPL",
+        "amountTraded": 1,
+        "cashSpent" : 100,
+        "price" : 100,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "MSFT",
+        "amountTraded": 4,
+        "cashSpent" : 600,
+        "price" : 150,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+      {
+        "ticker": "BLZD",
+        "amountTraded": 3,
+        "cashSpent" : 60,
+        "price" : 20,
+        "time" : new Date(new Date() - (Math.random() * 10000000) + 1),
+      },
+    ],
+  }
+
+  return transactionHistory;
+}
+
 class FullUserProfile extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       positions: getPositionsForUser(),
+      transactionHistory: getTransactionHistoryForUser(),
     }
   }
 
@@ -797,7 +866,7 @@ class FullUserProfile extends React.Component {
           </div> 
           <br/> 
           <div className="exchange_history_wrapper">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet tellus arcu, vitae condimentum massa volutpat vel. Maecenas interdum nisi non ornare convallis. Donec sit amet ligula lectus. Pellentesque eleifend semper velit, nec porta diam hendrerit a. Suspendisse facilisis tortor eget fermentum interdum. Aliquam malesuada mauris id ante facilisis elementum. Aliquam suscipit, turpis ac sollicitudin scelerisque, metus metus efficitur mauris, at dapibus ante libero sed ante. Phasellus scelerisque metus vel lacus vulputate rhoncus. Proin sit amet nisi vitae enim molestie semper ut sit amet ex. Vivamus sed nunc at quam bibendum pulvinar vitae non augue. Mauris tristique tincidunt magna, in accumsan lectus hendrerit malesuada.
+            <TransactionHistory transactionHistory={this.state.transactionHistory} />
           </div> 
         </div>
       </div> 
@@ -832,6 +901,55 @@ class Positions extends React.Component {
     return (
       <div className="list_of_positions">
         {this.state.positionsToShow}
+      </div>
+    )
+  }
+}
+
+class TransactionHistory extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      transactionHistoryToShow: [],
+    };
+  };
+
+  componentDidMount() {
+    var historyToShow = [];
+
+    const buy_text = <p style={{color: "green"}}> Your Buy Transaction History: </p>;
+    historyToShow.push(buy_text);
+    //Looping through the Buy Transactions
+    for (var i = 0; i < this.props.transactionHistory.BuyTransactions.length; i++) {
+      var text_to_show_for_buy = <p> Ticker: {this.props.transactionHistory.BuyTransactions[i].ticker} &nbsp;
+        Amount Traded: {this.props.transactionHistory.BuyTransactions[i].amountTraded} &nbsp;
+        Cash Spent: {this.props.transactionHistory.BuyTransactions[i].cashSpent} &nbsp;
+        Price Bought At: {this.props.transactionHistory.BuyTransactions[i].price} &nbsp;
+        Transaction Time: {this.props.transactionHistory.BuyTransactions[i].time.toString()}</p>
+      historyToShow.push(text_to_show_for_buy);
+    }
+
+    const sell_text = <p style={{color: "red"}}> Your Sell Transaction History: </p>;
+    historyToShow.push(sell_text);
+    //Looping through the Sell Transactions
+    for (var i = 0; i < this.props.transactionHistory.SellTransactions.length; i++) {
+      var text_to_show_for_buy = <p> Ticker: {this.props.transactionHistory.SellTransactions[i].ticker} &nbsp;
+        Amount Traded: {this.props.transactionHistory.SellTransactions[i].amountTraded} &nbsp;
+        Cash Spent: {this.props.transactionHistory.SellTransactions[i].cashSpent} &nbsp;
+        Price Bought At: {this.props.transactionHistory.SellTransactions[i].price} &nbsp;
+        Transaction Time: {this.props.transactionHistory.SellTransactions[i].time.toString()}</p>
+      historyToShow.push(text_to_show_for_buy);
+    }
+
+    this.setState({
+      transactionHistoryToShow: historyToShow,
+    })
+  }
+
+  render() {
+    return (
+      <div className="transaction_history">
+        {this.state.transactionHistoryToShow}
       </div>
     )
   }
