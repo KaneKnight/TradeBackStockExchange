@@ -11,8 +11,8 @@ import (
 
 var schema = `
 create table transactionTable (
-    buyerId integer,
-    sellerId integer,
+    buyerId bigint,
+    sellerId bigint,
     ticker text,
     amountTraded integer,
     cashTraded integer,
@@ -20,17 +20,16 @@ create table transactionTable (
 );
 
 create table positionTable (
-    userId integer,
+    userId bigint,
     ticker text,
     amount integer,
-    cashSpentOnPosition interger
+    cashSpentOnPosition integer
 );
 
 create table userTable (
-    userId integer,
-    userName text,
-    userCash integer
-    cashReserved integer,
+    userId bigint,
+    userCash integer,
+    cashReserved integer
 );
 
 create table companyTable (
@@ -49,9 +48,8 @@ type DBConfig struct {
 /*--------------TYPE STRUCTS USED FOR QUERIES---------------*/
 
 type UserRequest struct {
-    UserId int `json:"userId"`
-    UserName string `json:"userName"`
-    UserCash int `json:"userCash"`
+    UserIdString string `json:"userIdString"`
+    UserId       int
 }
 
 
@@ -66,7 +64,7 @@ type Transaction struct {
     SellerId int          `db:"sellerid"`
     Ticker string         `db:"ticker"`
     AmountTraded int      `db:"amounttraded"`
-    CashTraded  int   `db:"cashtraded"`
+    CashTraded  int       `db:"cashtraded"`
     TimeOfTrade time.Time `db:"timeoftrade"`
 }
 
@@ -78,17 +76,20 @@ type Position struct {
 }
 
 type OrderRequest struct {
-  UserId int `json:"userId"`
+  UserIdString string `json:"userIdString"`
   EquityTicker string `json:"equityTicker"`
   Amount int `json:"amount"`
   OrderType string `json:"orderType"`
   LimitPrice float64  `json:"limitPrice"`
+  UserId int `json:"userId"`
 }
 
 type CancelOrderRequest struct {
     LimitPrice int `json:"limitPrice"`
+    UserIdString string `json:"userIdString"`
+    Ticker string  `json:"ticker"`
+    Bid    bool    `json:"bid"`
     UserId int `json:"userId"`
-    Ticker string `json:"ticker"`
 }
 
 type PriceRequest struct {
@@ -96,23 +97,27 @@ type PriceRequest struct {
 }
 
 type PriceResponse struct {
-    LowestAsk  int `json:"lowestAsk"`
-    HighestBid int `json:"highestBid"`
+    LowestAsk  float64 `json:"lowestAsk"`
+    HighestBid float64 `json:"highestBid"`
 }
 
 
 type PositionResponse struct {
-    EquityTicker string  `json:"equityTicker"`
-    NumberOfSharesOwned int  `json:"numberOfSharesOwned"`
-    ValueOfPostion float64  `json:"valueOfPosition"`
-    PercentageGain float64  `json:"percentageGain"`
+  Positions []JSONPosition `json:"positions"`
+}
+
+type JSONPosition struct {
+  Ticker string  `json:"ticker"`
+  Amount int     `json:"numberOfSharesOwned"`
+  Value  float64 `json:"valueOfPosition"`
+  Gain   float64 `json:"percentageGain"`
+  Name   string  `json:"name"`
 }
 
 type PositionRequest struct {
-    EquityTicker string `json:"equityTicker"`
-    UserId int `json:"userId"`
+    UserIdString string `json:"userIdString"`
+    UserId       int
 }
-
 
 type Company struct {
     Value string `db:"ticker"`
@@ -124,7 +129,7 @@ type CompanyList struct {
 }
 
 type CompanyDataRequest struct {
-    Ticker   string `json:"companyName"`
+    Ticker   string `json:"ticker"`
     DataNums int    `json:"dataNums"`
 }
 
@@ -137,12 +142,31 @@ type CompanyData struct {
 }
 
 type CompanyInfoRequest struct {
-  UserId      int    `json:"UserId"`
-  Ticker      string `json:"Ticker"`
+  UserIdString string `json:"userIdString"`
+  Ticker       string `json:"Ticker"`
+  UserId       int    `json:"userId"`
 }
 
 type CompanyInfoResponse struct {
   Amount      int    `db:"amount"`
+}
+
+type UserTransactionsRequest struct {
+  UserIdString string `json:"userIdString"`
+  UserId       int
+}
+
+type UserTransactionsResponse struct {
+  BuyTransactions []UserTransaction  `json:"BuyTransactions"`
+  SellTransactions []UserTransaction `json:"SellTransactions"`
+}
+
+type UserTransaction struct {
+  Ticker       string  `json:"ticker"`
+  AmountTraded int     `json:"amountTraded"`
+  CashTraded   int     `json:"cashSpent"`
+  Price        float64 `json:"price"`
+  TimeOfTrade  string  `json:"time"`
 }
 
 /* No args, called on the DataBase struct and returns a pointer to
@@ -162,17 +186,14 @@ func (db DBConfig) OpenDataBase() (*sqlx.DB) {
  * into the database.*/
 func InsertTransaction(db *sqlx.DB, t *Transaction) {
     ax := db.MustBegin()
-    err := ax.MustExec(`insert into transactionTable (buyerId, sellerId,
+    fmt.Println(*t)
+    ax.MustExec(`insert into transactionTable (buyerId, sellerId,
                                           ticker, amountTraded,
                                           cashTraded, timeOfTrade)
                                           values ($1, $2, $3, $4, $5, $6)`,
                                           t.BuyerId, t.SellerId,  t.Ticker,
                                           t.AmountTraded, t.CashTraded, t.TimeOfTrade)
     ax.Commit()
-    if (err != nil) {
-        log.Fatalln(err)
-    }
-
 }
 
 /* 2 args, the sqlx database struct pointer and the userId of the user
@@ -196,6 +217,9 @@ func UserCanSellAmountOfShares(db *sqlx.DB,
                               userId int,
                               ticker string,
                               requestedAmount int) bool {
+    if userId == -1 {
+      return true
+    }
     var numberOfSharesOwned int
     err := db.Get(&numberOfSharesOwned, `select amount from positionTable
                                          where userId=$1
@@ -213,6 +237,10 @@ func UserCanSellAmountOfShares(db *sqlx.DB,
 func UserCanBuyAmountRequested(db *sqlx.DB,
                                userId int,
                                priceOfSale int) bool {
+    if userId == -1 {
+      return true
+    }
+
     var userCash int
     err := db.Get(&userCash, `select userCash - cashReserved from userTable
                               where userId=$1`, userId)
@@ -228,10 +256,12 @@ func UserCanBuyAmountRequested(db *sqlx.DB,
 func UpdatePositionOfUsersFromTransaction(db *sqlx.DB,
                                           t *Transaction) {
      ax := db.MustBegin()
-     UpdateBuyerPosition(db, ax, t.BuyerId, t.Ticker,
-                         t.AmountTraded, t.CashTraded)
-     UpdateSellerPosition(db, ax, t.SellerId, t.Ticker,
-                          t.AmountTraded, t.CashTraded)
+     if t.BuyerId != -1 {
+        UpdateBuyerPosition(db, ax, t.BuyerId, t.Ticker, t.AmountTraded, t.CashTraded)
+     }
+     if (t.SellerId != -1) {
+        UpdateSellerPosition(db, ax, t.SellerId, t.Ticker, t.AmountTraded, t.CashTraded)
+     }
      err := ax.Commit()
      if (err != nil) {
        log.Fatalln(err)
@@ -260,13 +290,10 @@ func UpdateBuyerPosition(db *sqlx.DB,
        UpdatePosition(ax, buyerId, ticker, amountTraded, cashTraded)
    }
 
-   err2 := ax.MustExec(`update userTable
+   ax.MustExec(`update userTable
                        set cashReserved=cashReserved-$1
                        where userId=$2`, cashTraded, buyerId)
 
-    if (err2 != nil) {
-        log.Fatalln(err)
-    }
    UpdateUserCash(ax, buyerId, -cashTraded)
 }
 
@@ -294,7 +321,7 @@ func CreateNewPosition(ax *sqlx.Tx,
                        ticker string,
                        amountTraded int,
                        cashTraded int) {
-    err := ax.MustExec(`insert into positionTable (userId,
+    ax.MustExec(`insert into positionTable (userId,
                                             ticker,
                                             amount,
                                             cashSpentOnPosition)
@@ -302,9 +329,6 @@ func CreateNewPosition(ax *sqlx.Tx,
                                            ticker,
                                            amountTraded,
                                            cashTraded)
-    if (err != nil) {
-        log.Fatalln(err)
-    }
 }
 
 /* 5 args, sqlx transaction struct pointer, then the userId and the ticker,
@@ -315,17 +339,14 @@ func UpdatePosition(ax *sqlx.Tx,
                     ticker string,
                     amountTraded int,
                     cashTraded int) {
-    err := ax.MustExec(`update positionTable
+    ax.MustExec(`update positionTable
                  set amount=amount+$1,
-                     cashSpentOnPosition=cashSpentOnPosition+$2
+                 cashSpentOnPosition=cashSpentOnPosition+$2
                  where userId=$3 and ticker=$4`,
                  amountTraded,
                  cashTraded,
                  userId,
                  ticker)
-    if (err != nil) {
-        log.Fatalln(err)
-    }
 }
 
 /* 3 args, the sqlx transaction object pointer, the userId of the user
@@ -334,12 +355,9 @@ func UpdatePosition(ax *sqlx.Tx,
 func UpdateUserCash(ax *sqlx.Tx,
                     userId int,
                     cashTraded int) {
-    err := ax.MustExec(`update userTable
+    ax.MustExec(`update userTable
                  set userCash=userCash+$1
                  where userId=$2`, cashTraded, userId)
-    if (err != nil) {
-        log.Fatalln(err)
-    }
 }
 
 
@@ -348,39 +366,40 @@ func UpdateUserCash(ax *sqlx.Tx,
  * the username and the last is the password hash.*/
 func CreateUser(db *sqlx.DB,
                 userId int,
-                userName string,
                 startingCash int) {
-    ax := db.MustBegin()
-    err := ax.MustExec(`insert into userTable (userId, userName, userCash, 
-cashReserved)
-                 values ($1, $2, $3, $3)`, userId, userName, startingCash)
-    ax.Commit()
-    if (err != nil) {
-        log.Fatalln(err)
-    }
+    db.MustExec(`insert into userTable (userId, userCash, cashReserved)
+                 values ($1, $2, $3)`, userId, startingCash, 0)
+}
+
+func UserExists(db *sqlx.DB, userId int) bool {
+  var num int
+  err := db.Get(&num, `select count(*) from userTable where userId=$1`, userId)
+  if err != nil {
+    log.Fatalln(err)
+  }
+  return num != 0
 }
 
 func ReserveCash(db *sqlx.DB,
                  userId int,
                  numberOfShares int,
                  limitPrice int) {
-    ax := db.MustBegin()
-    err := ax.MustExec(`update userTable
-                       set cashReserved=cashReserved+$1
-                       where userId=$2`, numberOfShares * limitPrice, userId)
-    ax.Commit()
-    if (err != nil) {
-        log.Fatalln(err)
-    }
+    fmt.Println(userId, numberOfShares, limitPrice)
+    db.MustExec(`update userTable
+                 set cashReserved=cashReserved+$1
+                 where userId=$2`, numberOfShares * limitPrice, userId)
+}
+
+func ZeroReserveCashOfAllUsers(db *sqlx.DB) {
+    db.MustExec(`update userTable
+                 set cashReserved=0`)
 }
 
 func GetAvailableCash(db *sqlx.DB,
                       userId int) int {
     var available int
-    ax := db.MustBegin()
-    err := ax.Select(&available, `select userCash - cashReserved from userTable
+    err := db.Select(&available, `select userCash - cashReserved from userTable
                                  where userId=$1`, userId)
-    ax.Commit()
     if (err != nil) {
         log.Fatalln(err)
     }
@@ -389,17 +408,50 @@ func GetAvailableCash(db *sqlx.DB,
 
 func GetPosition(db *sqlx.DB, ticker string, userId int) Position {
     var position []Position
-    ax := db.MustBegin()
-    err := ax.Select(&position, `select * from positionTable
-                                 where userid=$1 and ticker=$2`, userId,
-        ticker)
-    ax.Commit()
+    err := db.Select(&position, `select * from positionTable
+                                 where userid=$1 and ticker=$2`, userId, ticker)
     if (err != nil) {
         log.Fatalln(err)
     }
     return position[0]
 }
 
+type Pos struct {
+  Ticker string
+  Name   string
+}
+func GetAllUserPositions(db *sqlx.DB, userId int) []Pos {
+  var positions []Pos
+  err := db.Select(&positions, `select positionTable.ticker, name from positionTable join companyTable on positionTable.ticker=companyTable.ticker where userId=$1`, userId)
+  if err != nil {
+    log.Fatalln(err)
+  }
+
+  return positions
+}
+
+func GetAllUserTransactions(db *sqlx.DB, userId int) UserTransactionsResponse {
+  var response UserTransactionsResponse
+  fmt.Println(userId)
+  err1 := db.Select(&response.BuyTransactions, `select ticker, amountTraded, cashTraded,
+        cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
+        timeOfTrade 
+        from transactionTable
+        where buyerId=$1`, userId)
+  if err1 != nil {
+    log.Fatalln(err1)
+  }
+  err2 := db.Select(&response.SellTransactions, `select ticker, amountTraded, cashTraded,
+        cast(cashTraded as float(53))/cast(amountTraded as float(53))/100 as Price,
+        timeOfTrade 
+        from transactionTable
+        where sellerId=$1`, userId)
+  if err2 != nil {
+    log.Fatalln(err2)
+  }
+  fmt.Println(response)
+  return response
+}
 
 func GetAllCompanies(db *sqlx.DB) CompanyList {
     var companyList CompanyList
@@ -425,27 +477,15 @@ func QueryCompanyDataPoints(db *sqlx.DB, ticker string, num int) CompanyDataResp
     return resp
 }
 
-type amounts struct {
-  Amounts []int `db: amount`
-}
-
 func QueryCompanyInfo(db *sqlx.DB, userId int, ticker string) CompanyInfoResponse {
   var resp CompanyInfoResponse
-  var amounts amounts
-
-  err := db.Select(&amounts.Amounts, `select amount
+  err := db.Get(&resp.Amount, `select amount
                                   from positionTable
                                   where ticker=$1 and userId=$2`,
                                   ticker, userId)
 
-
   if err != nil {
-    log.Fatalln(err)
-  }
-  if len(amounts.Amounts) == 0 {
     resp.Amount = 0
-  } else {
-    resp.Amount = amounts.Amounts[0]
   }
   return resp
 }
@@ -455,10 +495,8 @@ func QueryCompanyInfo(db *sqlx.DB, userId int, ticker string) CompanyInfoRespons
  * DATABASE.*/
 func RemoveUser(db *sqlx.DB,
                 userId int) {
-    ax := db.MustBegin()
-    ax.MustExec(`delete from userTable
+    db.MustExec(`delete from userTable
                  where userId=$1`, userId)
-    ax.Commit()
 }
 /*
 func main() {

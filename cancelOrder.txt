@@ -12,4 +12,7 @@ Send this json via post to http://cloud-vm-45-112.doc.ic.ac
      * Bloomberg can request valid tickers by sending a get request to
      * http://cloud-vm-45-112.doc.ic.ac.uk:8080/get-company-list */
     "ticker": any valid ticker
+
+    /* Whether to cancel bid or ask orders. True is bid orders, False is ask. */
+    "bid": true/false
 }

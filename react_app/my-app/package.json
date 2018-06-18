@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "auth0-js": "^9.6.1",
     "react": "^16.4.0",
     "react-d3-basic": "^1.6.11",
     "react-dom": "^16.4.0",
     "react-easy-chart": "^1.0.0",
+    "react-interactive-tutorials": "^0.1.11",
     "react-scripts": "1.1.4"
   },
   "scripts": {

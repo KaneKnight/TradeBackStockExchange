@@ -11,7 +11,8 @@ import (
     "github.com/louiscarteron/WebApps2018/db"
     "github.com/jmoiron/sqlx"
     "github.com/Workiva/go-datastructures/queue"
-    //"fmt"
+    "fmt"
+    "hash/fnv"
 )
 
 var dbConfig = db.DBConfig{
@@ -36,15 +37,25 @@ func init() {
     database = dbConfig.OpenDataBase()
     orderQueue = queue.New(100)
     bookMap = make(map[string]*Book)
+    db.ZeroReserveCashOfAllUsers(database)
 
     //initiate the processor routine
     go processOrder()
+}
+
+func hash(s string) int {
+    h := fnv.New32a()
+    h.Write([]byte(s))
+    return int(h.Sum32())
 }
 
 //orderHandler assume that API is supplied with correct JSON format
 func OrderHandler(c *gin.Context) {
     var orderRequest db.OrderRequest
     c.BindJSON(&orderRequest)
+    if orderRequest.UserId != -1 {
+      orderRequest.UserId = hash(orderRequest.UserIdString)
+    }
 
     var buy bool
     var market bool
@@ -62,7 +73,6 @@ func OrderHandler(c *gin.Context) {
         market = false
         buy = false
     }
-
     price := LimitPrice(orderRequest.LimitPrice * 100)
     order := InitOrder(orderRequest.UserId, buy, market,
         orderRequest.EquityTicker, orderRequest.Amount, price, time.Now())
@@ -70,9 +80,23 @@ func OrderHandler(c *gin.Context) {
     c.JSON(http.StatusOK, nil)
 }
 
+func UserTransactionsHandler(c *gin.Context) {
+  var request db.UserTransactionsRequest
+  var response db.UserTransactionsResponse
+  c.BindJSON(&request)
+  fmt.Println(request.UserIdString)
+  if request.UserId != -1 {
+    request.UserId = hash(request.UserIdString)
+  }
+
+  response = db.GetAllUserTransactions(database, request.UserId)
+  c.JSON(http.StatusOK, response)
+}
+
 func CancelHandler(c *gin.Context) {
     var cancelOrder db.CancelOrderRequest
     c.BindJSON(&cancelOrder)
+    //TODO: check with bloomberg script
 
     CancelOrder(&cancelOrder)
     c.JSON(http.StatusOK, nil)
@@ -83,28 +107,34 @@ func HighestBidLowestAsk(c *gin.Context) {
     c.BindJSON(&priceRequest)
     ticker := priceRequest.Ticker
     response := db.PriceResponse{
-        GetLowestAskOfStock(ticker),
-        GetHighestBidOfStock(ticker)}
+        float64(GetLowestAskOfStock(ticker))/100.0,
+        float64(GetHighestBidOfStock(ticker))/100.0}
     c.JSON(http.StatusOK, response)
 }
 
 func CreateUser(c *gin.Context) {
     var userData db.UserRequest
     c.BindJSON(&userData)
-
-    db.CreateUser(database, userData.UserId, userData.UserName,
-        userData.UserCash * 100)
+    if userData.UserId != -1 {
+      userData.UserId = hash(userData.UserIdString)
+    }
+    if !db.UserExists(database, userData.UserId) {
+      db.CreateUser(database, userData.UserId, 10000000 * 100)
+    }
     c.JSON(http.StatusOK, nil)
 }
 
 func GetPositionData(c *gin.Context) {
     var positionRequest db.PositionRequest
     c.BindJSON(&positionRequest)
+    if positionRequest.UserId != -1 {
+      positionRequest.UserId = hash(positionRequest.UserIdString)
+    }
 
-    response := getPositionResponse(positionRequest.EquityTicker,
-        positionRequest.UserId)
+    var positionResponse db.PositionResponse
+    positionResponse = GetUserPositionsResponse(positionRequest.UserId)
 
-    c.JSON(http.StatusOK, response)
+    c.JSON(http.StatusOK, positionResponse)
 }
 
 //API handler that returns a list of all equity we serve
@@ -118,10 +148,12 @@ func GetCompanyDataPoints(c *gin.Context) {
     var data db.CompanyDataRequest
     c.BindJSON(&data)
 
-    response := db.QueryCompanyDataPoints(database, data.Ticker, data.DataNums)
+    response := db.CompanyDataResponse{make([]db.CompanyData, 1)}
+    response.CompanyData[0] = db.CompanyData{float64(GetLowestAskOfStock(data.Ticker))/100.0}
+    /*response := db.QueryCompanyDataPoints(database, data.Ticker, data.DataNums)
     for i := 0; i < len(response.CompanyData); i++ {
       response.CompanyData[i].Price = Round(response.CompanyData[i].Price, 0.01)
-    }
+    }*/
     c.JSON(http.StatusOK, response)
 }
 
@@ -129,6 +161,9 @@ func GetCompanyDataPoints(c *gin.Context) {
 func GetCompanyInfo(c *gin.Context) {
     var data db.CompanyInfoRequest
     c.BindJSON(&data)
+    if data.UserId != -1 {
+      data.UserId = hash(data.UserIdString)
+    }
 
     response := db.QueryCompanyInfo(database, data.UserId, data.Ticker)
     c.JSON(http.StatusOK, response)
@@ -137,22 +172,22 @@ func GetCompanyInfo(c *gin.Context) {
 //To be run continuously as a goroutine whilst the platform is functioning
 func processOrder() {
     for true {
-        order1 := InitOrder(1, true, false,
-            "AAPL",1, 5000, time.Now())
-        orderQueue.Put(order1)
+        fmt.Println(orderQueue.Len())
         var order *Order
         i, _ := orderQueue.Poll(1, -1) //blocks if orderQueue empty
         order = i[0].(*Order)
         priceOfSale := int(order.LimitPrice) * order.NumberOfShares
+        fmt.Println("casted: " , int(order.LimitPrice))
         /* Checks if buyer can afford and that the seller can sell.*/
         if ((order.Buy && db.UserCanBuyAmountRequested(database, order.UserId,
             priceOfSale)) ||
             !order.Buy && db.UserCanSellAmountOfShares(database,
                 order.UserId, order.CompanyTicker, order.NumberOfShares)) {
 
-            if (order.Buy) {
+            if (order.Buy && order.UserId != -1) {
+              fmt.Println("Here:  ", order.UserId)
                 db.ReserveCash(database, order.UserId,
-                    order.NumberOfShares, int(order.LimitPrice * 100))
+                    order.NumberOfShares, int(order.LimitPrice))
             }
             book := bookMap[order.CompanyTicker]
             if book == nil {
@@ -171,5 +206,3 @@ func processOrder() {
         }
     }
 }
-
-
