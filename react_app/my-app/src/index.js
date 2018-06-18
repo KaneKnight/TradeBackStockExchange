@@ -732,7 +732,7 @@ class CompanyInfo extends React.Component {
       <div className="company_info_cont"> 
         <div className="company_info_text">
           Showing for <u> {this.props.current_company} </u>: 
-          <p> Price: {this.props.current_price} $ {this.props.is_price_up === null ? null : (this.props.is_price_up ? '(up)' : '(down)')} </p>
+          <p> Price: {this.props.current_price} $  </p>
           <p> Currently own {figures === undefined ? "no" : figures} shares. </p>
         </div>
       </div>
@@ -772,11 +772,9 @@ class UserInfo extends React.Component {
       <div className="user_info_cont">
         <div className="user_info_area">
           <div className="info_overview">
-            <span style={{fontSize: "20px", fontWeight: "bold"}}>User Portfolio preview: </span> 
-            <p> Equities owned: </p>
-            <p> Portfolio value: </p>  
-          </div> 
-          <div className="profile_button_cont">
+            {/* <span style={{fontSize: "20px", fontWeight: "bold"}}>User Portfolio preview: </span>  */}
+          {/* </div>  */}
+          {/* <div className="profile_button_cont"> */}
             <button className="view_full_profile_button" onClick={this.handleRenderFullProfile}> Click To View Full Profile </button>  
             {this.state.renderFullProfile ? <FullUserProfile unmountMe={this.handleUnrenderFullProfile}/> : null}
           </div>
@@ -940,7 +938,7 @@ class FullUserProfile extends React.Component {
           <button className="close_user_profile_button" onClick={this.props.unmountMe}>X</button> 
           <p style={{textAlign: "center"}}> Your User Portfolio: </p>
           <div className="user_info_profile_wrapper">
-          <p style={{textAlign: "center"}}> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p> 
+          {/* <p style={{textAlign: "center"}}> Current Amount: {to_stringify.Current_amount} USD (<span style={{color: price_difference >= 0 ? "#53be53" : "#ee5f5b"}}>{price_difference >= 0 ? "Gained" : "Lost"} </span> {Math.abs(price_difference)} USD)</p>  */}
           </div> 
           <p style={{textAlign: "center", textDecoration: "underline"}}> Positions Owned: </p> 
           <div className="positions_held_wrapper">
@@ -1513,7 +1511,7 @@ class ActionConfirmation extends React.Component {
 
     // Current amount is with respect to current price, that updates every graph poll. Can be changed if wanted. 
 
-    var current_amount = this.props.current_price * this.state.number_of_stock;
+    var current_amount = (this.state.action_type === "limit" ? this.state.limit_price : this.props.current_price) * this.state.number_of_stock;
     var amount_left = this.state.user_budget - current_amount;
 
     return (
@@ -1542,7 +1540,7 @@ class ActionConfirmation extends React.Component {
             </div>
           </p>
           <p> Total price: {current_amount}</p>
-          <p style={{color: amount_left > 0 ? "default" : "red"}}> Total funds left: {amount_left}</p> 
+          <br /> 
           <div className="place_order">
             <button className="place_order_button" disabled={amount_left < 0 || this.state.number_of_stock <= 0 || (this.state.action_type === 'limit' && this.state.limit_price <= 0)} onClick={() => this.submitRequest()}> Place order </button> 
           </div>
