@@ -315,8 +315,8 @@ class CompanyList extends React.Component {
     var dummy_data = JSON.stringify(dummy_data_str);
     jQuery.ajaxSetup({async:false});
     $.get(
-      "http://localhost:8080/api/get-company-list",
-      //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-list",
+      //"http://localhost:8080/api/get-company-list",
+      "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-list",
       res => {
         result = res.results;
       }
@@ -686,8 +686,8 @@ function getFigures(comp) {
   var temp;
   jQuery.ajaxSetup({async:false});
   $.post(
-    "http://localhost:8080/api/get-company-info",
-    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
+    //"http://localhost:8080/api/get-company-info",
+    "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
     dummy_data,
     res => {
       temp = res.Amount;  
@@ -1497,8 +1497,8 @@ class ActionConfirmation extends React.Component {
     jQuery.ajaxSetup({async:false});
     var url_type = this.props.button_name.toLowerCase();
     $.post(
-      //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
-      "http://localhost:8080/api/" + url_type,
+      "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/" + url_type,
+      //"http://localhost:8080/api/" + url_type,
       data,
       res => {
         this.setState({renderSubmitted: true})
