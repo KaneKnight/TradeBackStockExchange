@@ -243,7 +243,7 @@ func (b *Book) canFillSellOrder(order *Order) bool {
     for (amountLeftToFill > 0 && (currentPrice.Price >= order.
         LimitPrice || order.MarketOrder)) {
         amountLeftToFill -= currentPrice.Size
-        isNextPrice, newPrice, _ := b.SellTree.Previous(
+        isNextPrice, newPrice, _ := b.BuyTree.Previous(
             currentPrice.
                 Price)
         if (isNextPrice) {
@@ -326,7 +326,7 @@ func (b *Book) CalculateTransactionsSell(order *Order) *[]*db.Transaction {
             currentPrice.TotalVolume += buyOrder.NumberOfShares
             currentPrice.UserOrderMap[buyOrder.UserId].PopFromList()
         } else {
-            isNextPrice, newPrice, _ := b.BuyTree.Next(currentPrice.Price)
+            isNextPrice, newPrice, _ := b.BuyTree.Previous(currentPrice.Price)
             if (isNextPrice) {
                 currentPrice = b.BuyLimitMap[newPrice.(LimitPrice)]
                 b.HighestBuy = currentPrice
