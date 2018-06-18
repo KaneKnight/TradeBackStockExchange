@@ -277,7 +277,7 @@ func (b *Book) CalculateTransactionsBuy(order *Order) *[]*db.Transaction {
                     time.Now())
               } else {
                 cashTraded = sellOrder.NumberOfShares * int(currentPrice.Price)
-                transaction = InitTransaction(order.UserId, sellOrder.UserId, 
+                transaction = InitTransaction(order.UserId, sellOrder.UserId,
                     order.CompanyTicker, sellOrder.NumberOfShares, cashTraded,
                     time.Now())
               }

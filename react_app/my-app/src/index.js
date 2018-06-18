@@ -446,7 +446,7 @@ function getInitialDataForGraph(comp) {
   jQuery.ajaxSetup({async:false});
   $.post(
     "http://localhost:8080/api/get-datapoints",
-    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
+    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-datapoints",
     data,
     res => {
       console.log(res.data[0].Price);
@@ -492,7 +492,7 @@ function getNextDataPointForGraph(comp) {
   jQuery.ajaxSetup({async:false});
   $.post(
     "http://localhost:8080/api/get-datapoints",
-    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-company-info",
+    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-datapoints",
     data,
     res => {
       temp = res.data[0].Price;  

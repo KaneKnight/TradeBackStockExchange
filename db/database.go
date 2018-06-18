@@ -142,7 +142,7 @@ type CompanyData struct {
 }
 
 type CompanyInfoRequest struct {
-  UserIdString string `json:"UserId"`
+  UserIdString string `json:"userIdString"`
   Ticker       string `json:"Ticker"`
   UserId       int    `json:"userId"`
 }
@@ -477,27 +477,15 @@ func QueryCompanyDataPoints(db *sqlx.DB, ticker string, num int) CompanyDataResp
     return resp
 }
 
-type amounts struct {
-  Amounts []int `db: amount`
-}
-
 func QueryCompanyInfo(db *sqlx.DB, userId int, ticker string) CompanyInfoResponse {
   var resp CompanyInfoResponse
-  var amounts amounts
-
-  err := db.Select(&amounts.Amounts, `select amount
+  err := db.Get(&resp.Amount, `select amount
                                   from positionTable
                                   where ticker=$1 and userId=$2`,
                                   ticker, userId)
 
-
   if err != nil {
-    log.Fatalln(err)
-  }
-  if len(amounts.Amounts) == 0 {
     resp.Amount = 0
-  } else {
-    resp.Amount = amounts.Amounts[0]
   }
   return resp
 }
