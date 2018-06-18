@@ -15,9 +15,9 @@ os.sys.path.insert(0, parentdir)
 
 SPREAD = 0.01
 # Test Server
-SERVER_URL = "http://localhost:8080/api/"
+# SERVER_URL = "http://localhost:8080/api/"
 # Deployed Server
-# SERVER_URL = 'http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/'
+SERVER_URL = 'http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/'
 REQUEST_TYPES = {
     'order': 'order',
     'price': 'highest-bid-lowest-ask',

@@ -125,7 +125,8 @@ function sendExistingUserCheck() {
   var string_data = {"userIdString" : JSON.parse(localStorage.getItem("profile")).sub};
   var data = JSON.stringify(string_data);
   $.post(
-    "http://localhost:8080/api/check-user-exists",
+    //"http://localhost:8080/api/check-user-exists",
+    "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/check-user-exists",
     data,
     res => {
       console.log("Finished checking user");  
@@ -445,8 +446,8 @@ function getInitialDataForGraph(comp) {
   
   jQuery.ajaxSetup({async:false});
   $.post(
-    "http://localhost:8080/api/get-datapoints",
-    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-datapoints",
+    //"http://localhost:8080/api/get-datapoints",
+    "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-datapoints",
     data,
     res => {
       console.log(res.data[0].Price);
@@ -491,8 +492,8 @@ function getNextDataPointForGraph(comp) {
   
   jQuery.ajaxSetup({async:false});
   $.post(
-    "http://localhost:8080/api/get-datapoints",
-    //"http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-datapoints",
+    //"http://localhost:8080/api/get-datapoints",
+    "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-datapoints",
     data,
     res => {
       temp = res.data[0].Price;  
@@ -795,7 +796,8 @@ function getPositionsForUser() {
   var data = JSON.stringify(data_to_send);
   jQuery.ajaxSetup({async:false});
   $.post(
-    "http://localhost:8080/api/get-all-user-positions",
+    //"http://localhost:8080/api/get-all-user-positions",
+    "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-all-user-positions",
     data,
     res => {
       positions = res;
@@ -840,7 +842,8 @@ function getTransactionHistoryForUser() {
   var data = JSON.stringify(data_to_send);
   jQuery.ajaxSetup({async: false});
   $.post(
-    "http://localhost:8080/api/get-transaction-history",
+    //"http://localhost:8080/api/get-transaction-history",
+    "http://cloud-vm-45-112.doc.ic.ac.uk:8080/api/get-transaction-history",
     data,
     res => {
       transactionHistory[0] = res.BuyTransactions;
